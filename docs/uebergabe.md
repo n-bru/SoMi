@@ -15,7 +15,7 @@
 
 ## Stand
 
-- Version 0.1.1 als Beta und Hauptversion (Freigabe durch Nick am 03.11.2026): Grundgerüst ohne Noten, eigene Farbe Tafelgrün, Logo Notenheft.
+- Version 0.1.2 als Beta und Hauptversion (Freigabe durch Nick am 03.11.2026): Grundgerüst ohne Noten, eigene Farbe Tafelgrün, Logo Notenheft.
 - Entscheidungen (03.11.2026): nur für Nick; eigene Adresse n-bru.github.io/SoMi; App-Sperre standardmäßig an; Klassenarbeiten gehören dazu; Hausaufgaben als abschaltbares Kriterium; Notenskala 1 bis 6 mit + und −; Aufbewahrung 5 Jahre, Löschen nur nach Rückfrage; LE kann Noten bekommen.
 - Kriterien: Mathe nach SILP Mathe 4.2/4.3 (Stand 09/2026), Sport nach SILP Sport Kap. 3 (Stand 03/2021, veraltet).
 
