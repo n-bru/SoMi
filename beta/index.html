@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f6f1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SoMi Beta">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>SoMi Beta</title>
+<style>
+/* SoMi-Farben „Tafelgrün“ (eigene Farbgebung, nicht Sopäd-Team-Design) */
+:root{--bg:#f5f6f1;--card:#fffffe;--ink:#1f2622;--muted:#5e6a63;--line:#dfe5dd;--soft:#ebf0e9;
+--acc:#2e6b57;--acc-ink:#fff;--accs:#dcede4;--up:#3b6e47;--ups:#e4f1e3;--down:#a63a2e;--downs:#f9e1dc;--new:#8a640c;--news:#f8edcf;--sig:#e3a008;--sigt:#8a6200;--sig-ink:#1f2622}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14201b;--card:#1c2a24;--ink:#e8efea;--muted:#a3b3aa;--line:#2c3d35;--soft:#22312a;
+--acc:#7fc4a6;--acc-ink:#10201a;--accs:#24392f;--up:#8ccb98;--ups:#20301f;--down:#f28d7f;--downs:#3b2320;--new:#e8c15f;--news:#382d16;--sig:#f5c542;--sigt:#f5c542;--sig-ink:#14201b}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#14201b;--card:#1c2a24;--ink:#e8efea;--muted:#a3b3aa;--line:#2c3d35;--soft:#22312a;
+--acc:#7fc4a6;--acc-ink:#10201a;--accs:#24392f;--up:#8ccb98;--ups:#20301f;--down:#f28d7f;--downs:#3b2320;--new:#e8c15f;--news:#382d16;--sig:#f5c542;--sigt:#f5c542;--sig-ink:#14201b}
+:root{font-size:16px}:root[data-fs=l]{font-size:18px}:root[data-fs=xl]{font-size:20px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.45 ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
+@media (min-width:900px) and (orientation:landscape){main{max-width:860px;padding-left:24px;padding-right:24px}}
+h1{font-size:1.9rem;font-weight:800;margin:6px 0 12px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+h1::before{content:"";width:14px;height:14px;border-radius:5px;background:var(--acc);transform:rotate(45deg);flex:none}
+h2{font-size:1.1rem;margin:18px 0 8px}
+p{margin:6px 0}
+.muted{color:var(--muted);font-size:.92rem}.small{font-size:.85rem}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:24px;padding:16px;margin-bottom:10px}
+.card.tap{cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit}
+.row{display:flex;gap:10px;align-items:center}.grow{flex:1;min-width:0}
+.between{display:flex;justify-content:space-between;align-items:center;gap:10px}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:10px 14px;font-weight:600;min-height:40px}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.btn.block{width:100%;padding:14px;border-radius:18px}
+.btn.ghost{background:none;border:none;color:var(--acc);padding:8px 4px}
+.btn.danger{color:var(--down)}.btn:disabled{opacity:.45;cursor:default}
+.code{font-weight:800;letter-spacing:.02em;font-size:1.05rem}
+.tag{display:inline-block;background:var(--accs);color:var(--acc);border-radius:6px;padding:1px 7px;font-size:.8rem;font-weight:600}
+.tag.na{background:var(--news);color:var(--new)}.tag.zd{background:var(--ups);color:var(--up)}
+label{display:block;font-weight:600;margin:14px 0 6px}
+.sub{font-weight:400;color:var(--muted);font-size:.86rem;margin:-2px 0 6px}
+input,select,textarea{font:inherit;font-size:max(16px,1rem);color:var(--ink);background:var(--card);border:1.5px solid #b7c3bb;border-radius:12px;padding:11px 12px;width:100%}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--sig);outline-offset:1px}
+textarea{min-height:76px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pick{display:grid;gap:6px;grid-template-columns:repeat(3,1fr)}
+.pick button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:9px 4px;font-weight:700;font-size:.9rem;min-height:40px}
+.pick .on{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.swr{display:flex;align-items:center;gap:12px;margin:10px 0;font-weight:600;cursor:pointer}.swr .sub{display:block;font-weight:400;margin-top:2px}
+input.sw{appearance:none;-webkit-appearance:none;width:50px!important;min-width:50px;height:30px;border-radius:15px;background:var(--line);border:none;position:relative;margin:0;padding:0;transition:background .15s;flex:none}
+input.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+input.sw:checked{background:var(--acc)}input.sw:checked::after{left:23px}
+.kic{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--kc) 22%,var(--card));font-size:1.3rem;line-height:1;border:none;padding:0}
+.icgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-height:50vh;overflow:auto}.icgrid button{font-size:1.6rem;padding:6px 0;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}
+.icgrid .used{opacity:.35}.icgrid .on{border:2px solid var(--acc);background:var(--accs)}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.stat div{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:10px}.stat b{display:block;font-size:1.6rem;color:var(--acc);font-variant-numeric:tabular-nums}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:0 6px max(6px,env(safe-area-inset-bottom));z-index:5}
+nav button{flex:1;min-width:0;background:none;border:none;padding:8px 0 6px;color:var(--muted);font-size:.74rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:4px}
+nav button svg{width:54px;height:30px;padding:3px 15px;border-radius:15px;transition:background .15s}
+nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);max-width:min(92vw,520px);text-align:center;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:50}
+.toast.undo{display:flex;gap:14px;align-items:center;text-align:left}
+.toast.undo button{border:none;background:none;color:var(--bg);font-weight:800;text-decoration:underline;padding:4px 2px;flex:none}
+.cele{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 55%,transparent)}
+.cele .box{background:var(--card);border-radius:28px;padding:22px 20px;max-width:360px;width:90%;max-height:90vh;overflow:auto;box-shadow:0 20px 50px -20px rgba(0,0,0,.35)}
+.duo{display:grid;grid-template-columns:1fr 1.3fr;gap:10px}.duo .btn{padding:12px 10px}
+.marktip{color:var(--sigt);font-weight:800;margin:12px 0 8px}
+.mark{outline:4px solid var(--sig)!important;outline-offset:3px}
+.chk{list-style:none;padding:0;margin:8px 0 12px;display:grid;gap:4px}.chk li.ok{color:var(--muted);text-decoration:line-through}
+.logo{width:34px;height:34px;flex:none}
+.head{display:flex;align-items:center;gap:10px;margin:2px 0 4px}.head .kl{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+/* App-Sperre */
+#lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;padding:24px;overflow:auto}
+#lock .box{max-width:340px;width:100%;text-align:center}
+#lock h1{justify-content:center}#lock h1::before{display:none}
+#lock .pins{display:flex;justify-content:center;gap:14px;margin:18px 0 8px}
+#lock .pins i{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink)}#lock .pins i.on{background:var(--ink)}
+#lock .pins.bad{animation:shake .35s}@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+#lock .keys{display:grid;grid-template-columns:repeat(3,70px);justify-content:center;gap:14px 22px;margin:12px auto 0}
+#lock .keys button{width:70px;height:70px;padding:0;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:1.5rem;font-weight:700}
+#lock .keys button.nb{border:none;background:none;font-size:.8rem;font-weight:600;color:var(--muted)}#lock .keys button.nb:last-child{font-size:1.3rem;color:var(--ink)}
+body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .toast{visibility:hidden}
+@media (prefers-reduced-motion:reduce){#lock .pins.bad{animation:none}}
+@media print{nav,.noprint{display:none!important}main{padding:0}#lock{display:none!important}}
+.betab{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:10px;z-index:50;background:var(--sig,#e3a008);color:#2b2420;font:700 .7rem/1 system-ui,sans-serif;letter-spacing:.06em;padding:5px 8px;border-radius:8px;pointer-events:none}@media print{.betab{display:none}}
+</style>
+</head>
+<body><div class="betab" aria-label="Beta-Version">BETA</div>
+<main id="app"></main>
+<nav id="nav" class="noprint"></nav>
+<script>
+"use strict";
+/* ===== Speicher =====
+   Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
+const SOMI_VERSION="0.1.1 Beta",SOMI_STAND="03.11.2026";
+const KEY="somi-beta";
+const FAECHER=["Mathe","Sport"];
+const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
+const PROFILE={r:"Regel",na:"Nachteilsausgleich",zd:"zieldifferent (LE)"};
+const FRIST_JAHRE=5; // VO-DV I § 9 Abs. 1: „alle übrigen Daten“, ab Ende des Kalenderjahres der Archivierung
+let db;
+// Mit App-Sperre liegt im Speicher nur ein verschlüsselter Umschlag {somiEnc,salt,iv,ct}; db bleibt bis zum Entsperren leer
+let ENCWAIT=null,LKEY=null;
+const leer=()=>({v:1,sus:[],groups:[],del:[]});
+function load(){try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+  if(db?.somiEnc){ENCWAIT=db;db={...leer(),lock:{salt:ENCWAIT.salt,after:ENCWAIT.after??1,len:ENCWAIT.len||4}}}
+  migrate()}
+function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];
+  const n=db.sus.length+db.groups.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);
+  if(db.sus.length+db.groups.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
+function applyTheme(){const t=db?.theme,r=document.documentElement;if(t==="light"||t==="dark")r.dataset.theme=t;else delete r.dataset.theme;
+  if(db?.fs==="l"||db?.fs==="xl")r.dataset.fs=db.fs;else delete r.dataset.fs;
+  const dark=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.querySelector('meta[name=theme-color]')?.setAttribute("content",dark?"#14201b":"#f5f6f1")}
+let SAVEQ=Promise.resolve(),SAVEN=0;
+function save(){if(ENCWAIT)return; // gesperrt und noch nicht entschlüsselt: nichts überschreiben
+  if(db.lock&&LKEY){const n=++SAVEN,key=LKEY,json=JSON.stringify(db),meta={somiEnc:1,salt:db.lock.salt,after:db.lock.after,len:db.lock.len};
+    SAVEQ=SAVEQ.then(async()=>{const body=await gcm(key,enc(json));if(n===SAVEN)localStorage.setItem(KEY,JSON.stringify({...meta,...body}))}).catch(()=>toast("Speichern nicht möglich. Bitte sichern."))}
+  else try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast("Speichern nicht möglich. Bitte sichern.")}}
+
+/* ===== Helfer ===== */
+const $=s=>document.querySelector(s);
+const uid=()=>Math.random().toString(36).slice(2,10);
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const today=()=>iso(new Date());
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// Kennungen in onclick immer über ja(): als JS-Text verpackt und für das HTML-Attribut maskiert
+const ja=s=>esc(JSON.stringify(String(s??"")));
+const dDEy=s=>s?s.slice(8,10)+"."+s.slice(5,7)+"."+s.slice(0,4):"";
+const byNum=(a,b)=>a.localeCompare(b,"de",{numeric:true});
+// Daten aus Dateien: nur gültige Kennungen und Typen, sonst wird der Eintrag abgelehnt
+const okId=s=>typeof s==="string"&&/^[A-Za-z0-9_-]{1,40}$/.test(s),okDate=s=>typeof s==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(s);
+const okStr=(s,n=4000)=>s==null||typeof s==="string"&&s.length<=n,okNum=v=>v==null||typeof v==="number"&&isFinite(v);
+const okSY=s=>typeof s==="string"&&/^\d{4}\/\d{2}$/.test(s);
+function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&okNum(s.upd)}catch(e){return false}}
+function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&okNum(g.upd)}catch(e){return false}}
+const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f)};
+const susById=id=>db.sus.find(s=>s.id===id);
+const groupById=id=>db.groups.find(g=>g.id===id);
+const gName=g=>`${g.cls} ${g.fach}${g.kurs&&g.kurs!=="-"?" "+g.kurs:""}`;
+const looksLikeName=s=>/^[A-ZÄÖÜ][a-zäöüß]{2,}([ -][A-ZÄÖÜ][a-zäöüß]+)*$/.test(s.trim());
+const syNow=()=>{const d=new Date(),y=d.getFullYear()-(d.getMonth()<7?1:0);return `${y}/${String(y+1).slice(2)}`};
+function toast(t){document.querySelectorAll(".toast").forEach(x=>x.remove());const el=document.createElement("div");el.className="toast";el.setAttribute("role","status");el.textContent=t;document.body.appendChild(el);setTimeout(()=>el.remove(),Math.max(1800,t.length*45))}
+let UNDO_T;
+function undoToast(msg,fn,ms=8000){document.querySelectorAll(".toast").forEach(x=>x.remove());const el=document.createElement("div");el.className="toast undo";el.setAttribute("role","status");
+  el.innerHTML=`<span class="grow">${esc(msg)}</span><button>Rückgängig</button>`;el.querySelector("button").onclick=()=>{el.remove();clearTimeout(UNDO_T);fn()};document.body.appendChild(el);clearTimeout(UNDO_T);UNDO_T=setTimeout(()=>el.remove(),ms)}
+const touch=o=>{o.upd=Date.now();return o};
+
+/* ===== Symbole: neutral, nichts, was auf Hobby, Herkunft, Religion oder Aussehen schließen lässt ===== */
+const ICONS=["🦊","🐢","🦉","🐝","🐬","🦋","🐙","🦒","🐧","🦔","🐳","🦜","🐌","🐞","🦁","🐼","🐨","🦓","🦩","🐸","🐠","🦀","🐘","🦭","🐿","🌻","🌵","🍀","🌲","🍄","🌈","⭐","🌙","🚀","⛵","🎈","🪁","🔑","🧭","💎","🍐","🍋","🍉","🫐","🥕","🍒"];
+function freeIcon(cls){const used=new Set(db.sus.filter(s=>!cls||s.cls===cls).map(s=>s.icon)),free=ICONS.filter(i=>!used.has(i));const pool=free.length?free:ICONS;return pool[Math.floor(Math.random()*pool.length)]}
+const susColor=s=>{let h=0;for(const c of s.id+s.code)h=(h*31+c.charCodeAt(0))%360;return `hsl(${h} 55% 60%)`};
+const susIcon=s=>`<span class="kic" style="--kc:${susColor(s)}" aria-hidden="true">${esc(s.icon||"•")}</span>`;
+async function pickIcon(cur,cls){const used=new Set(db.sus.filter(s=>s.cls===cls).map(s=>s.icon));
+  return dlg(`<p style="font-weight:700;margin:0 0 4px">Symbol wählen</p><p class="small muted" style="margin:0 0 10px">Bitte zufällig wählen, nicht passend zur Person. Grau = in der Klasse schon vergeben.</p>
+  <div class="icgrid">${ICONS.map(i=>`<button data-i="${i}" class="${i===cur?"on":""}${used.has(i)&&i!==cur?" used":""}">${i}</button>`).join("")}</div>
+  <div class="duo" style="margin-top:12px"><button class="btn" data-a="0">Abbrechen</button><button class="btn" data-a="r">Zufällig</button></div>`,
+  (el,done)=>{el.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>done(b.dataset.i));el.querySelector('[data-a="0"]').onclick=()=>done(null);el.querySelector('[data-a="r"]').onclick=()=>done(freeIcon(cls))})}
+
+/* ===== Navigation ===== */
+let view={tab:"heute"};
+const LOGO='<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#DCEDE4"/><path d="M20 46v12l3-2.6 3 2.6v-12z" fill="#7FC4A6"/><rect x="14" y="8" width="36" height="44" rx="5" fill="#2E6B57"/><rect x="41" y="7" width="4" height="46" rx="1.5" fill="#1E4A3B"/><rect x="19" y="13" width="17" height="12" rx="2.5" fill="#F5F6F1"/><path d="M23.5 19.2l2.6 2.6 5.2-6" fill="none" stroke="#2E6B57" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ICON={
+heute:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+gruppen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.4-.2 4 1.3 4.5 4.3"/></svg>',
+profil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1"/></svg>'};
+function renderNav(){$("#nav").innerHTML=[["heute","Heute"],["gruppen","Lerngruppen"],["profil","Einstellungen"]].map(([k,t])=>`<button class="${view.tab===k?"on":""}" ${view.tab===k?'aria-current="page"':""} onclick="navTo('${k}')">${ICON[k].replace("<svg ",'<svg aria-hidden="true" ')}${t}</button>`).join("")}
+// Verlauf der Ansichten: „Zurück“ führt dorthin, wo man herkam
+let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,!!v.imp]);
+function go(v){const i=HIST.findIndex(h=>vkey(h)===vkey(v));if(i>=0)HIST.length=i;else if(view&&vkey(view)!==vkey(v))HIST.push(view);view=v;render();window.scrollTo(0,0)}
+function back(){view=HIST.pop()||{tab:view.tab};render();window.scrollTo(0,0)}
+function navTo(k){HIST=[];go({tab:k})}
+function render(){
+  renderNav();const a=$("#app");
+  if(view.imp)a.innerHTML=importV();
+  else if(view.sus)a.innerHTML=susV();
+  else if(view.group)a.innerHTML=groupV();
+  else a.innerHTML={heute:heuteV,gruppen:gruppenV,profil:profilV}[view.tab]();
+  if(view.mark)requestAnimationFrame(()=>$("#app .mark")?.scrollIntoView({block:"center",behavior:"smooth"}));
+}
+
+/* ===== Eigene Dialoge (funktionieren auch dort, wo confirm/prompt blockiert sind) ===== */
+function dlg(html,onMount){return new Promise(res=>{const el=document.createElement("div");el.className="cele"+(LOCKED?" lockdlg":"");el.style.zIndex=LOCKED?120:40;
+  el.innerHTML=`<div class="box" role="dialog" aria-modal="true">${html}</div>`;document.body.appendChild(el);
+  const done=v=>{el.remove();res(v)};el.onclick=e=>{if(e.target===el)done(null)};onMount(el,done)})}
+async function ask(msg,o={}){const r=await dlg(`<p style="font-weight:700;font-size:1.05rem;margin:0 0 ${o.sub?6:16}px">${esc(msg)}</p>${o.sub?`<p class="small muted" style="margin:0 0 16px">${esc(o.sub)}</p>`:""}
+  <div class="duo"><button class="btn" data-a="0">${esc(o.cancel||"Abbrechen")}</button><button class="btn pri" data-a="1" style="${o.danger?"background:var(--down);border-color:var(--down)":""}">${esc(o.ok||"OK")}</button></div>`,
+  (el,done)=>{el.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>done(b.dataset.a==="1"));el.querySelector('[data-a="1"]').focus()});return r===true}
+async function askText(msg,ph,type){return dlg(`<p style="font-weight:700;margin:0 0 10px">${esc(msg)}</p><input id="dlgIn" type="${type||"text"}" autocomplete="${type==="password"?"current-password":"off"}" placeholder="${esc(ph||"")}">
+  <div class="duo" style="margin-top:14px"><button class="btn" data-a="0">Abbrechen</button><button class="btn pri" data-a="1">OK</button></div>`,
+  (el,done)=>{const i=el.querySelector("#dlgIn");i.focus();i.onkeydown=e=>{if(e.key==="Enter")done(i.value)};el.querySelector('[data-a="0"]').onclick=()=>done(null);el.querySelector('[data-a="1"]').onclick=()=>done(i.value)})}
+
+/* ===== Gerät: dauerhafter Speicher, Offline, Home-Bildschirm ===== */
+const isWeb=/^https?:$/.test(location.protocol),standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+try{navigator.storage?.persist?.()}catch(e){}
+if(isWeb&&"serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+function envHint(){if(sessionStorage.getItem("hideEnv"))return "";
+  const x=`<button class="btn ghost small" onclick="sessionStorage.setItem('hideEnv',1);render()">Ausblenden</button>`;
+  if(!isWeb)return `<div class="card" style="border:2px solid var(--new)"><b>Achtung: Vorschau-Modus</b><p class="small" style="margin:6px 0">Die App läuft gerade als Datei. Dort kann das Gerät die Daten jederzeit löschen. Öffne sie über ihre Internetadresse und speichere regelmäßig eine Sicherung.</p>${x}</div>`;
+  if(isIOS&&!standalone)return `<div class="card"><b>Tipp: Als App installieren</b><p class="small" style="margin:6px 0">Tippe in Safari auf „Teilen“ und dann „Zum Home-Bildschirm“. Dann startet SoMi wie eine App, funktioniert offline und Safari löscht die Daten nicht nach einigen Wochen ohne Nutzung. Trag hier im Safari-Tab nichts ein: Das App-Symbol hat einen eigenen Speicher.</p>${x}</div>`;
+  return ""}
+
+/* ===== Einrichtung: drei Schritte ===== */
+const SETUP=[
+ {k:"lock",t:"Code für die App-Sperre festlegen",done:()=>!!db.lock,tip:"Schalte die App-Sperre ein und lege einen Code fest."},
+ {k:"demo",t:"Fiktive Beispielklasse laden",done:()=>db.groups.length>0,tip:"Tippe auf „Fiktive Beispielklasse laden“."},
+ {k:"backup",t:"Erste Sicherung speichern",done:()=>!!db.lastBackup,tip:"Tippe auf „Sicherung speichern“ und lege ein Passwort fest."}];
+const setupOpen=()=>db.setupDone?[]:SETUP.filter(s=>!s.done());
+function setupCard(){const open=setupOpen();if(!open.length)return "";const nx=open[0];
+  return `<div class="card" style="border:2px solid var(--sig)"><b>Einrichtung: noch ${open.length} von ${SETUP.length} Schritten</b>
+  <ul class="chk">${SETUP.map(s=>`<li class="${s.done()?"ok":""}">${s.done()?"✓":"○"} ${s.t}</li>`).join("")}</ul>
+  <p class="row" style="margin:0;flex-wrap:wrap"><button class="btn pri" onclick="go({tab:'profil',mark:'${nx.k}'})">${nx.t}</button><span class="grow"></span><button class="btn ghost small" onclick="db.setupDone=1;save();render()">Später</button></p></div>`}
+function markFor(k){if(view.tab!=="profil"||!view.mark)return null;
+  const s=SETUP.find(x=>x.k===view.mark);
+  if(s&&s.done()){const nx=SETUP.find(x=>!x.done());view.mark=nx?nx.k:null;if(!nx){db.setupDone=1;save();setTimeout(()=>toast("Einrichtung fertig"),400)}}
+  return view.mark===k?SETUP.find(x=>x.k===k).tip:null}
+const mk=k=>markFor(k)?" mark":"";
+const mtip=k=>{const t=markFor(k);return t?`<div class="marktip">↓ ${t}</div>`:""};
+
+/* ===== Heute ===== */
+const own=()=>db.groups.filter(g=>!g.demo);
+function backupHint(){const n=own().length,last=db.lastBackup||0,days=(Date.now()-last)/864e5;
+  if(!n||days<3)return ""; // Noten wiegen schwerer: Erinnerung nach 3 Tagen (Pfad: 5)
+  return `<div class="card row"><div class="grow small"><b>Sicherung fällig.</b> ${last?`Letzte vor ${Math.floor(days)} Tagen.`:"Noch keine Sicherung."} Ohne Sicherung sind die Daten weg, wenn das Gerät verloren geht, das App-Symbol gelöscht oder der Browserspeicher geleert wird.</div><button class="btn pri" onclick="exportJSON()">Sichern</button></div>`}
+// Aufbewahrung: 5 Jahre ab Ende des Kalenderjahres, in dem die Lerngruppe archiviert wurde. Gelöscht wird nur nach Rückfrage.
+const keepUntil=g=>`${+g.arch.slice(0,4)+FRIST_JAHRE}-12-31`;
+const due=()=>db.groups.filter(g=>g.arch&&!g.demo&&keepUntil(g)<today());
+function dueHint(){const d=due();if(!d.length)return "";
+  return `<div class="card" style="border:2px solid var(--new)"><b>Aufbewahrungsfrist abgelaufen</b><p class="small" style="margin:6px 0 8px">Diese archivierten Lerngruppen musst du nicht mehr aufbewahren: ${d.map(g=>esc(gName(g))+" ("+esc(g.sy)+")").join(", ")}. Prüfe, ob du sie löschen möchtest. SoMi löscht nichts von selbst.</p>
+  <p class="row" style="flex-wrap:wrap;margin:0">${d.map(g=>`<button class="btn" onclick="go({tab:'gruppen',group:${ja(g.id)}})">${esc(gName(g))} ansehen</button>`).join("")}</p></div>`}
+function heuteV(){
+  const dateLong=new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"});
+  const act=db.groups.filter(g=>!g.arch).sort((a,b)=>byNum(gName(a),gName(b)));
+  let h=`<div class="head">${LOGO}<span class="kl"><b>HBG Köln</b> · SoMi</span></div><p class="muted">${dateLong}</p><h1>Heute</h1>${envHint()}${setupCard()}${backupHint()}${dueHint()}`;
+  h+=`<div class="stat"><div>Lerngruppen<b>${act.length}</b><span class="muted small">aktiv</span></div><div>Schüler:innen<b>${new Set(act.flatMap(g=>g.members)).size}</b><span class="muted small">in aktiven Gruppen</span></div><div>Archiv<b>${db.groups.filter(g=>g.arch).length}</b><span class="muted small">Gruppen</span></div></div>`;
+  if(!act.length)return h+`<div class="card"><p>Noch keine Lerngruppen.</p><p class="muted">Lege unter „Lerngruppen“ eine Gruppe an oder lade unter „Einstellungen“ die fiktive Beispielklasse.</p><p><button class="btn pri" onclick="go({tab:'gruppen',adding:true})">Lerngruppe anlegen</button></p></div>`;
+  h+=`<h2>Deine Lerngruppen</h2>`+act.map(groupCard).join("");
+  return h+`<p class="muted small">Version 0.1: Lerngruppen und Kürzel. Noten, Klassenarbeiten, Arbeits- und Sozialverhalten und Rücklauf-Listen folgen in den nächsten Versionen.</p>`}
+const groupCard=g=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)}})"><div class="grow"><div class="code">${esc(gName(g))}${g.demo?' <span class="tag">Beispiel</span>':""}</div><div class="muted small">${esc(g.sy)} · ${g.members.length} Schüler:innen${g.arch?` · archiviert am ${dDEy(g.arch)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`;
+
+/* ===== Lerngruppen ===== */
+let GD=null; // Entwurf „Lerngruppe anlegen“
+function gruppenV(){
+  const act=db.groups.filter(g=>!g.arch).sort((a,b)=>byNum(gName(a),gName(b))),arch=db.groups.filter(g=>g.arch).sort((a,b)=>b.arch.localeCompare(a.arch));
+  if(view.adding&&!GD)GD={fach:"Mathe",cls:"",kurs:"-"};
+  return `<h1>Lerngruppen</h1>
+  ${GD?`<div class="card"><b>Neue Lerngruppe</b>
+    <label>Fach</label><div class="pick" style="grid-template-columns:1fr 1fr">${FAECHER.map(f=>`<button class="${GD.fach===f?"on":""}" onclick="GD.fach='${f}';render()">${f}</button>`).join("")}</div>
+    <label for="gcls">Klasse</label><input id="gcls" value="${esc(GD.cls)}" placeholder="z. B. 7B" maxlength="20" oninput="GD.cls=this.value">
+    <label>Kurs</label><div class="sub">Mathe hat ab Klasse 7 E- und G-Kurse. Danach richtet sich später der Notenschlüssel.</div><div class="pick">${Object.entries(KURSE).map(([k,t])=>`<button class="${GD.kurs===k?"on":""}" onclick="GD.kurs='${k}';render()">${t}</button>`).join("")}</div>
+    <div class="duo" style="margin-top:14px"><button class="btn" onclick="GD=null;view.adding=false;render()">Abbrechen</button><button class="btn pri" onclick="addGroup()">Anlegen</button></div></div>`
+  :`<p><button class="btn pri" onclick="GD={fach:'Mathe',cls:'',kurs:'-'};render();$('#gcls')?.focus()">+ Lerngruppe</button></p>`}
+  ${act.length?act.map(groupCard).join(""):`<p class="muted">Noch keine aktiven Lerngruppen.</p>`}
+  ${arch.length?`<details class="card"><summary style="font-weight:800">Archiv (${arch.length})</summary><p class="muted small">Archivierte Gruppen sind nur lesbar. Aufbewahrung ${FRIST_JAHRE} Jahre ab Ende des Kalenderjahres der Archivierung (VO-DV I § 9).</p>${arch.map(groupCard).join("")}</details>`:""}`}
+function addGroup(){const cls=GD.cls.trim().toUpperCase();if(!cls)return toast("Bitte die Klasse eintragen, z. B. 7B.");
+  if(looksLikeName(GD.cls))return toast("Bitte nur die Klasse eintragen, keinen Namen.");
+  if(db.groups.some(g=>!g.arch&&g.cls===cls&&g.fach===GD.fach&&(g.kurs||"-")===GD.kurs))return toast("Diese Lerngruppe gibt es schon.");
+  const g=touch({id:uid(),fach:GD.fach,cls,kurs:GD.kurs,sy:syNow(),members:[],arch:null});db.groups.push(g);GD=null;save();go({tab:"gruppen",group:g.id})}
+let SD=null; // Entwurf „Schüler:in hinzufügen“
+const nextCode=cls=>{let i=1;const taken=new Set(db.sus.map(s=>s.code.toLowerCase()));while(taken.has(`${cls}-${String(i).padStart(2,"0")}`.toLowerCase()))i++;return `${cls}-${String(i).padStart(2,"0")}`};
+function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};return gruppenV()}
+  const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code)),ro=!!g.arch;
+  const others=db.sus.filter(s=>!g.members.includes(s.id)&&s.cls===g.cls).sort((a,b)=>byNum(a.code,b.code));
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
+  <h1>${esc(gName(g))}</h1><p class="muted">${esc(g.sy)} · ${KURSE[g.kurs||"-"]} · ${ms.length} Schüler:innen${g.demo?" · fiktives Beispiel":""}</p>
+  ${ro?`<div class="card" style="border:2px solid var(--line)"><b>Archiviert am ${dDEy(g.arch)}</b><p class="small" style="margin:6px 0">Aufbewahren bis ${dDEy(keepUntil(g))}. Danach fragt SoMi, ob du die Gruppe löschen möchtest.</p>
+    <p class="row" style="flex-wrap:wrap;margin:0"><button class="btn" onclick="unarchive(${ja(g.id)})">Wieder aktivieren</button><button class="btn ghost danger" onclick="delGroup(${ja(g.id)})">Löschen</button></p></div>`:""}
+  ${ro?"":SD?`<div class="card"><b>Schüler:in hinzufügen</b>
+    <div class="sub" style="margin-top:6px">Nur Kürzel nach dem Muster Klasse-Nummer, keine Namen, keine Initialen.</div>
+    <label for="scode">Kürzel</label><input id="scode" value="${esc(SD.code)}" maxlength="40" oninput="SD.code=this.value">
+    <div class="duo" style="margin-top:14px"><button class="btn" onclick="SD=null;render()">Abbrechen</button><button class="btn pri" onclick="addSus(${ja(g.id)})">Hinzufügen</button></div></div>`
+    :`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="SD={code:nextCode(${ja(g.cls)})};render();$('#scode')?.focus()">+ Schüler:in</button>${others.length?`<button class="btn" onclick="addExisting(${ja(g.id)})">Aus Klasse ${esc(g.cls)} übernehmen</button>`:""}</p>`}
+  ${ms.length?ms.map(s=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)},sus:${ja(s.id)}})">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${(s.profil||"r")!=="r"?`<span class="tag ${s.profil}">${esc(PROFILE[s.profil])}${s.profil==="zd"?(s.zdNote?" · mit Note":" · Bericht"):""}</span>`:`<span class="muted small">Regel</span>`}</div><span aria-hidden="true" class="muted">›</span></button>`).join(""):`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
+  ${ro?"":`<div class="card"><b>Schuljahresende</b><p class="small muted" style="margin:6px 0 10px">Archivieren macht die Gruppe nur noch lesbar. Die Daten bleiben ${FRIST_JAHRE} Jahre erhalten (VO-DV I § 9). Gelöscht wird erst nach deiner Bestätigung.</p><button class="btn" onclick="archive(${ja(g.id)})">Lerngruppe archivieren</button></div>`}`}
+function addSus(gid){const g=groupById(gid),code=SD.code.trim();if(!code)return toast("Bitte ein Kürzel eintragen.");
+  if(looksLikeName(code)||!/\d/.test(code)||!/^[A-Za-z0-9ÄÖÜäöü_-]{2,20}$/.test(code))return toast("Bitte nur ein Kürzel wie 7B-01 verwenden, keinen Namen.");
+  let s=db.sus.find(x=>x.code.toLowerCase()===code.toLowerCase());
+  if(s&&g.members.includes(s.id))return toast("Schon in dieser Gruppe.");
+  if(!s){s=touch({id:uid(),code,cls:g.cls,icon:freeIcon(g.cls),profil:"r",na:"",zdNote:false});db.sus.push(s)}
+  g.members.push(s.id);touch(g);SD={code:nextCode(g.cls)};save();render();toast(`${code} hinzugefügt`);$("#scode")?.focus()}
+async function addExisting(gid){const g=groupById(gid),ks=db.sus.filter(s=>!g.members.includes(s.id)&&s.cls===g.cls).sort((a,b)=>byNum(a.code,b.code));
+  const sel=await dlg(`<p style="font-weight:700;margin:0 0 6px">Aus Klasse ${esc(g.cls)} übernehmen</p><p class="small muted" style="margin:0 0 10px">Diese Kürzel gibt es schon in einer anderen Lerngruppe. Profil und Symbol bleiben gleich.</p>
+    <div style="max-height:46vh;overflow:auto">${ks.map(s=>`<label class="row" style="margin:6px 0;font-weight:600"><input type="checkbox" style="width:auto" value="${esc(s.id)}" checked> ${esc(s.icon||"")} ${esc(s.code)}</label>`).join("")}</div>
+    <div class="duo" style="margin-top:14px"><button class="btn" data-a="0">Abbrechen</button><button class="btn pri" data-a="1">Übernehmen</button></div>`,
+    (el,done)=>{el.querySelector('[data-a="0"]').onclick=()=>done(null);el.querySelector('[data-a="1"]').onclick=()=>done([...el.querySelectorAll("input:checked")].map(i=>i.value))});
+  if(!sel?.length)return;sel.forEach(id=>susById(id)&&g.members.push(id));touch(g);save();render();toast(`${sel.length} übernommen`)}
+async function archive(gid){const g=groupById(gid);
+  if(!await ask(`${gName(g)} archivieren?`,{ok:"Archivieren",sub:`Die Gruppe ist danach nur noch lesbar. Aufbewahren bis ${dDEy(`${new Date().getFullYear()+FRIST_JAHRE}-12-31`)}.`}))return;
+  g.arch=today();touch(g);save();render();undoToast("Archiviert",()=>{g.arch=null;touch(g);save();render()})}
+function unarchive(gid){const g=groupById(gid);g.arch=null;touch(g);save();render();toast("Wieder aktiv")}
+async function delGroup(gid){const g=groupById(gid),early=!g.demo&&g.arch&&keepUntil(g)>=today();
+  if(!await ask(`${gName(g)} (${g.sy}) endgültig löschen?`,{ok:"Endgültig löschen",danger:true,sub:early?`Achtung: Die Aufbewahrungsfrist läuft noch bis ${dDEy(keepUntil(g))}. Lösche nur, wenn die Daten anderswo aufbewahrt sind.`:"Das lässt sich nicht rückgängig machen. Hast du eine Sicherung?"}))return;
+  if(early&&!await ask("Wirklich vor Ablauf der Frist löschen?",{ok:"Ja, löschen",danger:true}))return;
+  // Schüler:innen, die in keiner anderen Gruppe sind, gehen mit
+  const keep=new Set(db.groups.filter(x=>x.id!==gid).flatMap(x=>x.members)),gone=g.members.filter(id=>!keep.has(id));
+  db.groups=db.groups.filter(x=>x.id!==gid);db.sus=db.sus.filter(s=>!gone.includes(s.id));db.del.push(gid,...gone);save();go({tab:"gruppen"});toast("Gelöscht")}
+
+/* ===== Schüler:in ===== */
+function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){view={tab:"gruppen",group:view.group};return groupV()}
+  const ro=!!g.arch,p=s.profil||"r",dis=ro?"disabled":"";
+  const inG=db.groups.filter(x=>x.members.includes(s.id)).map(gName);
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
+  <div class="row" style="margin:6px 0 12px"><button class="kic" style="--kc:${susColor(s)};width:52px;height:52px;font-size:1.8rem" aria-label="Symbol ändern" ${dis} onclick="setIcon(${ja(s.id)})">${esc(s.icon||"•")}</button><h1 class="grow" style="margin:0">${esc(s.code)}</h1></div>
+  <p class="muted small">In: ${inG.map(esc).join(", ")}</p>
+  <div class="card"><b>Profil</b><div class="sub" style="margin-top:6px">Gilt in allen Lerngruppen. Der Förderschwerpunkt wird bewusst nicht gespeichert.</div>
+  <div class="pick" style="margin-top:8px">${Object.entries(PROFILE).map(([k,t])=>`<button class="${p===k?"on":""}" ${dis} onclick="setProfil(${ja(s.id)},'${k}')">${t}</button>`).join("")}</div>
+  ${p==="na"?`<label for="na">Nachteilsausgleich</label><div class="sub">Z. B. mehr Zeit, mündlich statt schriftlich, Ersatzaufgabe im Sport. Keine Diagnosen eintragen.</div><textarea id="na" ${dis} maxlength="2000" onchange="setNA(${ja(s.id)},this.value)">${esc(s.na)}</textarea>`:""}
+  ${p==="zd"?`<label class="swr"><span class="grow">Note im Zeugnis<span class="sub">Aus: Leistungsbeschreibung als Bericht. An: Note auf Grundlage der Förderplanziele.</span></span><input type="checkbox" class="sw" ${s.zdNote?"checked":""} ${dis} onchange="setZd(${ja(s.id)},this.checked)"></label><p class="muted small">Die Förderplanziele als Bewertungskriterien kommen in einer späteren Version.</p>`:""}</div>
+  ${ro?"":`<p><button class="btn ghost danger" onclick="removeFromGroup(${ja(g.id)},${ja(s.id)})">Aus ${esc(gName(g))} entfernen</button></p>`}`}
+async function setIcon(id){const s=susById(id),i=await pickIcon(s.icon,s.cls);if(!i)return;s.icon=i;touch(s);save();render()}
+function setProfil(id,p){const s=susById(id);s.profil=p;touch(s);save();render()}
+function setNA(id,v){const s=susById(id);if(looksLikeName(v.split(/\s+/)[0]||""))toast("Bitte keine Namen eintragen.");s.na=v.trim();touch(s);save();toast("Gespeichert")}
+function setZd(id,v){const s=susById(id);s.zdNote=v;touch(s);save();render()}
+async function removeFromGroup(gid,sid){const g=groupById(gid),s=susById(sid);
+  if(!await ask(`${s.code} aus ${gName(g)} entfernen?`,{ok:"Entfernen"}))return;
+  const old=g.members.slice();g.members=g.members.filter(x=>x!==sid);touch(g);save();back();
+  undoToast(`${s.code} entfernt`,()=>{g.members=old;touch(g);save();render()})}
+
+/* ===== Einstellungen ===== */
+function profilV(){
+  return `<h1>Einstellungen</h1>
+  <div class="card"><b>Erscheinungsbild</b><div class="pick" style="margin-top:10px">${[["system","Wie Gerät"],["light","Hell"],["dark","Dunkel"]].map(([k,t])=>`<button class="${(db.theme||"system")===k?"on":""}" onclick="db.theme='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div>
+  <div class="sub" style="margin:14px 0 6px;font-weight:700">Schriftgröße</div><div class="pick">${[["m","Normal"],["l","Groß"],["xl","Sehr groß"]].map(([k,t])=>`<button class="${(db.fs||"m")===k?"on":""}" onclick="db.fs='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div></div>
+  ${lockV()}
+  <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen auf diesem Gerät</p>
+  ${mtip("backup")}<p class="row" style="flex-wrap:wrap"><button class="btn pri${mk("backup")}" onclick="exportJSON()">Sicherung speichern</button><button class="btn" onclick="$('#imp').click()">Sicherung laden</button></p>
+  <input type="file" id="imp" accept=".json,application/json" hidden onchange="importJSON(this)">
+  <p class="muted small">${db.lastBackup?`Letzte Sicherung: ${dDEy(iso(new Date(db.lastBackup)))}. `:""}Sichere spätestens alle 3 Tage und vor jedem Gerätewechsel. Laden ergänzt nur: Neues kommt dazu, bei gleichen Einträgen gilt die neuere Fassung.</p>
+  ${db.bsalt?`<p class="small">Sicherungs-Passwort ist auf diesem Gerät gemerkt. <button class="btn ghost small" onclick="forgetBackupPw()">Vergessen</button></p>`:""}
+  ${mtip("demo")}<p class="row" style="flex-wrap:wrap">${db.groups.some(g=>g.demo)?`<button class="btn" onclick="delDemo()">Beispielklasse entfernen</button>`:`<button class="btn${mk("demo")}" onclick="demo()">Fiktive Beispielklasse laden</button>`}</p>
+  <p><button class="btn ghost danger" onclick="wipe()">Alle Daten auf diesem Gerät löschen</button></p></div>
+  <div class="card"><h2 style="margin-top:0">Aufbewahrung</h2><p class="small">Noten und Beobachtungen bewahrst du ${FRIST_JAHRE} Jahre auf, gerechnet ab Ende des Kalenderjahres, in dem die Lerngruppe archiviert wurde (VO-DV I § 9 Abs. 1). SoMi erinnert dich, wenn die Frist abgelaufen ist. Gelöscht wird nur nach deiner Bestätigung.</p><p class="muted small">Die Frist bitte mit der:dem Datenschutzbeauftragten bestätigen.</p></div>
+  <div class="card"><h2 style="margin-top:0">Datenschutz</h2>
+  <p>Die Daten liegen nur auf diesem Gerät. Sie verlassen es nur als verschlüsselte Sicherungsdatei.</p>
+  <p>Lege Schüler:innen nur mit Kürzel an (z. B. 7B-01). Keine Namen, keine Initialen. Die Zuordnung Kürzel zu Name liegt außerhalb der App.</p>
+  <p>Der Förderschwerpunkt wird nicht gespeichert, nur das Profil.</p>
+  <p>Sicherungen nur auf dienstlichem Speicher ablegen, nicht in einer privaten Cloud. Nutze nur dienstliche Geräte mit Code-Sperre.</p>
+  <p>Vor dem Einsatz mit echten Noten: Absprache mit Schulleitung und Datenschutzbeauftragten.</p></div>
+  <p class="muted small" style="text-align:center">SoMi ${SOMI_VERSION} · Stand ${SOMI_STAND} · nur für den eigenen Unterricht</p>`}
+function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+async function giveFile(name,txt,type="application/json"){const file=new File([txt],name,{type});
+  if(matchMedia("(pointer:coarse)").matches&&navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file]});return true}catch(e){if(e.name==="AbortError")return false}}
+  download(name,txt,type);return true}
+
+/* ===== Verschlüsselung (Sicherungen) – aus Pfad ===== */
+const b64=u=>{let s="";new Uint8Array(u).forEach(c=>s+=String.fromCharCode(c));return btoa(s)},unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const enc=x=>new TextEncoder().encode(typeof x==="string"?x:JSON.stringify(x)),dec=b=>new TextDecoder().decode(b);
+const rnd=n=>crypto.getRandomValues(new Uint8Array(n));
+async function pwKey(pw,salt){const base=await crypto.subtle.importKey("raw",enc(pw),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:310000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function gcm(key,data){const iv=rnd(12);return {iv:b64(iv),ct:b64(await crypto.subtle.encrypt({name:"AES-GCM",iv},key,data))}}
+const ungcm=(key,o)=>crypto.subtle.decrypt({name:"AES-GCM",iv:unb64(o.iv)},key,unb64(o.ct));
+async function idb(){return new Promise((ok,no)=>{const r=indexedDB.open("somi-beta",1);r.onupgradeneeded=()=>r.result.createObjectStore("h");r.onsuccess=()=>ok(r.result);r.onerror=no})}
+async function idbGet(k){const d=await idb();return new Promise(ok=>{const r=d.transaction("h").objectStore("h").get(k);r.onsuccess=()=>ok(r.result);r.onerror=()=>ok(null)})}
+async function idbSet(k,v){const d=await idb();return new Promise(ok=>{const t=d.transaction("h","readwrite");v==null?t.objectStore("h").delete(k):t.objectStore("h").put(v,k);t.oncomplete=ok})}
+async function askNewPw(msg){const pw=await askText(msg,"Passwort (mind. 8 Zeichen)","password");if(!pw)return null;if(pw.length<8){toast("Mindestens 8 Zeichen");return null}
+  if(await askText("Passwort wiederholen","Passwort","password")!==pw){toast("Passwörter sind verschieden");return null}return pw}
+// Passwort einmal festlegen; der daraus abgeleitete Schlüssel bleibt nicht auslesbar auf dem Gerät
+async function backupKey(){let k=null;try{k=await idbGet("bkey")}catch(e){}if(k&&db.bsalt)return {key:k,salt:db.bsalt};
+  const pw=await askNewPw("Lege ein Passwort für deine Sicherungen fest. Du brauchst es, um eine Sicherung auf einem anderen Gerät zu laden.");if(!pw)return null;
+  const salt=b64(rnd(16));k=await pwKey(pw,unb64(salt));
+  if(await ask("Passwort auf diesem Gerät merken? Dann geht jede Sicherung mit einem Tipp.",{ok:"Merken",cancel:"Jedes Mal fragen"})){db.bsalt=salt;try{await idbSet("bkey",k)}catch(e){}save()}
+  return {key:k,salt}}
+async function forgetBackupPw(){await idbSet("bkey",null);delete db.bsalt;save();render();toast("Sicherungs-Passwort vergessen")}
+async function sealFile(payload,keyInfo){const body=await gcm(keyInfo.key,enc(payload));
+  return JSON.stringify({somi:1,art:"sicherung",erstellt:new Date().toISOString(),salt:keyInfo.salt,...body})}
+async function openFile(o){if(o.somi!==1||!o.salt)throw new Error("format");
+  for(;;){const pw=await askText("Passwort der Sicherung","Passwort","password");if(!pw)return null;
+    try{return JSON.parse(dec(await ungcm(await pwKey(pw,unb64(o.salt)),o)))}catch(e){toast("Passwort falsch")}}}
+const backupName=()=>`somi-sicherung-${today()}.json`;
+async function exportJSON(){if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
+  const ki=await backupKey();if(!ki)return;
+  if(!db.backupTip&&!await backupTip())return;
+  const {bsalt,lock,...rest}=db,payload={...rest,groups:db.groups.filter(g=>!g.demo),sus:db.sus.filter(s=>!s.demo)};
+  if(!await giveFile(backupName(),await sealFile(payload,ki)))return;
+  db.lastBackup=Date.now();db.backupTip=1;save();render();toast(isIOS?"Sicherung erstellt. Sie liegt in „Dateien“ → „Auf meinem iPad“.":"Sicherung erstellt.")}
+async function backupTip(){const steps=isIOS?[`Gleich öffnet sich das Teilen-Fenster. Tippe dort auf <b>„In Dateien sichern“</b>.`,`Wähle <b>„Auf meinem iPad“</b>. Lege beim ersten Mal einen Ordner <b>„SoMi“</b> an und öffne ihn.`,`Tippe auf <b>„Sichern“</b>. Bei späteren Sicherungen wählst du wieder diesen Ordner.`]
+    :[`Die Datei landet im Ordner <b>„Downloads“</b>.`,`Verschiebe sie in einen eigenen Ordner <b>„SoMi“</b> auf deinem Dienstgerät.`];
+  return dlg(`<p style="font-weight:700;font-size:1.05rem;margin:0 0 8px">Wohin mit der Sicherung?</p>
+  <p class="small" style="margin:0 0 8px">Die Sicherung ist eine verschlüsselte Datei. Sie muss in den Dateien auf deinem Dienstgerät liegen, sonst hilft sie im Notfall nicht.</p>
+  <ol class="small" style="padding-left:20px;margin:0 0 8px">${steps.map(x=>`<li style="margin:6px 0">${x}</li>`).join("")}</ol>
+  <p class="small muted" style="margin:0 0 14px">Lade die Sicherung nicht in eine private Cloud hoch.</p>
+  <div class="duo"><button class="btn" data-a="0">Abbrechen</button><button class="btn pri" data-a="1">Verstanden</button></div>`,(el,done)=>{el.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>done(b.dataset.a==="1"));el.querySelector('[data-a="1"]').focus()}).then(v=>v===true)}
+// Zusammenführen: pro Eintrag gilt die neuere Fassung (upd), Löschungen werden übernommen
+function mergeList(mine,theirs,dels){const m=new Map(mine.map(x=>[x.id,x]));let n=0;
+  for(const x of theirs){if(dels.has(x.id))continue;const e=m.get(x.id);if(!e||(x.upd||0)>(e.upd||0)){m.set(x.id,x);n++}}
+  return {list:[...m.values()].filter(x=>!dels.has(x.id)),n}}
+let IMP=null;
+async function importJSON(inp){const f=inp.files[0];inp.value="";if(!f)return;let o,d;
+  try{o=JSON.parse(await f.text())}catch(e){return toast("Datei nicht lesbar")}
+  if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
+  try{d=await openFile(o)}catch(e){return toast("Keine SoMi-Sicherung")}if(!d)return;
+  if(!Array.isArray(d.groups)||!Array.isArray(d.sus))return toast("Keine SoMi-Sicherung");
+  const ng=d.groups.length,ns=d.sus.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);
+  const bad=ng-d.groups.length+ns-d.sus.length;if(bad)toast(`${bad} beschädigte Einträge nicht übernommen`);
+  d.del=(Array.isArray(d.del)?d.del:[]).filter(okId);
+  IMP={o,d,settings:!db.groups.some(g=>!g.demo)};go({tab:"profil",imp:true})}
+function importV(){if(!IMP){view={tab:"profil"};return profilV()}const {o,d}=IMP;
+  const neu=d.groups.filter(g=>!groupById(g.id)).length;
+  return `<button class="btn ghost" onclick="IMP=null;go({tab:'profil'})">‹ Abbrechen</button><h1>Sicherung laden</h1>
+  <p class="muted">Erstellt am ${dDEy((o.erstellt||"").slice(0,10))} · ${d.groups.length} Lerngruppen · ${d.sus.length} Schüler:innen</p>
+  <div class="card"><p class="small">${neu} Lerngruppe${neu===1?"":"n"} sind neu auf diesem Gerät. Vorhandenes wird <b>ergänzt</b>: Bei gleichen Einträgen gilt die neuere Fassung. Nichts wird ersetzt, was hier neuer ist.</p>
+  <label class="row" style="margin:12px 0;font-weight:600"><input type="checkbox" style="width:auto" ${IMP.settings?"checked":""} onchange="IMP.settings=this.checked"> Auch Einstellungen übernehmen (Erscheinungsbild, Schriftgröße)</label></div>
+  <p><button class="btn pri block" onclick="applyImport()">Übernehmen</button></p>`}
+function applyImport(){const d=IMP.d,dels=new Set([...db.del,...d.del]);
+  const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
+  if(IMP.settings)for(const f of ["theme","fs"])if(d[f]!=null&&okSetting[f](d[f]))db[f]=d[f];
+  IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen neu oder aktualisiert`);go({tab:"gruppen"})}
+async function wipe(){if(!await ask("Wirklich alle Daten auf diesem Gerät löschen?",{ok:"Alles löschen",danger:true,sub:"Speichere vorher eine Sicherung. Die Aufbewahrungsfrist gilt auch hier."}))return;
+  const keep={theme:db.theme,fs:db.fs,bsalt:db.bsalt,lock:db.lock,setupDone:db.setupDone};db={...leer(),...keep};save();go({tab:"heute"})}
+async function delDemo(){if(!await ask("Die fiktive Beispielklasse entfernen? Deine eigenen Lerngruppen bleiben.",{ok:"Entfernen"}))return;
+  db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);save();render();toast("Beispielklasse entfernt")}
+function demo(){if(db.groups.some(g=>g.demo))return toast("Beispielklasse ist schon da");
+  const prof=["r","r","na","r","zd","r","r","na"],sus=prof.map((p,i)=>touch({id:uid(),code:`DEMO-${String(i+1).padStart(2,"0")}`,cls:"DEMO",icon:ICONS[i*5%ICONS.length],profil:p,
+    na:p==="na"?(i===2?"Fiktiv: 10 Minuten mehr Zeit bei Klassenarbeiten.":"Fiktiv: Ersatzaufgabe im Sport (Schiedsrichter, Helfen)."):"",zdNote:p==="zd",demo:true}));
+  db.sus.push(...sus);
+  db.groups.push(touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true}),
+    touch({id:uid(),fach:"Sport",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.slice(0,6).map(s=>s.id),arch:null,demo:true}));
+  save();toast("Beispielklasse geladen");go(view.mark?{tab:"profil",mark:"demo"}:{tab:"gruppen"})}
+
+/* ===== App-Sperre mit Verschlüsselung (aus Pfad; in SoMi Standard an) =====
+   Aus dem Code (4 bis 6 Ziffern) wird per PBKDF2 (600 000 Runden) ein AES-Schlüssel. Im Browserspeicher liegen die Daten dann
+   nur verschlüsselt; der Schlüssel bleibt nur im Arbeitsspeicher, solange SoMi entsperrt ist. Code vergessen = Daten weg. */
+let LOCKED=false,LOCKIN="",LOCKFAIL=0,LOCKWAIT=0,HIDDEN_AT=0;
+const FAILKEY=KEY+"-sperre";try{({n:LOCKFAIL=0,bis:LOCKWAIT=0}=JSON.parse(localStorage.getItem(FAILKEY)||"{}"))}catch(e){}
+const saveFail=()=>{try{LOCKFAIL?localStorage.setItem(FAILKEY,JSON.stringify({n:LOCKFAIL,bis:LOCKWAIT})):localStorage.removeItem(FAILKEY)}catch(e){}};
+async function codeKey(code,salt){const base=await crypto.subtle.importKey("raw",enc(code),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt:unb64(salt),iterations:600000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function tryCode(c){const raw=ENCWAIT||JSON.parse(localStorage.getItem(KEY)||"null");if(!raw?.somiEnc)return null;
+  try{const key=await codeKey(c,raw.salt);return {key,data:JSON.parse(dec(await ungcm(key,raw)))}}catch(e){return null}}
+function askCode(msg,sub){return dlg(`<p style="font-weight:700;margin:0 0 6px">${esc(msg)}</p>${sub?`<p class="small muted" style="margin:0 0 10px">${sub}</p>`:""}<input id="dlgIn" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="4 bis 6 Ziffern">
+  <div class="duo" style="margin-top:14px"><button class="btn" data-a="0">Abbrechen</button><button class="btn pri" data-a="1">OK</button></div>`,
+  (el,done)=>{const i=el.querySelector("#dlgIn");i.focus();i.onkeydown=e=>{if(e.key==="Enter")done(i.value)};el.querySelector('[data-a="0"]').onclick=()=>done(null);el.querySelector('[data-a="1"]').onclick=()=>done(i.value)})}
+function lockV(){const L=db.lock;
+  return `<div class="card"><h2 style="margin-top:0">App-Sperre und Verschlüsselung</h2>${mtip("lock")}
+  <label class="swr${mk("lock")}"><span class="grow">SoMi mit Code sperren und verschlüsseln<span class="sub">Zusätzlich zur Gerätesperre. Empfohlen: an.</span></span><input type="checkbox" class="sw" ${L?"checked":""} onchange="this.checked?setLock():offLock()"></label>
+  ${L?`<div class="sub" style="margin:10px 0 6px;font-weight:700">Sperren, wenn SoMi im Hintergrund war</div><div class="pick">${[[0,"Sofort"],[1,"Nach 1 Min."],[5,"Nach 5 Min."]].map(([m,t])=>`<button class="${L.after===m?"on":""}" onclick="db.lock.after=${m};save();render()">${t}</button>`).join("")}</div>
+  <p class="row" style="flex-wrap:wrap;margin-top:10px"><button class="btn" onclick="setLock(true)">Code ändern</button><button class="btn" onclick="lockNow()">Jetzt sperren</button></p>`
+  :`<p class="small" style="color:var(--down);font-weight:700">Die Sperre ist aus. Noten liegen dann unverschlüsselt auf dem Gerät.</p>`}
+  <p class="muted small" style="margin-bottom:0">Ist die Sperre an, liegen die Daten auf diesem Gerät nur verschlüsselt im Speicher. Ein Ziffern-Code schützt vor einem Blick und vor einfachem Auslesen, mit viel Aufwand ließe er sich durchprobieren. Der Gerätecode bleibt deshalb Pflicht. Wer den Code vergisst, kommt nicht mehr an die Daten und muss die letzte Sicherung laden.</p></div>`}
+async function setLock(change){if(!crypto.subtle){toast("In dieser Ansicht nicht möglich. Bitte im Browser öffnen.");return render()}
+  if(change){const c=await askCode("Aktuellen Code eingeben");if(c==null)return;if(!await tryCode(c))return toast("Code falsch")}
+  const a=await askCode(change?"Neuen Code festlegen":"Code für SoMi festlegen","4 bis 6 Ziffern, nicht dein Gerätecode. Du gibst ihn bei jedem Start ein. Vergessen heißt: Die Daten auf diesem Gerät sind weg. Speichere deshalb regelmäßig eine Sicherung.");
+  if(a==null)return render();if(!/^\d{4,6}$/.test(a)){render();return toast("Bitte 4 bis 6 Ziffern.")}
+  if(await askCode("Code wiederholen")!==a){render();return toast("Die Codes stimmen nicht überein.")}
+  const salt=b64(rnd(16));LKEY=await codeKey(a,salt);db.lock={salt,len:a.length,after:db.lock?.after??1};save();await SAVEQ;render();toast(change?"Code geändert":"SoMi ist jetzt gesperrt und verschlüsselt")}
+async function offLock(){if(!await ask("App-Sperre wirklich ausschalten?",{ok:"Ausschalten",danger:true,sub:"Danach liegen Noten und Beobachtungen unverschlüsselt im Speicher dieses Geräts."}))return render();
+  const c=await askCode("Zum Ausschalten Code eingeben");
+  if(c!=null&&await tryCode(c)){delete db.lock;LKEY=null;save();render();toast("App-Sperre ist aus")}else{render();if(c)toast("Code falsch")}}
+function lockNow(){if(!db.lock)return;LOCKED=true;LOCKIN="";document.body.classList.add("locked");document.activeElement?.blur?.();renderLock()}
+function renderLock(msg,busy){let el=$("#lock");if(!LOCKED){el?.remove();return}
+  if(!el){el=document.createElement("div");el.id="lock";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","SoMi ist gesperrt");document.body.appendChild(el)}
+  const wait=Math.ceil((LOCKWAIT-Date.now())/1000),len=db.lock.len||4;
+  el.innerHTML=`<div class="box"><div style="font-size:2.4rem" aria-hidden="true">🔒</div><h1 style="margin:6px 0 4px">SoMi ist gesperrt</h1>
+  <p class="muted" aria-live="polite">${wait>0?`Zu viele Versuche. Warte ${wait} Sekunden.`:busy?"Wird entsperrt …":esc(msg||"Gib deinen Code ein.")}</p>
+  <div class="pins${msg?" bad":""}" aria-hidden="true">${[...Array(len)].map((_,i)=>`<i class="${i<LOCKIN.length?"on":""}"></i>`).join("")}</div>
+  <div class="keys">${[1,2,3,4,5,6,7,8,9].map(n=>`<button onclick="lockPress('${n}')">${n}</button>`).join("")}<button class="nb" onclick="lockForgot()">Vergessen?</button><button onclick="lockPress('0')">0</button><button class="nb" aria-label="Ziffer löschen" onclick="LOCKIN=LOCKIN.slice(0,-1);renderLock()">⌫</button></div></div>`;
+  if(wait>0)setTimeout(()=>LOCKED&&renderLock(),1000)}
+let LOCKBUSY=false;
+async function lockPress(d){if(LOCKWAIT>Date.now()||LOCKBUSY)return;const len=db.lock.len||4;if(LOCKIN.length>=len)return;LOCKIN+=d;renderLock();if(LOCKIN.length<len)return;
+  LOCKBUSY=true;renderLock("",true);const r=await tryCode(LOCKIN);LOCKBUSY=false;LOCKIN="";
+  if(r){LOCKFAIL=0;LOCKWAIT=0;saveFail();LKEY=r.key;if(ENCWAIT){ENCWAIT=null;db=r.data;migrate();applyTheme()}LOCKED=false;document.body.classList.remove("locked");renderLock();render();return}
+  LOCKFAIL++;if(LOCKFAIL>=5)LOCKWAIT=Date.now()+30000*2**Math.min(LOCKFAIL-5,10);saveFail();try{navigator.vibrate?.(80)}catch(e){}renderLock("Falscher Code. Versuch es noch einmal.")}
+async function lockForgot(){if(!await ask("Code vergessen?",{ok:"Alles löschen",danger:true,sub:"Ohne Code lassen sich die Daten nicht entschlüsseln. Du kannst alles auf diesem Gerät löschen und danach deine letzte Sicherung laden."}))return;
+  const keep=ENCWAIT?{}:db;ENCWAIT=null;LKEY=null;
+  db={...leer(),theme:keep.theme,fs:keep.fs,bsalt:keep.bsalt,setupDone:keep.setupDone};migrate();
+  localStorage.removeItem(KEY);save();LOCKED=false;document.body.classList.remove("locked");renderLock();applyTheme();go({tab:"profil"});toast("Alles gelöscht. Lade jetzt deine letzte Sicherung und schalte die Sperre wieder ein.")}
+document.addEventListener("visibilitychange",()=>{if(!db?.lock)return;if(document.hidden){HIDDEN_AT=Date.now();if(!db.lock.after)lockNow()}
+  else if(!LOCKED&&HIDDEN_AT&&Date.now()-HIDDEN_AT>=db.lock.after*6e4)lockNow()});
+document.addEventListener("keydown",e=>{if(!LOCKED||e.target.closest?.(".cele"))return;if(/^\d$/.test(e.key))lockPress(e.key);else if(e.key==="Backspace"){LOCKIN=LOCKIN.slice(0,-1);renderLock()}});
+
+load();applyTheme();matchMedia("(prefers-color-scheme:dark)").addEventListener?.("change",applyTheme);if(db.lock)lockNow();render();
+</script>
+</body>
+</html>
