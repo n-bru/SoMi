@@ -8,6 +8,8 @@ assert cache.startswith("somi-") and not cache.startswith("somi-beta"), "Cache-N
 src = repo / "quelle" / "somi.html"
 assert 'const KEY="somi-v1";' in src.read_text(), "Speicher-Schlüssel der Hauptversion fehlt"
 shutil.copy(src, repo / "index.html")
+for f in ["icon-180.png", "icon-192.png", "icon-512.png"]:
+    shutil.copy(repo / "quelle" / "icons" / f, repo / f)
 sw = (repo / "sw.js").read_text()
 sw, n = re.subn(r'const C="[^"]+"', f'const C="{cache}"', sw, count=1)
 assert n == 1
