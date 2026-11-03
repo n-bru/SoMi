@@ -89,7 +89,9 @@ nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
 .pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 .bar{height:6px;border-radius:3px;background:var(--soft);margin:8px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
 .seqsus{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 8px}.seqsus .code{font-size:2rem}.kic.big{width:60px;height:60px;font-size:2rem}
-.btn.abw{border-style:dashed}
+.btn.abw{border-style:dashed}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.three .btn{padding-left:4px;padding-right:4px}
+.seqk{text-align:center;margin:4px 0 0;font-size:1.15rem}
+.stgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stgrid .btn{min-height:64px;font-size:1.05rem}.stgrid .btn.cur{outline:3px solid var(--sig);outline-offset:2px}
 body:has(.padwrap) .toast{bottom:auto;top:max(12px,env(safe-area-inset-top))} /* Hinweis nicht über die Noten-Tasten legen */
 .pad button{min-height:48px;border-radius:14px;border:1.5px solid var(--line);background:var(--soft);font-weight:800;font-size:1.1rem;font-variant-numeric:tabular-nums}
 .pad button:active{background:var(--acc);color:var(--acc-ink)}
@@ -122,7 +124,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.2.1",SOMI_STAND="03.11.2026";
+const SOMI_VERSION="0.2.2",SOMI_STAND="03.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -131,13 +133,13 @@ const FRIST_JAHRE=5; // VO-DV I § 9 Abs. 1: „alle übrigen Daten“, ab Ende 
 let db;
 // Mit App-Sperre liegt im Speicher nur ein verschlüsselter Umschlag {somiEnc,salt,iv,ct}; db bleibt bis zum Entsperren leer
 let ENCWAIT=null,LKEY=null;
-const leer=()=>({v:1,sus:[],groups:[],obs:[],del:[]});
+const leer=()=>({v:1,sus:[],groups:[],obs:[],att:[],del:[]});
 function load(){try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
   if(db?.somiEnc){ENCWAIT=db;db={...leer(),lock:{salt:ENCWAIT.salt,after:ENCWAIT.after??1,len:ENCWAIT.len||4}}}
   migrate()}
-function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];if(!Array.isArray(db.obs))db.obs=[];
-  const n=db.sus.length+db.groups.length+db.obs.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);db.obs=db.obs.filter(okObs);
-  if(db.sus.length+db.groups.length+db.obs.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
+function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];if(!Array.isArray(db.obs))db.obs=[];if(!Array.isArray(db.att))db.att=[];
+  const n=db.sus.length+db.groups.length+db.obs.length+db.att.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);db.obs=db.obs.filter(okObs);db.att=db.att.filter(okAtt);
+  if(db.sus.length+db.groups.length+db.obs.length+db.att.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
 function applyTheme(){const t=db?.theme,r=document.documentElement;if(t==="light"||t==="dark")r.dataset.theme=t;else delete r.dataset.theme;
   if(db?.fs==="l"||db?.fs==="xl")r.dataset.fs=db.fs;else delete r.dataset.fs;
   const dark=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.querySelector('meta[name=theme-color]')?.setAttribute("content",dark?"#14201b":"#f5f6f1")}
@@ -162,7 +164,7 @@ const okId=s=>typeof s==="string"&&/^[A-Za-z0-9_-]{1,40}$/.test(s),okDate=s=>typ
 const okStr=(s,n=4000)=>s==null||typeof s==="string"&&s.length<=n,okNum=v=>v==null||typeof v==="number"&&isFinite(v);
 const okSY=s=>typeof s==="string"&&/^\d{4}\/\d{2}$/.test(s);
 function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&okNum(s.upd)}catch(e){return false}}
-function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&(g.lastK==null||Object.hasOwn(KMAP,g.lastK))&&okNum(g.upd)}catch(e){return false}}
+function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&(g.lastK==null||Object.hasOwn(KMAP,g.lastK))&&(g.lastKs==null||Array.isArray(g.lastKs)&&g.lastKs.length<=12&&g.lastKs.every(k=>Object.hasOwn(KMAP,k)))&&okNum(g.upd)}catch(e){return false}}
 const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f),hausa:v=>typeof v==="boolean"};
 const susById=id=>db.sus.find(s=>s.id===id);
 const groupById=id=>db.groups.find(g=>g.id===id);
@@ -216,6 +218,12 @@ const KMAP=Object.fromEntries(KRIT.map(x=>[x.k,x]));
 const kritList=()=>KRIT.filter(x=>!x.opt||db.hausa);
 function okObs(o){try{return !!o&&okId(o.id)&&okId(o.gid)&&okId(o.sid)&&Object.hasOwn(KMAP,o.k)&&NOTEN.includes(o.n)&&(o.fb==null||typeof o.fb==="boolean")&&okDate(o.d)&&okStr(o.t,300)&&okNum(o.upd)}catch(e){return false}}
 const obsOf=(gid,sid)=>db.obs.filter(o=>o.gid===gid&&(!sid||o.sid===sid));
+/* Sport: Stundenstatus. db.att = [{id,gid,sid,d,st,upd}], höchstens einer pro Gruppe, Kürzel und Tag */
+const ST={akt:"aktiv",ohne:"ohne Sportsachen",unf:"sportunfähig",abw:"nicht anwesend"};
+function okAtt(a){try{return !!a&&okId(a.id)&&okId(a.gid)&&okId(a.sid)&&Object.hasOwn(ST,a.st)&&okDate(a.d)&&okNum(a.upd)}catch(e){return false}}
+const msOf=g=>g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code));
+const profTag=s=>(s.profil||"r")==="zd"?'<span class="tag zd">LE</span>':(s.profil==="na"?'<span class="tag na">NA</span>':"");
+const bigSus=s=>`<div class="seqsus">${susIcon(s).replace('class="kic"','class="kic big"')}<span class="code">${esc(s.code)}</span>${profTag(s)}</div>`;
 // Halbjahre: 1. HJ ab 1. August, 2. HJ ab 1. Februar
 const hjStart=()=>{const d=new Date(),y=d.getFullYear(),m=d.getMonth();return m>=7?`${y}-08-01`:m>=1?`${y}-02-01`:`${y-1}-08-01`};
 const sjStart=()=>`${syNow().slice(0,4)}-08-01`;
@@ -230,12 +238,14 @@ const ssBtn=()=>`<button class="btn ss${SHOW?" on":""}" onclick="SHOW=!SHOW;rend
 const stale=g=>{const lim=daysAgo(14);return g.members.map(susById).filter(Boolean).filter(s=>!db.obs.some(o=>o.gid===g.id&&o.sid===s.id&&o.d>=lim)).sort((a,b)=>byNum(a.code,b.code))};
 
 // Modus: "e" einzeln (Kürzel antippen), "k" ganze Klasse nacheinander (i = Position, run = in diesem Durchgang erfasst)
-const erNeu=(gid,mode)=>({gid,mode:mode||"e",sel:[],k:null,fb:false,d:today(),t:"",i:0,run:{}});
+// ks = Kriterien der Runde (null = noch nicht gewählt), j = Position im Kriterium, pre = Auswahl vor dem Start
+const erNeu=(gid,mode)=>({gid,mode:mode||"e",sel:[],k:null,fb:false,d:today(),t:"",i:0,j:0,run:{},ks:null,pre:null});
 let ER=erNeu(null);
 function erStart(gid,mode){ER=erNeu(gid,mode);go({tab:view.tab,group:gid,erf:gid})}
 function erMode(m){ER.mode=m;ER.sel=[];render()}
-function erfV(){const g=groupById(view.erf);if(!g||g.arch||g.fach!=="Mathe"){view={tab:view.tab,group:view.erf};return groupV()}
+function erfV(){const g=groupById(view.erf);if(!g||g.arch){view={tab:view.tab,group:view.erf};return groupV()}
   if(ER.gid!==g.id)ER=erNeu(g.id);
+  if(g.fach==="Sport")return sportV(g);
   const ks=kritList();let k=ER.k||g.lastK||"qual";if(!ks.some(x=>x.k===k))k="qual";const K=KMAP[k];
   const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code));
   const todayK=new Set(db.obs.filter(o=>o.gid===g.id&&o.d===ER.d&&o.k===k).map(o=>o.sid));
@@ -245,10 +255,10 @@ function erfV(){const g=groupById(view.erf);if(!g||g.arch||g.fach!=="Mathe"){vie
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
   <div class="between"><h1 style="margin-bottom:4px">Erfassen</h1>${ssBtn()}</div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>
   <div class="pick" style="grid-template-columns:1fr 1fr;margin-bottom:10px">${[["k","Ganze Klasse nacheinander"],["e","Einzeln bewerten"]].map(([m,t])=>`<button class="${ER.mode===m?"on":""}" aria-pressed="${ER.mode===m}" onclick="erMode('${m}')">${t}</button>`).join("")}</div>
-  <div class="card"><div class="chips" role="group" aria-label="Kriterium">${ks.map(x=>`<button class="${x.k===k?"on":""}" aria-pressed="${x.k===k}" onclick="ER.k='${x.k}';render()">${esc(x.t)}</button>`).join("")}</div>
+  ${ER.mode==="k"?"":`<div class="card"><div class="chips" role="group" aria-label="Kriterium">${ks.map(x=>`<button class="${x.k===k?"on":""}" aria-pressed="${x.k===k}" onclick="ER.k='${x.k}';render()">${esc(x.t)}</button>`).join("")}</div>
   ${K.hint?`<p class="small" style="margin:10px 0 0;color:var(--sigt);font-weight:700">${esc(K.hint)}</p>`:""}
   <details style="margin-top:8px"><summary class="small" style="font-weight:700;cursor:pointer">Ankertexte aus dem SILP</summary>
-  <div class="two small" style="margin-top:6px"><div><b>gut</b><ul class="anc">${K.gut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div><b>ausreichend</b><ul class="anc">${K.aus.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div></details></div>
+  <div class="two small" style="margin-top:6px"><div><b>gut</b><ul class="anc">${K.gut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div><b>ausreichend</b><ul class="anc">${K.aus.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div></details></div>`}
   ${ER.mode==="k"?seqCard(g,ms,cell,plus,mid,minus):`<div class="card">
   <div class="between" style="flex-wrap:wrap"><b>${ER.sel.length?`${ER.sel.length} ausgewählt`:"Kürzel antippen"}</b>${ER.sel.length?`<button class="btn ghost small" onclick="ER.sel=[];render()">Auswahl aufheben</button>`:""}</div>
   <div class="tiles">${ms.map(s=>`<button class="tile${ER.sel.includes(s.id)?" on":""}" aria-pressed="${ER.sel.includes(s.id)}" onclick="erSel(${ja(s.id)})">${susIcon(s)}<span class="code">${esc(s.code)}</span>${todayK.has(s.id)?'<span class="done" aria-label="heute schon erfasst">✓</span>':""}${(s.profil||"r")==="zd"?'<span class="tag zd">LE</span>':(s.profil==="na"?'<span class="tag na">NA</span>':"")}</button>`).join("")||`<p class="muted">Noch niemand in dieser Gruppe.</p>`}</div>
@@ -259,29 +269,47 @@ function erfV(){const g=groupById(view.erf);if(!g||g.arch||g.fach!=="Mathe"){vie
 const erExtras=()=>`<label for="erT">Stichwort <span class="muted small">(freiwillig, vor der Note eintragen; Diktat über die Tastatur geht auch)</span></label><input id="erT" maxlength="300" value="${esc(ER.t)}" oninput="ER.t=this.value" placeholder="z. B. Lösungsweg an der Tafel erklärt">
   <label class="swr"><span class="grow">Nur Rückmeldung<span class="sub">Zählt nicht für die Note, z. B. in Übungsphasen.</span></span><input type="checkbox" class="sw" ${ER.fb?"checked":""} onchange="ER.fb=this.checked"></label>
   <div class="row"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${ER.d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();render()"></div>`;
+const ancBox=K=>`${K.hint?`<p class="small" style="margin:6px 0 0;color:var(--sigt);font-weight:700;text-align:center">${esc(K.hint)}</p>`:""}
+  <details style="margin-top:6px"><summary class="small" style="font-weight:700;cursor:pointer">Ankertexte aus dem SILP</summary>
+  <div class="two small" style="margin-top:6px"><div><b>gut</b><ul class="anc">${K.gut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div><b>ausreichend</b><ul class="anc">${K.aus.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div></details>`;
+function seqSetup(g){const ks=kritList();if(!ER.pre)ER.pre=(g.lastKs||[g.lastK||"qual"]).filter(k=>ks.some(x=>x.k===k));const pre=ER.pre;
+  return `<div class="card"><b>Was hast du heute beobachtet?</b><p class="small muted" style="margin:4px 0 10px">Tippe die Kriterien an, die du in dieser Stunde wirklich gesehen hast. Die Runde fragt bei jedem Kürzel nur diese ab.</p>
+  <div class="chips" role="group" aria-label="Kriterien für die Runde">${ks.map(x=>`<button class="${pre.includes(x.k)?"on":""}" aria-pressed="${pre.includes(x.k)}" onclick="seqPre('${x.k}')">${esc(x.t)}</button>`).join("")}</div>
+  <p style="margin-bottom:0"><button class="btn pri block" ${pre.length?"":"disabled"} onclick="seqGo()">Runde starten${pre.length?` (${pre.length} ${pre.length===1?"Kriterium":"Kriterien"})`:""}</button></p></div>`}
+function seqPre(k){const p=ER.pre||[],i=p.indexOf(k);if(i>=0)p.splice(i,1);else p.push(k);ER.pre=KRIT.map(x=>x.k).filter(x=>p.includes(x));render()}
+function seqGo(){const g=groupById(ER.gid);if(!g||!ER.pre?.length)return;ER.ks=[...ER.pre];ER.j=0;g.lastKs=[...ER.ks];save();render()}
 function seqCard(g,ms,cell,plus,mid,minus){if(!ms.length)return `<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
-  const vals=Object.values(ER.run),nB=vals.filter(v=>v!=="abw").length,nA=vals.filter(v=>v==="abw").length;
+  if(!ER.ks)return seqSetup(g);
+  const ks=ER.ks,runs=Object.values(ER.run),nA=runs.filter(v=>v==="abw").length,nB=runs.filter(v=>v!=="abw"&&Object.values(v).some(x=>x!=="skip")).length;
+  const sum=`${nB} bewertet${nA?` · ${nA} nicht anwesend`:""}`;
   if(ER.i>=ms.length)return `<div class="card seqdone"><b style="font-size:1.2rem">Fertig</b><p>${nB} bewertet${nA?`, ${nA} nicht anwesend`:""}.</p>
-    <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="seqPrev()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.run={};render()">Neuer Durchgang</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
-  const s=ms[ER.i],had=ER.run[s.id],o=had&&had!=="abw"?db.obs.find(x=>x.id===had):null;
-  return `<div class="card"><div class="between"><b>${ER.i+1} von ${ms.length}</b><span class="muted small">${nB} bewertet${nA?` · ${nA} nicht anwesend`:""}</span></div>
+    <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="seqPrev()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.j=0;ER.run={};ER.pre=[...ER.ks];ER.ks=null;render()">Neue Runde</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
+  if(ER.j>=ks.length)ER.j=0;
+  const s=ms[ER.i],r=ER.run[s.id],k=ks[ER.j],K=KMAP[k],had=r&&r!=="abw"?r[k]:null,o=had&&had!=="skip"?db.obs.find(x=>x.id===had):null;
+  const note=r==="abw"?"In dieser Runde: nicht anwesend.":had==="skip"?"In dieser Runde übersprungen.":o?`In dieser Runde schon bewertet: ${hid(nTxt(o.n))}. Eine neue Note ersetzt sie.`:"";
+  return `<div class="card"><div class="between"><b>${ER.i+1} von ${ms.length}</b><span class="muted small">${sum}</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
-  <div class="seqsus">${susIcon(s).replace('class="kic"','class="kic big"')}<span class="code">${esc(s.code)}</span>${(s.profil||"r")==="zd"?'<span class="tag zd">LE</span>':(s.profil==="na"?'<span class="tag na">NA</span>':"")}</div>
-  ${had?`<p class="small" style="text-align:center;margin:0">${had==="abw"?"In diesem Durchgang: nicht anwesend.":`In diesem Durchgang schon bewertet: ${hid(nTxt(o?.n||""))}. Eine neue Note ersetzt sie.`}</p>`:""}
+  ${bigSus(s)}
+  <p class="seqk"><b>${esc(K.t)}</b>${ks.length>1?` <span class="muted small">(${ER.j+1} von ${ks.length})</span>`:""}</p>
+  ${ancBox(k==="koop"?{...K,hint:null}:K)}
+  ${note?`<p class="small" style="text-align:center;margin:6px 0 0">${note}</p>`:""}
   <div class="padwrap"><div class="pad" role="group" aria-label="Note">${plus.map(cell).join("")}${mid.map(cell).join("")}${minus.map(cell).join("")}</div>
-  <div class="two" style="margin-top:6px"><button class="btn" ${ER.i?"":"disabled"} onclick="seqPrev()">‹ Vorherige:r</button><button class="btn abw" onclick="seqAbw()">nicht anwesend</button></div></div>
-  ${erExtras()}</div>`}
-function seqPrev(){if(ER.i>0)ER.i--;render()}
-function seqDrop(sid){const had=ER.run[sid];if(had&&had!=="abw"){db.obs=db.obs.filter(o=>o.id!==had)}delete ER.run[sid]}
-function seqAbw(){const g=groupById(ER.gid),ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code)),s=ms[ER.i];if(!s)return;
-  seqDrop(s.id);ER.run[s.id]="abw";ER.i++;save();render()}
+  <div class="three" style="margin-top:6px"><button class="btn" ${ER.i||ER.j?"":"disabled"} onclick="seqPrev()">‹ Zurück</button><button class="btn abw" onclick="seqSkip()">überspringen</button><button class="btn abw" onclick="seqAbw()">nicht anwesend</button></div></div>
+  ${erExtras()}
+  <p style="margin:12px 0 0"><button class="btn ghost small" onclick="ER.pre=[...ER.ks];ER.ks=null;render()">Kriterien ändern</button></p></div>`}
+function seqStep(sid){if(ER.run[sid]==="abw"||ER.j>=ER.ks.length-1){ER.i++;ER.j=0}else ER.j++}
+function seqPrev(){if(ER.j>0)ER.j--;else if(ER.i>0){ER.i--;const ms=msOf(groupById(ER.gid));ER.j=ER.run[ms[ER.i]?.id]==="abw"?0:Math.max(0,(ER.ks?.length||1)-1)}render()}
+function seqDropK(sid,k){const r=ER.run[sid];if(r==="abw"){ER.run[sid]={};return}if(r&&r[k]&&r[k]!=="skip")db.obs=db.obs.filter(o=>o.id!==r[k]);if(r)delete r[k]}
+function seqDropAll(sid){const r=ER.run[sid];if(r&&r!=="abw"){const ids=new Set(Object.values(r));db.obs=db.obs.filter(o=>!ids.has(o.id))}delete ER.run[sid]}
+function seqCur(){const g=groupById(ER.gid);return g&&ER.ks?msOf(g)[ER.i]:null}
+function seqSkip(){const s=seqCur();if(!s)return;const k=ER.ks[ER.j];seqDropK(s.id,k);(ER.run[s.id]??={})[k]="skip";seqStep(s.id);save();render()}
+function seqAbw(){const s=seqCur();if(!s)return;seqDropAll(s.id);ER.run[s.id]="abw";ER.i++;ER.j=0;save();render()}
 function erSel(id){const i=ER.sel.indexOf(id);if(i>=0)ER.sel.splice(i,1);else ER.sel.push(id);render()}
 function addObs(n){const g=groupById(ER.gid);if(!g||!NOTEN.includes(n))return;
-  if(ER.mode==="k"){const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code)),s=ms[ER.i];if(!s)return;
-    const ks=kritList(),k=ks.some(x=>x.k===(ER.k||g.lastK))?(ER.k||g.lastK):"qual",t=ER.t.trim().slice(0,300);
+  if(ER.mode==="k"){const s=seqCur(),k=ER.ks?.[ER.j];if(!s||!k)return;const t=ER.t.trim().slice(0,300);
     if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
-    seqDrop(s.id);const o=touch({id:uid(),gid:g.id,sid:s.id,k,n,fb:!!ER.fb,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});
-    db.obs.push(o);ER.run[s.id]=o.id;g.lastK=k;ER.k=k;ER.t="";ER.i++;save();render();toast(`${s.code} gespeichert${SHOW?": "+nTxt(n):""}`);return}
+    seqDropK(s.id,k);const o=touch({id:uid(),gid:g.id,sid:s.id,k,n,fb:!!ER.fb,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});
+    db.obs.push(o);(ER.run[s.id]??={})[k]=o.id;g.lastK=k;ER.t="";seqStep(s.id);save();render();toast(`${s.code} · ${KMAP[k].t} gespeichert${SHOW?": "+nTxt(n):""}`);return}
   if(!ER.sel.length)return toast("Tippe zuerst ein oder mehrere Kürzel an.");
   const ks=kritList(),k=ks.some(x=>x.k===(ER.k||g.lastK))?(ER.k||g.lastK):"qual",t=ER.t.trim().slice(0,300);
   if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
@@ -290,8 +318,40 @@ function addObs(n){const g=groupById(ER.gid);if(!g||!NOTEN.includes(n))return;
   const ids=new Set(neu.map(o=>o.id));
   undoToast(`${neu.length} ${neu.length===1?"Eintrag":"Einträge"} gespeichert${SHOW?": "+nTxt(n):""}${ER.fb?" (nur Rückmeldung)":""}`,()=>{db.obs=db.obs.filter(o=>!ids.has(o.id));save();render()})}
 
+function sportV(g){const ms=msOf(g),d=ER.d||today(),day=new Map(db.att.filter(a=>a.gid===g.id&&a.d===d).map(a=>[a.sid,a]));
+  const cnt=Object.keys(ST).map(k=>[k,ms.filter(s=>day.get(s.id)?.st===k).length]).filter(x=>x[1]);
+  const head=`<button class="btn ghost" onclick="back()">‹ Zurück</button><h1 style="margin-bottom:4px">Stundenstatus</h1><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>`;
+  const dat=`<div class="row" style="margin-top:12px"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();ER.i=0;render()"></div>`;
+  const sum=cnt.map(([k,n])=>`${n} ${ST[k]}`).join(" · ")||"noch nichts erfasst";
+  if(!ms.length)return head+`<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
+  if(ER.i>=ms.length)return head+`<div class="card seqdone"><b style="font-size:1.2rem">Fertig</b><p>${esc(sum)}.</p>
+    <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="ER.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;render()">Von vorn</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p>${dat}</div>`;
+  const s=ms[ER.i],a=day.get(s.id),rest=ms.slice(ER.i).filter(x=>!day.has(x.id)).length;
+  return head+`<div class="card"><div class="between"><b>${ER.i+1} von ${ms.length}</b><span class="muted small">${esc(sum)}</span></div>
+  <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
+  ${bigSus(s)}
+  ${a?`<p class="small" style="text-align:center;margin:0 0 6px">An diesem Tag schon erfasst: ${esc(ST[a.st])}. Tippen ersetzt es.</p>`:""}
+  <div class="stgrid">${Object.entries(ST).map(([k,t])=>`<button class="btn${k==="akt"?" pri":k==="abw"?" abw":""}${a?.st===k?" cur":""}" onclick="setAtt('${k}')">${t}</button>`).join("")}</div>
+  <div class="two" style="margin-top:8px"><button class="btn" ${ER.i?"":"disabled"} onclick="ER.i--;render()">‹ Zurück</button><button class="btn" ${rest?"":"disabled"} onclick="attRest()">Alle übrigen: aktiv</button></div>
+  ${dat}</div>`}
+function setAtt(st){const g=groupById(ER.gid);if(!g||!Object.hasOwn(ST,st))return;const s=msOf(g)[ER.i];if(!s)return;const d=ER.d||today();
+  const a=db.att.find(x=>x.gid===g.id&&x.sid===s.id&&x.d===d);if(a){a.st=st;touch(a)}else db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st,...(g.demo?{demo:true}:{})}));
+  ER.i++;save();render()}
+function attRest(){const g=groupById(ER.gid);if(!g)return;const d=ER.d||today(),ms=msOf(g);let n=0;
+  for(const s of ms.slice(ER.i))if(!db.att.some(x=>x.gid===g.id&&x.sid===s.id&&x.d===d)){db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st:"akt",...(g.demo?{demo:true}:{})}));n++}
+  ER.i=ms.length;save();render();toast(`${n} als aktiv gespeichert`)}
+function attOvV(g){const from=OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00",all=db.att.filter(a=>a.gid===g.id&&a.d>=from),ms=msOf(g);
+  const nT=new Set(all.map(a=>a.d)).size;
+  const rows=ms.map(s=>{const m=all.filter(a=>a.sid===s.id);return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span> ${profTag(s)}</th>${Object.keys(ST).map(k=>{const n=m.filter(a=>a.st===k).length;return `<td class="num${k!=="akt"&&n>=3?" old":""}">${n||"–"}</td>`}).join("")}</tr>`}).join("");
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button><h1 style="margin-bottom:4px">Übersicht</h1><p class="muted" style="margin-top:0">${esc(gName(g))} · Stundenstatus · ${nT} ${nT===1?"Stunde":"Stunden"} erfasst</p>
+  <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
+  ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">aktiv</th><th class="num">ohne Sachen</th><th class="num">sport&shy;unfähig</th><th class="num">nicht da</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="small muted">Ab 3 Stunden ohne Sachen, sportunfähig oder nicht da ist die Zahl markiert.</p>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
+  ${g.arch?"":`<p><button class="btn pri block" onclick="erStart(${ja(g.id)},'k')">Stundenstatus erfassen</button></p>`}`}
+
 let OVP="hj";
 function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.ov};return groupV()}
+  if(g.fach==="Sport")return attOvV(g);
   const from=OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00";
   const all=obsOf(g.id).filter(o=>o.d>=from);
   const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code)),lim=daysAgo(14);
@@ -401,10 +461,9 @@ function heuteV(){
   let h=`<div class="head">${LOGO}<span class="kl"><b>HBG Köln</b> · SoMi</span></div><p class="muted">${dateLong}</p><h1>Heute</h1>${envHint()}${setupCard()}${backupHint()}${dueHint()}`;
   h+=`<div class="stat"><div>Lerngruppen<b>${act.length}</b><span class="muted small">aktiv</span></div><div>Schüler:innen<b>${new Set(act.flatMap(g=>g.members)).size}</b><span class="muted small">in aktiven Gruppen</span></div><div>Archiv<b>${db.groups.filter(g=>g.arch).length}</b><span class="muted small">Gruppen</span></div></div>`;
   if(!act.length)return h+`<div class="card"><p>Noch keine Lerngruppen.</p><p class="muted">Lege unter „Lerngruppen“ eine Gruppe an oder lade unter „Einstellungen“ die fiktive Beispielklasse.</p><p><button class="btn pri" onclick="go({tab:'gruppen',adding:true})">Lerngruppe anlegen</button></p></div>`;
-  const mat=act.filter(g=>g.fach==="Mathe");
-  if(mat.length)h+=`<div class="card"><b>Schnell erfassen</b><p class="row" style="flex-wrap:wrap;margin:8px 0 0">${mat.map(g=>`<span class="row" style="gap:6px"><button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: ganze Klasse</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln</button></span>`).join("")}</p></div>`;
+  if(act.length)h+=`<div class="card"><b>Schnell erfassen</b><p class="row" style="flex-wrap:wrap;margin:8px 0 0">${act.map(g=>g.fach==="Mathe"?`<span class="row" style="gap:6px"><button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: ganze Klasse</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln</button></span>`:`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: Stundenstatus</button>`).join("")}</p></div>`;
   h+=`<h2>Deine Lerngruppen</h2>`+act.map(groupCard).join("");
-  return h+`<p class="muted small">Version 0.2: Sonstige Mitarbeit in Mathe. Klassenarbeiten, Arbeits- und Sozialverhalten, Rücklauf-Listen und Sport folgen in den nächsten Versionen.</p>`}
+  return h+`<p class="muted small">Version 0.2: Sonstige Mitarbeit in Mathe, Stundenstatus in Sport. Klassenarbeiten, Arbeits- und Sozialverhalten, Rücklauf-Listen und Sport folgen in den nächsten Versionen.</p>`}
 const groupCard=g=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)}})"><div class="grow"><div class="code">${esc(gName(g))}${g.demo?' <span class="tag">Beispiel</span>':""}</div><div class="muted small">${esc(g.sy)} · ${g.members.length} Schüler:innen${g.arch?` · archiviert am ${dDEy(g.arch)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`;
 
 /* ===== Lerngruppen ===== */
@@ -439,7 +498,7 @@ function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};retu
     <label for="scode">Kürzel</label><input id="scode" value="${esc(SD.code)}" maxlength="40" oninput="SD.code=this.value">
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="SD=null;render()">Abbrechen</button><button class="btn pri" onclick="addSus(${ja(g.id)})">Hinzufügen</button></div></div>`
     :`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="SD={code:nextCode(${ja(g.cls)})};render();$('#scode')?.focus()">+ Schüler:in</button>${others.length?`<button class="btn" onclick="addExisting(${ja(g.id)})">Aus Klasse ${esc(g.cls)} übernehmen</button>`:""}</p>`}
-  ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button></p>`:`<p class="muted small">Noten für Sport kommen in Version 0.5.</p>`}
+  ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button></p>`:`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Stundenstatus erfassen</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Stundenstatus</button></p><p class="muted small">Noten für Sport kommen in Version 0.5.</p>`}
   ${ms.length?ms.map(s=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)},sus:${ja(s.id)}})">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${(s.profil||"r")!=="r"?`<span class="tag ${s.profil}">${esc(PROFILE[s.profil])}${s.profil==="zd"?(s.zdNote?" · mit Note":" · Bericht"):""}</span>`:`<span class="muted small">Regel</span>`}</div><span aria-hidden="true" class="muted">›</span></button>`).join(""):`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   ${ro?"":`<div class="card"><b>Schuljahresende</b><p class="small muted" style="margin:6px 0 10px">Archivieren macht die Gruppe nur noch lesbar. Die Daten bleiben ${FRIST_JAHRE} Jahre erhalten (VO-DV I § 9). Gelöscht wird erst nach deiner Bestätigung.</p><button class="btn" onclick="archive(${ja(g.id)})">Lerngruppe archivieren</button></div>`}`}
 function addSus(gid){const g=groupById(gid),code=SD.code.trim();if(!code)return toast("Bitte ein Kürzel eintragen.");
@@ -463,7 +522,7 @@ async function delGroup(gid){const g=groupById(gid),early=!g.demo&&g.arch&&keepU
   if(early&&!await ask("Wirklich vor Ablauf der Frist löschen?",{ok:"Ja, löschen",danger:true}))return;
   // Schüler:innen, die in keiner anderen Gruppe sind, gehen mit
   const keep=new Set(db.groups.filter(x=>x.id!==gid).flatMap(x=>x.members)),gone=g.members.filter(id=>!keep.has(id));
-  db.groups=db.groups.filter(x=>x.id!==gid);db.sus=db.sus.filter(s=>!gone.includes(s.id));db.obs=db.obs.filter(o=>o.gid!==gid);db.del.push(gid,...gone);save();go({tab:"gruppen"});toast("Gelöscht")}
+  db.groups=db.groups.filter(x=>x.id!==gid);db.sus=db.sus.filter(s=>!gone.includes(s.id));db.obs=db.obs.filter(o=>o.gid!==gid);db.att=db.att.filter(a=>a.gid!==gid);db.del.push(gid,...gone);save();go({tab:"gruppen"});toast("Gelöscht")}
 
 /* ===== Schüler:in ===== */
 function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){view={tab:"gruppen",group:view.group};return groupV()}
@@ -544,7 +603,7 @@ const backupName=()=>`somi-sicherung-${today()}.json`;
 async function exportJSON(){if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
   const ki=await backupKey();if(!ki)return;
   if(!db.backupTip&&!await backupTip())return;
-  const {bsalt,lock,...rest}=db,payload={...rest,groups:db.groups.filter(g=>!g.demo),sus:db.sus.filter(s=>!s.demo),obs:db.obs.filter(o=>!o.demo)};
+  const {bsalt,lock,...rest}=db,payload={...rest,groups:db.groups.filter(g=>!g.demo),sus:db.sus.filter(s=>!s.demo),obs:db.obs.filter(o=>!o.demo),att:db.att.filter(a=>!a.demo)};
   if(!await giveFile(backupName(),await sealFile(payload,ki)))return;
   db.lastBackup=Date.now();db.backupTip=1;save();render();toast(isIOS?"Sicherung erstellt. Sie liegt in „Dateien“ → „Auf meinem iPad“.":"Sicherung erstellt.")}
 async function backupTip(){const steps=isIOS?[`Gleich öffnet sich das Teilen-Fenster. Tippe dort auf <b>„In Dateien sichern“</b>.`,`Wähle <b>„Auf meinem iPad“</b>. Lege beim ersten Mal einen Ordner <b>„SoMi“</b> an und öffne ihn.`,`Tippe auf <b>„Sichern“</b>. Bei späteren Sicherungen wählst du wieder diesen Ordner.`]
@@ -564,9 +623,9 @@ async function importJSON(inp){const f=inp.files[0];inp.value="";if(!f)return;le
   if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
   try{d=await openFile(o)}catch(e){return toast("Keine SoMi-Sicherung")}if(!d)return;
   if(!Array.isArray(d.groups)||!Array.isArray(d.sus))return toast("Keine SoMi-Sicherung");
-  if(!Array.isArray(d.obs))d.obs=[];
-  const ng=d.groups.length,ns=d.sus.length,no=d.obs.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);d.obs=d.obs.filter(okObs);
-  const bad=ng-d.groups.length+ns-d.sus.length+no-d.obs.length;if(bad)toast(`${bad} beschädigte Einträge nicht übernommen`);
+  if(!Array.isArray(d.obs))d.obs=[];if(!Array.isArray(d.att))d.att=[];
+  const ng=d.groups.length,ns=d.sus.length,no=d.obs.length,na=d.att.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);d.obs=d.obs.filter(okObs);d.att=d.att.filter(okAtt);
+  const bad=ng-d.groups.length+ns-d.sus.length+no-d.obs.length+na-d.att.length;if(bad)toast(`${bad} beschädigte Einträge nicht übernommen`);
   d.del=(Array.isArray(d.del)?d.del:[]).filter(okId);
   IMP={o,d,settings:!db.groups.some(g=>!g.demo)};go({tab:"profil",imp:true})}
 function importV(){if(!IMP){view={tab:"profil"};return profilV()}const {o,d}=IMP;
@@ -577,14 +636,14 @@ function importV(){if(!IMP){view={tab:"profil"};return profilV()}const {o,d}=IMP
   <label class="row" style="margin:12px 0;font-weight:600"><input type="checkbox" style="width:auto" ${IMP.settings?"checked":""} onchange="IMP.settings=this.checked"> Auch Einstellungen übernehmen (Erscheinungsbild, Schriftgröße, Kriterien)</label></div>
   <p><button class="btn pri block" onclick="applyImport()">Übernehmen</button></p>`}
 function applyImport(){const d=IMP.d,dels=new Set([...db.del,...d.del]);
-  const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels),c=mergeList(db.obs,d.obs,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
-  const gids=new Set(db.groups.map(g=>g.id)),sids=new Set(db.sus.map(x=>x.id));db.obs=c.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));
+  const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels),c=mergeList(db.obs,d.obs,dels),e=mergeList(db.att,d.att,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
+  const gids=new Set(db.groups.map(g=>g.id)),sids=new Set(db.sus.map(x=>x.id));db.obs=c.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.att=e.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));
   if(IMP.settings)for(const f of ["theme","fs","hausa"])if(d[f]!=null&&okSetting[f](d[f]))db[f]=d[f];
-  IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen, ${c.n} Einträge neu oder aktualisiert`);go({tab:"gruppen"})}
+  IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen, ${c.n+e.n} Einträge neu oder aktualisiert`);go({tab:"gruppen"})}
 async function wipe(){if(!await ask("Wirklich alle Daten auf diesem Gerät löschen?",{ok:"Alles löschen",danger:true,sub:"Speichere vorher eine Sicherung. Die Aufbewahrungsfrist gilt auch hier."}))return;
   const keep={theme:db.theme,fs:db.fs,bsalt:db.bsalt,lock:db.lock,setupDone:db.setupDone};db={...leer(),...keep};save();go({tab:"heute"})}
 async function delDemo(){if(!await ask("Die fiktive Beispielklasse entfernen? Deine eigenen Lerngruppen bleiben.",{ok:"Entfernen"}))return;
-  db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);db.obs=db.obs.filter(o=>!o.demo);save();render();toast("Beispielklasse entfernt")}
+  db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);db.obs=db.obs.filter(o=>!o.demo);db.att=db.att.filter(a=>!a.demo);save();render();toast("Beispielklasse entfernt")}
 function demo(){if(db.groups.some(g=>g.demo))return toast("Beispielklasse ist schon da");
   const prof=["r","r","na","r","zd","r","r","na"],sus=prof.map((p,i)=>touch({id:uid(),code:`DEMO-${String(i+1).padStart(2,"0")}`,cls:"DEMO",icon:ICONS[i*5%ICONS.length],profil:p,
     na:p==="na"?(i===2?"Fiktiv: 10 Minuten mehr Zeit bei Klassenarbeiten.":"Fiktiv: Ersatzaufgabe im Sport (Schiedsrichter, Helfen)."):"",zdNote:p==="zd",demo:true}));

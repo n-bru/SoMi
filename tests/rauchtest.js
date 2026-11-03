@@ -72,17 +72,23 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.locator("text=DEMO Mathe").count()>0,"Daten nach Entsperren da");
   // 0.2 Sonstige Mitarbeit: Erfassen, Sichtschutz, nur Rückmeldung, Übersicht
   await p.click("nav >> text=Heute");ok(await p.locator("text=Schnell erfassen").count()===1,"Schnell erfassen auf Heute");
-  // 0.2.1 Ganze Klasse nacheinander
+  // 0.2.2 Ganze Klasse: Kriterien wählen, Note, überspringen, nicht anwesend
   await p.click(".card >> button:has-text('DEMO Mathe: ganze Klasse')");ok(await p.locator("h1",{hasText:"Erfassen"}).count()===1,"Erfassen geöffnet");
-  ok(await p.locator(".seqsus:has-text('DEMO-01')").count()===1&&await p.locator("text=1 von").count()===1,"Ganze Klasse: startet mit DEMO-01");
+  ok(await p.locator("text=Was hast du heute beobachtet?").count()===1,"Runde beginnt mit Kriterienwahl");
+  await p.click(".chips button:has-text('Kooperation')");
+  ok(await p.locator("button:has-text('Runde starten (2 Kriterien)')").count()===1,"zwei Kriterien gewählt");
+  await p.click("button:has-text('Runde starten')");
+  ok(await p.locator(".seqsus:has-text('DEMO-01')").count()===1&&await p.locator(".seqk:has-text('Qualität')").count()===1,"Start: DEMO-01, erstes Kriterium");
   let s0=await p.evaluate(()=>db.obs.length);
-  await p.click(".pad button:text-is('3')");ok(await p.locator(".seqsus:has-text('DEMO-02')").count()===1,"nach Note weiter zu DEMO-02");
-  await p.click("button:has-text('nicht anwesend')");ok(await p.locator(".seqsus:has-text('DEMO-03')").count()===1,"nicht anwesend überspringt");
-  ok(await p.evaluate(n=>db.obs.length===n+1&&!db.obs.some(o=>o.sid===db.sus.find(s=>s.code==="DEMO-02").id&&o.d===today()&&o.k==="qual"&&o.n==="3"),s0),"nicht anwesend speichert nichts");
-  await p.click("button:has-text('Vorherige')");await p.click("button:has-text('Vorherige')");
+  await p.click(".pad button:text-is('3')");ok(await p.locator(".seqsus:has-text('DEMO-01')").count()===1&&await p.locator(".seqk:has-text('Kooperation')").count()===1,"nach Note: nächstes Kriterium");
+  await p.click("button:has-text('überspringen')");ok(await p.locator(".seqsus:has-text('DEMO-02')").count()===1,"überspringen: weiter zu DEMO-02");
+  await p.click("button:has-text('nicht anwesend')");ok(await p.locator(".seqsus:has-text('DEMO-03')").count()===1,"nicht anwesend: ganzes Kürzel übersprungen");
+  ok(await p.evaluate(n=>db.obs.length===n+1,s0),"nur die echte Note gespeichert");
+  await p.click(".three button:has-text('Zurück')");await p.click(".three button:has-text('Zurück')");await p.click(".three button:has-text('Zurück')");
   ok(await p.locator("text=schon bewertet").count()===1,"Zurück zeigt: schon bewertet");
   await p.click(".pad button:text-is('2')");ok(await p.evaluate(n=>db.obs.length===n+1&&db.obs.at(-1).n==="2",s0),"neue Note ersetzt die alte");
   const nM=await p.evaluate(()=>groupById(ER.gid).members.length);
+  await p.click("button:has-text('überspringen')");
   for(let i=1;i<nM;i++)await p.click("button:has-text('nicht anwesend')");
   ok(await p.locator(".seqdone:has-text('1 bewertet')").count()===1,"Fertig-Anzeige");
   await p.evaluate(n=>{db.obs=db.obs.slice(0,n);save()},s0);
@@ -112,6 +118,16 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.click("nav >> text=Heute");await p.click(".card >> button:has-text('DEMO Mathe')");
   ok(await p.locator(".chips button:has-text('Hausaufgaben')").count()===1,"Kriterium Hausaufgaben zuschaltbar");
   ok(await p.evaluate(()=>!okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"7",d:"2026-01-01"})&&!okObs({id:"a",gid:"b",sid:"c",k:"x",n:"2",d:"2026-01-01"})&&okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"2+",d:"2026-01-01"})),"Prüfhelfer okObs");
+  // Sport: Stundenstatus
+  await p.click("nav >> text=Heute");await p.click("button:has-text('DEMO Sport: Stundenstatus')");
+  ok(await p.locator("h1",{hasText:"Stundenstatus"}).count()===1,"Sport: Stundenstatus geöffnet");
+  await p.click(".stgrid button:has-text('aktiv')");await p.click(".stgrid button:has-text('ohne Sportsachen')");await p.click(".stgrid button:has-text('sportunfähig')");
+  await p.click("button:has-text('Alle übrigen: aktiv')");ok(await p.locator(".seqdone:has-text('4 aktiv')").count()===1,"Sport: alle übrigen aktiv");
+  ok(await p.evaluate(()=>db.att.length===6&&db.att.every(okAtt)),"Sport: 6 Status gespeichert");
+  await p.click("button:has-text('Letzte ansehen')");await p.click(".stgrid button:has-text('nicht anwesend')");
+  ok(await p.evaluate(()=>db.att.length===6&&db.att.filter(a=>a.st==="abw").length===1),"Sport: Status ersetzt, nicht doppelt");
+  await p.click("button:has-text('Zur Übersicht')");ok(await p.locator(".tbl tr:has-text('DEMO-02') td").nth(1).innerText().then(t=>t==="1"),"Sport-Übersicht zählt ohne Sachen");
+  ok(await p.evaluate(()=>!okAtt({id:"a",gid:"b",sid:"c",st:"x",d:"2026-01-01",upd:1})),"Prüfhelfer okAtt");
   // XSS: Kürzel mit HTML wird maskiert
   await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("text=+ Schüler:in");await p.fill("#scode",'7<img src=x onerror=alert(1)>');await p.click("button:has-text('Hinzufügen')");

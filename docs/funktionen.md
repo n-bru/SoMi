@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.2.1, Stand 03.11.2026)
+# SoMi – Funktionen (Version 0.2.2, Stand 03.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -17,10 +17,17 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - **Hinweis „Seit 2 Wochen ohne Eintrag“** beim Erfassen.
 - Sport: Noten kommen in Version 0.5.
 
-### Zwei Wege zum Erfassen (ab 0.2.1)
-- **Ganze Klasse nacheinander:** zeigt ein Kürzel nach dem anderen (nach Nummer sortiert). Note tippen speichert und springt weiter. „nicht anwesend“ springt weiter und speichert nichts. „‹ Vorherige:r“ geht zurück; eine neue Note ersetzt die aus diesem Durchgang. Am Ende: „Fertig: X bewertet, Y nicht anwesend“.
+### Zwei Wege zum Erfassen (ab 0.2.1, Runde ab 0.2.2)
+- **Ganze Klasse nacheinander:** Zuerst „Was hast du heute beobachtet?“: ein oder mehrere Kriterien antippen (die letzte Auswahl ist vorbelegt), dann „Runde starten“. Die App zeigt ein Kürzel nach dem anderen und fragt bei jedem die gewählten Kriterien nacheinander ab. Note tippen speichert und springt weiter.
+  - „überspringen“: für dieses Kriterium nichts speichern (da, aber nichts beobachtet).
+  - „nicht anwesend“: das ganze Kürzel überspringen, nichts speichern.
+  - „‹ Zurück“ geht einen Schritt zurück; eine neue Note ersetzt die aus dieser Runde. „Kriterien ändern“ führt zurück zur Auswahl.
 - **Einzeln bewerten:** Kürzel-Kacheln antippen (auch mehrere), dann Note. Wie in 0.2.0.
-- Auf „Heute“ und in der Lerngruppe gibt es beide Knöpfe nebeneinander; oben im Erfassen-Bildschirm lässt sich umschalten.
+
+## Sport: Stundenstatus (ab 0.2.2)
+- Runde durch die Gruppe: aktiv, ohne Sportsachen, sportunfähig, nicht anwesend. „Alle übrigen: aktiv“ füllt den Rest. Pro Tag ein Status je Kürzel; erneutes Tippen ersetzt ihn.
+- Übersicht pro Halbjahr/Schuljahr: Anzahl je Status, ab 3 markiert.
+- Daten: `db.att = [{id,gid,sid,d,st,upd}]`, geprüft mit `okAtt`, in Sicherung und Import enthalten.
 
 ## Einrichtung
 Drei Schritte: Code für die App-Sperre, fiktive Beispielklasse, erste Sicherung.

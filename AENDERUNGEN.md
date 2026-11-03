@@ -4,6 +4,7 @@ Neueste oben.
 
 | Datum | Version | Was | Beta/Haupt |
 |---|---|---|---|
+| 03.11.2026 | 0.2.2 | Ganze Klasse: zu Beginn die heute beobachteten Kriterien wählen, Runde fragt pro Kürzel nur diese ab; neuer Knopf „überspringen“. Sport: Stundenstatus (aktiv, ohne Sportsachen, sportunfähig, nicht anwesend) als Runde mit „Alle übrigen: aktiv“ und Übersicht | Beta |
 | 03.11.2026 | 0.2.1 | Erfassen: „Ganze Klasse nacheinander“ (Kürzel für Kürzel, Note tippen springt weiter, „nicht anwesend“ überspringt ohne Eintrag, zurückgehen und neu bewerten) und daneben „Einzeln bewerten“ | Beta |
 | 03.11.2026 | 0.2.0 | Sonstige Mitarbeit Mathe: Erfassen mit SILP-Kriterien und Ankertexten, Mehrfachauswahl, „nur Rückmeldung“, Stichwort, Übersicht pro Gruppe und Kürzel, Sichtschutz, Hinweis „seit 2 Wochen ohne Eintrag“, Hausaufgaben-Kriterium abschaltbar. Einträge in Sicherung und Zusammenführen. | Beta |
 | 03.11.2026 | 0.1.3 | App-Symbol mittelgroß (zwischen 0.1.1 und 0.1.2) | Beta + Haupt |
