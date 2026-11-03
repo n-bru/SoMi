@@ -20,7 +20,7 @@ rep('<body>', '<body><div class="betab" aria-label="Beta-Version">BETA</div>')
 out = repo / "beta"; out.mkdir(exist_ok=True)
 (out / "index.html").write_text(s)
 for f in ["icon-180.png", "icon-192.png", "icon-512.png"]:
-    shutil.copy(repo / f, out / f)
+    shutil.copy(repo / "quelle" / "icons" / f, out / f)
 m = (repo / "manifest.webmanifest").read_text().replace('"name":"SoMi","short_name":"SoMi"', '"name":"SoMi Beta","short_name":"SoMi Beta"')
 assert "SoMi Beta" in m
 (out / "manifest.webmanifest").write_text(m)
