@@ -62,6 +62,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p2.click("button:has-text('Übernehmen')");
   ok(await p2.locator(".card.tap",{hasText:"7B Mathe E"}).count()===1,"Sicherung auf neuem Gerät geladen");
   ok(await p2.locator("text=DEMO").count()===0,"Beispielklasse nicht in der Sicherung");
+  ok(await p2.evaluate(()=>db.obs.every(o=>!o.demo)),"keine Beispiel-Einträge in der Sicherung");
   // Sperre nach Neuladen
   await p.reload();ok(await p.locator("#lock").count()===1,"Nach Neustart gesperrt");
   for(const d of "1111")await p.click(`#lock .keys button:text-is("${d}")`);
@@ -69,6 +70,34 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   for(const d of "2468")await p.click(`#lock .keys button:text-is("${d}")`);
   await p.waitForSelector("#lock",{state:"detached"});ok(true,"Entsperrt mit richtigem Code");
   ok(await p.locator("text=DEMO Mathe").count()>0,"Daten nach Entsperren da");
+  // 0.2 Sonstige Mitarbeit: Erfassen, Sichtschutz, nur Rückmeldung, Übersicht
+  await p.click("nav >> text=Heute");ok(await p.locator("text=Schnell erfassen").count()===1,"Schnell erfassen auf Heute");
+  await p.click(".card >> button:has-text('DEMO Mathe')");ok(await p.locator("h1",{hasText:"Erfassen"}).count()===1,"Erfassen geöffnet");
+  const n0=await p.evaluate(()=>db.obs.length);ok(n0>0,"Beispielklasse hat fiktive Einträge");
+  await p.click(".pad button:text-is('2')");ok(await p.locator(".toast",{hasText:"Tippe zuerst"}).count()===1,"ohne Auswahl keine Note");
+  await p.click(".chips button:has-text('Kooperation')");
+  await p.click(".tile:has-text('DEMO-01')");await p.click(".tile:has-text('DEMO-02')");
+  ok(await p.locator("text=2 ausgewählt").count()===1,"Mehrfachauswahl");
+  await p.fill("#erT","Gruppenarbeit Station 3");await p.click(".pad button:text-is('2−')");
+  await p.waitForSelector(".toast:has-text('2 Einträge gespeichert')");
+  ok(await p.locator(".toast",{hasText:"2−"}).count()===0,"Sichtschutz: Note nicht im Hinweis");
+  let o=await p.evaluate(()=>db.obs.slice(-2));ok(o.length===2&&o.every(x=>x.n==="2-"&&x.k==="koop"&&x.t==="Gruppenarbeit Station 3"&&!x.fb),"zwei Einträge mit Kriterium, Note und Stichwort");
+  ok(await p.locator(".tile.on").count()===0&&await p.locator(".tile:has-text('DEMO-01') .done").count()===1,"Auswahl zurückgesetzt, Haken für heute");
+  await p.locator("label.swr:has-text('Nur Rückmeldung') input").check();await p.click(".tile:has-text('DEMO-03')");await p.click(".pad button:text-is('5')");
+  o=await p.evaluate(()=>db.obs.at(-1));ok(o.fb===true&&o.n==="5","nur Rückmeldung gespeichert");
+  await p.click(".pad button:text-is('4+')");// ohne Auswahl
+  await p.click("button:has-text('Übersicht DEMO Mathe')");ok(await p.locator("h1",{hasText:"Übersicht"}).count()===1,"Übersicht geöffnet");
+  ok(await p.locator(".tbl").innerText().then(t=>!/\d,\d/.test(t)&&!t.includes("2−")),"Sichtschutz: keine Noten in der Übersicht");
+  await p.click("button:has-text('Noten zeigen')");ok(await p.locator(".tbl tr:has-text('DEMO-01')").innerText().then(t=>t.includes("2−")),"Noten zeigen");
+  ok(await p.locator(".tbl tr:has-text('DEMO-03')").innerText().then(t=>/ \+[12]/.test(t)),"Rückmeldung zählt nicht mit");
+  await p.click(".tbl tr:has-text('DEMO-01')");ok(await p.locator("text=Sonstige Mitarbeit in DEMO Mathe").count()===1,"Einträge auf der Kürzel-Seite");
+  const c1=await p.locator(".obsl li").count();await p.locator(".obsl li").first().locator("button[aria-label='Eintrag löschen']").click();
+  ok(await p.locator(".obsl li").count()===c1-1,"Eintrag gelöscht");await p.click(".toast button:has-text('Rückgängig')");
+  ok(await p.locator(".obsl li").count()===c1,"Löschen rückgängig");
+  await p.click("nav >> text=Einstellungen");await p.locator("label.swr:has-text('Hausaufgaben') input").check();
+  await p.click("nav >> text=Heute");await p.click(".card >> button:has-text('DEMO Mathe')");
+  ok(await p.locator(".chips button:has-text('Hausaufgaben')").count()===1,"Kriterium Hausaufgaben zuschaltbar");
+  ok(await p.evaluate(()=>!okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"7",d:"2026-01-01"})&&!okObs({id:"a",gid:"b",sid:"c",k:"x",n:"2",d:"2026-01-01"})&&okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"2+",d:"2026-01-01"})),"Prüfhelfer okObs");
   // XSS: Kürzel mit HTML wird maskiert
   await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("text=+ Schüler:in");await p.fill("#scode",'7<img src=x onerror=alert(1)>');await p.click("button:has-text('Hinzufügen')");
