@@ -50,7 +50,9 @@ Weicht der Code von diesen Dateien ab, gilt der Code. Weise auf die Abweichung h
 
 ## Gestaltung
 
-- Pfad-Design B „warm und freundlich“ mit Akzent #B4532C (Sopäd-Team-Design). SoMi unterscheidet sich von Pfad über das eigene Logo (Notenblatt mit Haken), nicht über andere Farben.
+- SoMi ist Nicks eigene App, NICHT im Sopäd-Team-Design. Eigene Farbe „Tafelgrün“: Akzent #2E6B57 (dunkel #7FC4A6), Grund #F5F6F1 (dunkel #14201B), Fläche #DCEDE4. Senfgelb (`--sig`) bleibt Signalfarbe.
+- Logo: grünes Notenheft mit Etikett, Haken und blassem Lesebändchen (`somi-logo.svg`, `LOGO` in `quelle/somi.html`, Icons daraus).
+- Formen, Abstände und Bausteine wie Pfad-Design B.
 - Systemschrift, Tippziele mind. 40 px, Schrift in Feldern mind. 16 px, eigene Dialoge statt `confirm`/`prompt`.
 - Noten nie sichtbar, wenn das iPad am Beamer hängen könnte (Sichtschutz-Knopf ab Version 0.2).
 - Keine Punkte, Abzeichen, Ranglisten, keine Strichlisten für Meldungen.

@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.1.0, Stand 03.11.2026)
+# SoMi – Funktionen (Version 0.1.1, Stand 03.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 

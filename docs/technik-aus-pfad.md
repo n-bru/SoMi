@@ -12,6 +12,7 @@ Stand der Kopie: Pfad 1.1.3 (26.10.2026).
 | `toast`, `undoToast`, `dlg`, `ask`, `askText` | gleich | `ask` mit Untertitel |
 | `go`, `back`, `navTo`, `renderNav` | gleich | eigene Bereiche |
 | `applyTheme`, Hell/Dunkel, Schriftgröße | gleich | – |
+| Design B (Formen, Abstände, Bausteine) | angepasst | eigene Farben „Tafelgrün“ und eigenes Logo, nicht Sopäd-Team-Design |
 | `envHint`, Service Worker, `navigator.storage.persist` | vereinfacht | Einrichtungsseite mit Bildern noch nicht übernommen |
 | Einrichtungsschritte (`SETUP`, `markFor`, `mk`, `mtip`) | angepasst | Schritte: App-Sperre, Beispielklasse, Sicherung |
 | `pwKey`, `gcm`, `ungcm`, `idb*`, `askNewPw`, `backupKey`, `forgetBackupPw` | gleich | IndexedDB `somi` |

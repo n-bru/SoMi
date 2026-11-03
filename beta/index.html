@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fbf6ef">
+<meta name="theme-color" content="#f5f6f1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SoMi Beta">
@@ -14,13 +14,13 @@
 <link rel="icon" href="icon-192.png">
 <title>SoMi Beta</title>
 <style>
-/* Design B „warm und freundlich“ wie Pfad, Akzent #B4532C (Sopäd-Team-Design) */
-:root{--bg:#fbf6ef;--card:#fffdf9;--ink:#2b2420;--muted:#6e6259;--line:#efe4d6;--soft:#f5ece0;
---acc:#b4532c;--acc-ink:#fff;--accs:#fbe6dc;--up:#3b6e47;--ups:#e4f1e3;--down:#a63a2e;--downs:#f9e1dc;--new:#8a640c;--news:#f8edcf;--sig:#e3a008;--sigt:#8a6200;--sig-ink:#2b2420}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#1d1916;--card:#27221e;--ink:#f3ece4;--muted:#b3a69b;--line:#3a332d;--soft:#322b26;
---acc:#f0936b;--acc-ink:#1d1916;--accs:#43291f;--up:#8ccb98;--ups:#20301f;--down:#f28d7f;--downs:#3b2320;--new:#e8c15f;--news:#382d16;--sig:#f5c542;--sigt:#f5c542;--sig-ink:#1d1916}}
-:root[data-theme=dark]{color-scheme:dark;--bg:#1d1916;--card:#27221e;--ink:#f3ece4;--muted:#b3a69b;--line:#3a332d;--soft:#322b26;
---acc:#f0936b;--acc-ink:#1d1916;--accs:#43291f;--up:#8ccb98;--ups:#20301f;--down:#f28d7f;--downs:#3b2320;--new:#e8c15f;--news:#382d16;--sig:#f5c542;--sigt:#f5c542;--sig-ink:#1d1916}
+/* SoMi-Farben „Tafelgrün“ (eigene Farbgebung, nicht Sopäd-Team-Design) */
+:root{--bg:#f5f6f1;--card:#fffffe;--ink:#1f2622;--muted:#5e6a63;--line:#dfe5dd;--soft:#ebf0e9;
+--acc:#2e6b57;--acc-ink:#fff;--accs:#dcede4;--up:#3b6e47;--ups:#e4f1e3;--down:#a63a2e;--downs:#f9e1dc;--new:#8a640c;--news:#f8edcf;--sig:#e3a008;--sigt:#8a6200;--sig-ink:#1f2622}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14201b;--card:#1c2a24;--ink:#e8efea;--muted:#a3b3aa;--line:#2c3d35;--soft:#22312a;
+--acc:#7fc4a6;--acc-ink:#10201a;--accs:#24392f;--up:#8ccb98;--ups:#20301f;--down:#f28d7f;--downs:#3b2320;--new:#e8c15f;--news:#382d16;--sig:#f5c542;--sigt:#f5c542;--sig-ink:#14201b}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#14201b;--card:#1c2a24;--ink:#e8efea;--muted:#a3b3aa;--line:#2c3d35;--soft:#22312a;
+--acc:#7fc4a6;--acc-ink:#10201a;--accs:#24392f;--up:#8ccb98;--ups:#20301f;--down:#f28d7f;--downs:#3b2320;--new:#e8c15f;--news:#382d16;--sig:#f5c542;--sigt:#f5c542;--sig-ink:#14201b}
 :root{font-size:16px}:root[data-fs=l]{font-size:18px}:root[data-fs=xl]{font-size:20px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.45 ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -46,7 +46,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .tag.na{background:var(--news);color:var(--new)}.tag.zd{background:var(--ups);color:var(--up)}
 label{display:block;font-weight:600;margin:14px 0 6px}
 .sub{font-weight:400;color:var(--muted);font-size:.86rem;margin:-2px 0 6px}
-input,select,textarea{font:inherit;font-size:max(16px,1rem);color:var(--ink);background:var(--card);border:1.5px solid #c8b9a8;border-radius:12px;padding:11px 12px;width:100%}
+input,select,textarea{font:inherit;font-size:max(16px,1rem);color:var(--ink);background:var(--card);border:1.5px solid #b7c3bb;border-radius:12px;padding:11px 12px;width:100%}
 input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--sig);outline-offset:1px}
 textarea{min-height:76px;resize:vertical}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -100,7 +100,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.1.0 Beta",SOMI_STAND="03.11.2026";
+const SOMI_VERSION="0.1.1 Beta",SOMI_STAND="03.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -118,7 +118,7 @@ function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=
   if(db.sus.length+db.groups.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
 function applyTheme(){const t=db?.theme,r=document.documentElement;if(t==="light"||t==="dark")r.dataset.theme=t;else delete r.dataset.theme;
   if(db?.fs==="l"||db?.fs==="xl")r.dataset.fs=db.fs;else delete r.dataset.fs;
-  const dark=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.querySelector('meta[name=theme-color]')?.setAttribute("content",dark?"#1d1916":"#fbf6ef")}
+  const dark=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.querySelector('meta[name=theme-color]')?.setAttribute("content",dark?"#14201b":"#f5f6f1")}
 let SAVEQ=Promise.resolve(),SAVEN=0;
 function save(){if(ENCWAIT)return; // gesperrt und noch nicht entschlüsselt: nichts überschreiben
   if(db.lock&&LKEY){const n=++SAVEN,key=LKEY,json=JSON.stringify(db),meta={somiEnc:1,salt:db.lock.salt,after:db.lock.after,len:db.lock.len};
@@ -166,7 +166,7 @@ async function pickIcon(cur,cls){const used=new Set(db.sus.filter(s=>s.cls===cls
 
 /* ===== Navigation ===== */
 let view={tab:"heute"};
-const LOGO='<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#FBE6DC"/><g fill="none" stroke="#B4532C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="11" width="32" height="42" rx="5"/><path d="M23 22h18M23 30h18M23 38h8M34 41l4 4 7-8"/></g></svg>';
+const LOGO='<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#DCEDE4"/><rect x="14" y="9" width="36" height="44" rx="5" fill="#2E6B57"/><path d="M19 9v44" stroke="#DCEDE4" stroke-width="2" opacity=".45"/><rect x="23" y="17" width="22" height="14" rx="3" fill="#F5F6F1"/><path d="M28 24l3.5 3.5 7-8" fill="none" stroke="#2E6B57" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M40 53v6l3-2.4 3 2.4v-6z" fill="#7FC4A6" stroke="#7FC4A6" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 const ICON={
 heute:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
 gruppen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.4-.2 4 1.3 4.5 4.3"/></svg>',
