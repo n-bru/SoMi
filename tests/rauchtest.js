@@ -72,7 +72,21 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.locator("text=DEMO Mathe").count()>0,"Daten nach Entsperren da");
   // 0.2 Sonstige Mitarbeit: Erfassen, Sichtschutz, nur Rückmeldung, Übersicht
   await p.click("nav >> text=Heute");ok(await p.locator("text=Schnell erfassen").count()===1,"Schnell erfassen auf Heute");
-  await p.click(".card >> button:has-text('DEMO Mathe')");ok(await p.locator("h1",{hasText:"Erfassen"}).count()===1,"Erfassen geöffnet");
+  // 0.2.1 Ganze Klasse nacheinander
+  await p.click(".card >> button:has-text('DEMO Mathe: ganze Klasse')");ok(await p.locator("h1",{hasText:"Erfassen"}).count()===1,"Erfassen geöffnet");
+  ok(await p.locator(".seqsus:has-text('DEMO-01')").count()===1&&await p.locator("text=1 von").count()===1,"Ganze Klasse: startet mit DEMO-01");
+  let s0=await p.evaluate(()=>db.obs.length);
+  await p.click(".pad button:text-is('3')");ok(await p.locator(".seqsus:has-text('DEMO-02')").count()===1,"nach Note weiter zu DEMO-02");
+  await p.click("button:has-text('nicht anwesend')");ok(await p.locator(".seqsus:has-text('DEMO-03')").count()===1,"nicht anwesend überspringt");
+  ok(await p.evaluate(n=>db.obs.length===n+1&&!db.obs.some(o=>o.sid===db.sus.find(s=>s.code==="DEMO-02").id&&o.d===today()&&o.k==="qual"&&o.n==="3"),s0),"nicht anwesend speichert nichts");
+  await p.click("button:has-text('Vorherige')");await p.click("button:has-text('Vorherige')");
+  ok(await p.locator("text=schon bewertet").count()===1,"Zurück zeigt: schon bewertet");
+  await p.click(".pad button:text-is('2')");ok(await p.evaluate(n=>db.obs.length===n+1&&db.obs.at(-1).n==="2",s0),"neue Note ersetzt die alte");
+  const nM=await p.evaluate(()=>groupById(ER.gid).members.length);
+  for(let i=1;i<nM;i++)await p.click("button:has-text('nicht anwesend')");
+  ok(await p.locator(".seqdone:has-text('1 bewertet')").count()===1,"Fertig-Anzeige");
+  await p.evaluate(n=>{db.obs=db.obs.slice(0,n);save()},s0);
+  await p.click(".pick button:has-text('Einzeln bewerten')");ok(await p.locator(".tile").count()>0,"Umschalten auf Einzeln");
   const n0=await p.evaluate(()=>db.obs.length);ok(n0>0,"Beispielklasse hat fiktive Einträge");
   await p.click(".pad button:text-is('2')");ok(await p.locator(".toast",{hasText:"Tippe zuerst"}).count()===1,"ohne Auswahl keine Note");
   await p.click(".chips button:has-text('Kooperation')");

@@ -22,7 +22,7 @@
 ## Offene Punkte
 
 1. **GitHub Pages einschalten** (Nick): Repo-Einstellungen → Pages → Branch `main`, Ordner `/`. Erst dann ist die Beta erreichbar.
-2. **Version 0.2.0 als Beta** (03.11.2026): Mathe Sonstige Mitarbeit. Wartet auf Nicks Prüfung auf dem iPad, danach ggf. Hauptversion.
+2. **Version 0.2.1 als Beta** (03.11.2026): Mathe Sonstige Mitarbeit, ab 0.2.1 mit „Ganze Klasse nacheinander“ (inkl. „nicht anwesend“) und „Einzeln bewerten“. Wartet auf Nicks Prüfung auf dem iPad, danach ggf. Hauptversion.
 3. **Version 0.3:** Klassenarbeiten (Punkte, Notenschlüssel E/G/ohne, Nachteilsausgleich-Vermerk) und Notenvorschlag 40/60.
 4. **Version 0.4:** Arbeits- und Sozialverhalten, Rücklauf-Listen.
 5. **Version 0.5:** Sport (Gewichtung offen, Vorschlag 50/10/20/20), LE-Förderplanziele, PDFs, Stundenplan.

@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.2.0, Stand 03.11.2026)
+# SoMi – Funktionen (Version 0.2.1, Stand 03.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -16,6 +16,11 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - **Sichtschutz:** Noten sind nach jedem Start verborgen (●●). „Noten zeigen“ blendet sie ein, bis du sie wieder verbirgst oder SoMi neu startest. Beim Erfassen nennt der Hinweis die Note nur, wenn Noten gezeigt werden.
 - **Hinweis „Seit 2 Wochen ohne Eintrag“** beim Erfassen.
 - Sport: Noten kommen in Version 0.5.
+
+### Zwei Wege zum Erfassen (ab 0.2.1)
+- **Ganze Klasse nacheinander:** zeigt ein Kürzel nach dem anderen (nach Nummer sortiert). Note tippen speichert und springt weiter. „nicht anwesend“ springt weiter und speichert nichts. „‹ Vorherige:r“ geht zurück; eine neue Note ersetzt die aus diesem Durchgang. Am Ende: „Fertig: X bewertet, Y nicht anwesend“.
+- **Einzeln bewerten:** Kürzel-Kacheln antippen (auch mehrere), dann Note. Wie in 0.2.0.
+- Auf „Heute“ und in der Lerngruppe gibt es beide Knöpfe nebeneinander; oben im Erfassen-Bildschirm lässt sich umschalten.
 
 ## Einrichtung
 Drei Schritte: Code für die App-Sperre, fiktive Beispielklasse, erste Sicherung.
