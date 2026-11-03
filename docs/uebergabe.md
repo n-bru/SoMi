@@ -22,9 +22,9 @@
 ## Offene Punkte
 
 1. **GitHub Pages einschalten** (Nick): Repo-Einstellungen → Pages → Branch `main`, Ordner `/`. Erst dann ist die Beta erreichbar.
-2. **Version 0.2:** Mathe Sonstige Mitarbeit (Schnelleingabe mit SILP-Kriterien, Notenskala 1–6 mit ±, „nur Rückmeldung“, Sichtschutz).
+2. **Version 0.2.0 als Beta** (03.11.2026): Mathe Sonstige Mitarbeit. Wartet auf Nicks Prüfung auf dem iPad, danach ggf. Hauptversion.
 3. **Version 0.3:** Klassenarbeiten (Punkte, Notenschlüssel E/G/ohne, Nachteilsausgleich-Vermerk) und Notenvorschlag 40/60.
 4. **Version 0.4:** Arbeits- und Sozialverhalten, Rücklauf-Listen.
 5. **Version 0.5:** Sport (Gewichtung offen, Vorschlag 50/10/20/20), LE-Förderplanziele, PDFs, Stundenplan.
 6. **Aufbewahrungsfrist** mit DSB bestätigen.
-7. **Freigabe** durch Schulleitung und DSB vor dem Einsatz mit echten Noten.
+7. **Freigabe** durch Schulleitung und DSB: Nick hält sie nicht für nötig (03.11.2026). Die App weist in den Einstellungen weiter darauf hin.
