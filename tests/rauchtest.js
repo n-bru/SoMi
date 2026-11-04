@@ -128,6 +128,20 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>db.att.length===6&&db.att.filter(a=>a.st==="abw").length===1),"Sport: Status ersetzt, nicht doppelt");
   await p.click("button:has-text('Zur Übersicht')");ok(await p.locator(".tbl tr:has-text('DEMO-02') td").nth(1).innerText().then(t=>t==="1"),"Sport-Übersicht zählt ohne Sachen");
   ok(await p.evaluate(()=>!okAtt({id:"a",gid:"b",sid:"c",st:"x",d:"2026-01-01",upd:1})),"Prüfhelfer okAtt");
+  // Namen: getrennt, verschlüsselt, nicht in der Sicherung
+  await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
+  await p.click("button:has-text('Namen eintragen')");await p.locator("input[aria-label='Name zu DEMO-01']").fill("Fiktiv Testname");
+  await p.click("button:has-text('Namen speichern')");ok(await p.locator(".nm:has-text('Fiktiv Testname')").count()===1,"Name wird beim Kürzel angezeigt");
+  await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>{const n=localStorage.getItem("somi-beta-namen"),m=localStorage.getItem("somi-beta");return !!n&&n.includes('"somiEnc":1')&&!n.includes("Testname")&&!m.includes("Testname")&&!JSON.stringify(db).includes("Testname")}),"Namen getrennt und verschlüsselt gespeichert");
+  await p.click("nav >> text=Heute");await p.click(".card >> button:has-text('DEMO Mathe: ganze Klasse')");
+  await p.click("button:has-text('Namen verbergen')");ok(await p.locator(".nm").count()===0,"Namen verbergen");await p.click("button:has-text('Namen zeigen')");
+  await p.reload();for(const d of "2468")await p.click(`#lock .keys button:text-is("${d}")`);await p.waitForSelector("#lock",{state:"detached"});
+  ok(await p.evaluate(()=>NAMES[db.sus.find(s=>s.code==="DEMO-01").id]==="Fiktiv Testname"),"Namen nach Entsperren wieder da");
+  await p.click("nav >> text=Einstellungen");
+  const [dn]=await Promise.all([p.waitForEvent("download"),p.click("button:has-text('Namensliste sichern')")]);
+  const nf=path.join(require("os").tmpdir(),"somi-namen-test.json");await dn.saveAs(nf);
+  ok(JSON.parse(fs.readFileSync(nf,"utf8")).art==="namen"&&!fs.readFileSync(nf,"utf8").includes("Testname"),"Namensliste als verschlüsselte Datei");
   // XSS: Kürzel mit HTML wird maskiert
   await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("text=+ Schüler:in");await p.fill("#scode",'7<img src=x onerror=alert(1)>');await p.click("button:has-text('Hinzufügen')");
