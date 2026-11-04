@@ -93,6 +93,8 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.locator(".seqdone:has-text('1 bewertet')").count()===1,"Fertig-Anzeige");
   await p.evaluate(n=>{db.obs=db.obs.slice(0,n);save()},s0);
   await p.click(".pick button:has-text('Einzeln bewerten')");ok(await p.locator(".tile").count()>0,"Umschalten auf Einzeln");
+  ok(await p.locator(".pad.st button[data-s='3']",{hasText:"erfüllt"}).count()===1&&await p.locator(".pad.st .nt").count()===4,"Stufenknöpfe mit Note darunter");
+  if(process.env.SHOT2)await p.locator(".padwrap").first().screenshot({path:process.env.SHOT2});
   const n0=await p.evaluate(()=>db.obs.length);ok(n0>0,"Beispielklasse hat fiktive Einträge");
   await p.click(".pad button[data-s='3']");ok(await p.locator(".toast",{hasText:"Tippe zuerst"}).count()===1,"ohne Auswahl keine Note");
   await p.click(".chips button:has-text('Kooperation')");

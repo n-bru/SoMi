@@ -30,7 +30,7 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Daten: `db.att = [{id,gid,sid,d,st,upd}]`, geprüft mit `okAtt`, in Sicherung und Import enthalten.
 
 ## Stufen und Notenvorschlag (ab 0.2.4)
-- Beobachtungen in 4 Stufen: ++ mehr als gut, + gut (SILP-Anker „gut“), o teilweise, − kaum (Anker „ausreichend“ nicht erreicht). Gespeichert als `o.s` ("4" bis "1"); alte Einträge mit Note `o.n` bleiben gültig.
+- Beobachtungen in 4 Stufen: ++ übertroffen, + erfüllt (SILP-Anker „gut“), o teilweise erfüllt, − kaum erfüllt (Anker „ausreichend“ nicht erreicht); unter jedem Knopf klein die umgerechnete Note. Notenvorschlag: Mittel je Kriterium, dann gewichtet (1×–3×, Einstellungen). Gespeichert als `o.s` ("4" bis "1"); alte Einträge mit Note `o.n` bleiben gültig.
 - Umrechnung: jede Stufe hat einen Notenwert (Standard 1 / 2 / 3,5 / 5, Einstellungen → „Umrechnung Stufen → Note“, gespeichert als `db.stw`). Der Mittelwert der zählenden Einträge wird auf Drittel gerundet: 2,33 → 2−, 2,67 → 3+; genau in der Mitte zugunsten der Schüler:innen.
 - Übersicht und Kürzel-Seite zeigen den Notenvorschlag, verborgen durch den Sichtschutz.
 
