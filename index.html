@@ -25,6 +25,8 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.45 ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
+main{padding-top:max(16px,calc(env(safe-area-inset-top) + 12px))} /* iPhone: Inhalt unter Uhrzeit/Akku-Leiste beginnen */
+body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top);background:var(--bg);z-index:6;pointer-events:none} /* Leiste oben deckt beim Scrollen ab */
 @media (min-width:900px) and (orientation:landscape){main{max-width:860px;padding-left:24px;padding-right:24px}}
 h1{font-size:1.9rem;font-weight:800;margin:6px 0 12px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
 h1::before{content:"";width:14px;height:14px;border-radius:5px;background:var(--acc);transform:rotate(45deg);flex:none}
@@ -76,9 +78,36 @@ nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
 .mark{outline:4px solid var(--sig)!important;outline-offset:3px}
 .chk{list-style:none;padding:0;margin:8px 0 12px;display:grid;gap:4px}.chk li.ok{color:var(--muted);text-decoration:line-through}
 .logo{width:34px;height:34px;flex:none}
+/* Erfassen */
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 12px;font-weight:700;font-size:.88rem;min-height:40px}
+.chips .on{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.anc{margin:4px 0 0;padding-left:18px}.anc li{margin:3px 0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin:10px 0 4px}
+.tile{position:relative;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--card);border-radius:16px;padding:8px;min-height:56px;text-align:left}
+.tile .code{font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tile .tag{position:absolute;right:6px;bottom:4px;font-size:.66rem;padding:0 5px}
+.tile.on{border:2.5px solid var(--acc);background:var(--accs)}
+.tiles:has(.nm){grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.tile .done{position:absolute;top:4px;right:8px;color:var(--acc);font-weight:900}
+.padwrap{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));z-index:3;background:var(--card);margin:10px -8px 4px;padding:8px;border-radius:18px;box-shadow:0 -8px 16px -12px rgba(0,0,0,.35)}
+.pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.pad.st{grid-template-columns:repeat(4,1fr)}.pad.st .nt{opacity:.7;font-weight:600}.pad.st button{min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.pad.st b{font-size:1.5rem;line-height:1}.pad.st span{font-size:.75rem;font-weight:600;color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--soft);margin:8px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
+.seqsus{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 8px}.seqsus .code{font-size:2rem}.kic.big{width:60px;height:60px;font-size:2rem}
+.btn.abw{border-style:dashed}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.three .btn{padding-left:4px;padding-right:4px}
+.nm{display:block;font-size:.8rem;font-weight:600;color:var(--muted);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}h1 .nm{font-size:1rem}.seqsus .nm{font-size:1.1rem}
+.seqk{text-align:center;margin:4px 0 0;font-size:1.15rem}
+.stgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stgrid .btn{min-height:64px;font-size:1.05rem}.stgrid .btn.cur{outline:3px solid var(--sig);outline-offset:2px}
+body:has(.padwrap) .toast{bottom:auto;top:max(12px,env(safe-area-inset-top))} /* Hinweis nicht über die Noten-Tasten legen */
+.pad button{min-height:48px;border-radius:14px;border:1.5px solid var(--line);background:var(--soft);font-weight:800;font-size:1.1rem;font-variant-numeric:tabular-nums}
+.pad button:active{background:var(--acc);color:var(--acc-ink)}
+.btn.ss{padding:8px 12px;font-size:.88rem}.btn.ss.on{background:var(--news);border-color:var(--sig)}
+.hide{letter-spacing:2px;color:var(--muted);font-size:.7em}
+.tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}.tbl th,.tbl td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl thead th{font-size:.78rem;color:var(--muted);font-weight:700}.tbl tbody tr{cursor:pointer}.tbl .num{text-align:right}.tbl .verl{white-space:normal;font-weight:700}
+.tbl .old{color:var(--down);font-weight:700}
+.obsl{list-style:none;padding:0;margin:8px 0}.obsl li{display:flex;align-items:center;gap:4px;padding:8px 0;border-top:1px solid var(--line)}
 .head{display:flex;align-items:center;gap:10px;margin:2px 0 4px}.head .kl{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 /* App-Sperre */
 #lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;padding:24px;overflow:auto}
+#lock{padding-top:max(24px,calc(env(safe-area-inset-top) + 12px))}
 #lock .box{max-width:340px;width:100%;text-align:center}
 #lock h1{justify-content:center}#lock h1::before{display:none}
 #lock .pins{display:flex;justify-content:center;gap:14px;margin:18px 0 8px}
@@ -89,7 +118,7 @@ nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
 #lock .keys button.nb{border:none;background:none;font-size:.8rem;font-weight:600;color:var(--muted)}#lock .keys button.nb:last-child{font-size:1.3rem;color:var(--ink)}
 body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .toast{visibility:hidden}
 @media (prefers-reduced-motion:reduce){#lock .pins.bad{animation:none}}
-@media print{nav,.noprint{display:none!important}main{padding:0}#lock{display:none!important}}
+@media print{nav,.noprint,body::before{display:none!important}main{padding:0}#lock{display:none!important}}
 </style>
 </head>
 <body>
@@ -99,7 +128,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.1.3",SOMI_STAND="03.11.2026";
+const SOMI_VERSION="0.2.9",SOMI_STAND="04.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -108,13 +137,13 @@ const FRIST_JAHRE=5; // VO-DV I § 9 Abs. 1: „alle übrigen Daten“, ab Ende 
 let db;
 // Mit App-Sperre liegt im Speicher nur ein verschlüsselter Umschlag {somiEnc,salt,iv,ct}; db bleibt bis zum Entsperren leer
 let ENCWAIT=null,LKEY=null;
-const leer=()=>({v:1,sus:[],groups:[],del:[]});
+const leer=()=>({v:1,sus:[],groups:[],obs:[],att:[],del:[]});
 function load(){try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
   if(db?.somiEnc){ENCWAIT=db;db={...leer(),lock:{salt:ENCWAIT.salt,after:ENCWAIT.after??1,len:ENCWAIT.len||4}}}
   migrate()}
-function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];
-  const n=db.sus.length+db.groups.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);
-  if(db.sus.length+db.groups.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
+function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];if(!Array.isArray(db.obs))db.obs=[];if(!Array.isArray(db.att))db.att=[];
+  const n=db.sus.length+db.groups.length+db.obs.length+db.att.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);db.obs=db.obs.filter(okObs);db.att=db.att.filter(okAtt);
+  if(db.sus.length+db.groups.length+db.obs.length+db.att.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
 function applyTheme(){const t=db?.theme,r=document.documentElement;if(t==="light"||t==="dark")r.dataset.theme=t;else delete r.dataset.theme;
   if(db?.fs==="l"||db?.fs==="xl")r.dataset.fs=db.fs;else delete r.dataset.fs;
   const dark=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.querySelector('meta[name=theme-color]')?.setAttribute("content",dark?"#14201b":"#f5f6f1")}
@@ -139,8 +168,8 @@ const okId=s=>typeof s==="string"&&/^[A-Za-z0-9_-]{1,40}$/.test(s),okDate=s=>typ
 const okStr=(s,n=4000)=>s==null||typeof s==="string"&&s.length<=n,okNum=v=>v==null||typeof v==="number"&&isFinite(v);
 const okSY=s=>typeof s==="string"&&/^\d{4}\/\d{2}$/.test(s);
 function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&okNum(s.upd)}catch(e){return false}}
-function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&okNum(g.upd)}catch(e){return false}}
-const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f)};
+function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&(g.lastK==null||Object.hasOwn(KMAP,g.lastK))&&(g.lastKs==null||Array.isArray(g.lastKs)&&g.lastKs.length<=12&&g.lastKs.every(k=>Object.hasOwn(KMAP,k)))&&okNum(g.upd)}catch(e){return false}}
+const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f),hausa:v=>typeof v==="boolean",stw:v=>okStw(v),kgw:v=>okKgw(v)};
 const susById=id=>db.sus.find(s=>s.id===id);
 const groupById=id=>db.groups.find(g=>g.id===id);
 const gName=g=>`${g.cls} ${g.fach}${g.kurs&&g.kurs!=="-"?" "+g.kurs:""}`;
@@ -163,6 +192,235 @@ async function pickIcon(cur,cls){const used=new Set(db.sus.filter(s=>s.cls===cls
   <div class="duo" style="margin-top:12px"><button class="btn" data-a="0">Abbrechen</button><button class="btn" data-a="r">Zufällig</button></div>`,
   (el,done)=>{el.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>done(b.dataset.i));el.querySelector('[data-a="0"]').onclick=()=>done(null);el.querySelector('[data-a="r"]').onclick=()=>done(freeIcon(cls))})}
 
+
+/* ===== Sonstige Mitarbeit Mathe (ab 0.2) =====
+   Kriterien und Ankertexte nach SILP Mathe 4.2 der Schule. Einträge: db.obs = [{id,gid,sid,k,n,fb,d,t,upd}] */
+const NOTEN=["1+","1","1-","2+","2","2-","3+","3","3-","4+","4","4-","5+","5","5-","6"];
+const nWert=n=>{const b=+n[0];return n[1]==="+"?b-.3:n[1]==="-"?b+.3:b};
+const nTxt=n=>n.replace("-","−");
+/* Ab 0.2.4: Beobachtungen in 4 Stufen (o.s), alte Einträge mit Note (o.n) bleiben gültig.
+   Umrechnung: jede Stufe hat einen Notenwert (Einstellungen), der Mittelwert wird auf Drittel gerundet → Note mit + und −. */
+const STUF={"4":{t:"++",l:"übertroffen"},"3":{t:"+",l:"erfüllt"},"2":{t:"o",l:"teilweise erfüllt"},"1":{t:"−",l:"kaum erfüllt"}};
+const STW0={"4":1,"3":2,"2":3.5,"1":5};
+const stw=()=>({...STW0,...(db.stw||{})});
+const okKgw=v=>!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).every(k=>Object.hasOwn(KMAP,k)&&[1,2,3].includes(v[k]));
+const okStw=v=>!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).every(k=>Object.hasOwn(STUF,k)&&typeof v[k]==="number"&&v[k]>=1&&v[k]<=6);
+const oWert=o=>o.s?stw()[o.s]:nWert(o.n);
+const oTxt=o=>o.s?STUF[o.s].t:nTxt(o.n);
+function noteOf(m){if(m==null)return null;const n=Math.min(6,Math.max(1,Math.ceil(m*3-.5-1e-9)/3)) /* genau in der Mitte: zugunsten der Schüler:innen */,b=Math.round(n),d=n-b;
+  if(b>=6)return "6";return d<-.01?b+"+":d>.01?b+"-":String(b)}
+const noteTxt=m=>m==null?"–":nTxt(noteOf(m));
+const KRIT=[
+ {k:"qual",t:"Qualität der Beiträge",hint:"Fehler in Erarbeitungs- und Übungsphasen nicht abwerten (Kernlehrplan Mathe). Im Zweifel „nur Rückmeldung“.",
+  gut:["nennt richtige Lösungen und begründet sie nachvollziehbar","geht selbstständig auf andere Lösungen ein, findet Argumente und Begründungen","stellt Ergebnisse auf unterschiedliche Art und mit verschiedenen Medien dar"],
+  aus:["nennt teilweise richtige Lösungen, meist ohne nachvollziehbare Begründung","geht selten auf andere Lösungen ein, nennt Argumente, kann sie aber nicht begründen","stellt Ergebnisse nur auf eine Art dar"]},
+ {k:"kont",t:"Kontinuität",hint:"Eher pro Woche oder Reihe bewerten, nicht jede Stunde.",
+  gut:["beteiligt sich regelmäßig am Unterrichtsgespräch"],aus:["nimmt eher selten am Unterrichtsgespräch teil"]},
+ {k:"selbst",t:"Selbstständigkeit",
+  gut:["bringt sich von sich aus ein","ist ausdauernd bei der Sache, erledigt Aufgaben gründlich und zuverlässig","erarbeitet neue Inhalte weitgehend selbstständig, fragt selbst nach","erarbeitet bereitgestellte Materialien selbstständig"],
+  aus:["beteiligt sich gelegentlich eigenständig","braucht oft eine Aufforderung zum Arbeitsbeginn, arbeitet Rückstände nur teilweise auf","erarbeitet neue Inhalte mit viel Hilfe, fragt selten nach","erarbeitet bereitgestellte Materialien eher lückenhaft"]},
+ {k:"hausa",t:"Hausaufgaben (LZ)",opt:true,
+  gut:["erledigt LZ-Aufgaben sorgfältig und vollständig","trägt sie mit nachvollziehbaren Erläuterungen vor"],
+  aus:["erledigt LZ-Aufgaben weitgehend vollständig, teils oberflächlich","nennt Ergebnisse, erläutert erst auf Nachfrage und oft unvollständig"]},
+ {k:"koop",t:"Kooperation",hint:"Mehrere Kürzel antippen, dann gilt die Note für die ganze Gruppe.",
+  gut:["bringt sich ergebnisorientiert in Gruppen- und Teamarbeit ein","arbeitet kooperativ und respektiert Beiträge anderer"],
+  aus:["bringt sich nur wenig in die Gruppen- und Teamarbeit ein","unterstützt die Gruppenarbeit wenig, stört aber nicht"]},
+ {k:"fach",t:"Fachsprache",gut:["wendet Fachbegriffe sachangemessen an und kann ihre Bedeutung erklären"],aus:["versteht Fachbegriffe nicht immer, wendet sie teils nicht sachangemessen an"]},
+ {k:"werk",t:"Werkzeuge",gut:["setzt Werkzeuge sicher beim Bearbeiten und Darstellen ein"],aus:["braucht häufig Hilfe beim Einsatz von Werkzeugen"]},
+ {k:"praes",t:"Präsentation",gut:["präsentiert vollständig, strukturiert und gut nachvollziehbar"],aus:["präsentiert an mehreren Stellen eher oberflächlich, mit Verständnislücken"]},
+ {k:"port",t:"Portfolio, Heft",gut:["führt das Portfolio sorgfältig und vollständig"],aus:["führt das Portfolio weitgehend sorgfältig, aber teils unvollständig"]},
+ {k:"sue",t:"Schriftliche Übung",hint:"Etwa 20 Minuten. Rechne die Punkte selbst um.",gut:["ca. 75 % der Punkte"],aus:["ca. 50 % der Punkte"]}];
+const KMAP=Object.fromEntries(KRIT.map(x=>[x.k,x]));
+const kritList=()=>KRIT.filter(x=>!x.opt||db.hausa);
+function okObs(o){try{return !!o&&okId(o.id)&&okId(o.gid)&&okId(o.sid)&&Object.hasOwn(KMAP,o.k)&&(o.s==null?NOTEN.includes(o.n):Object.hasOwn(STUF,o.s)&&o.n==null)&&(o.fb==null||typeof o.fb==="boolean")&&okDate(o.d)&&okStr(o.t,300)&&okNum(o.upd)}catch(e){return false}}
+const obsOf=(gid,sid)=>db.obs.filter(o=>o.gid===gid&&(!sid||o.sid===sid));
+/* Sport: Stundenstatus. db.att = [{id,gid,sid,d,st,upd}], höchstens einer pro Gruppe, Kürzel und Tag */
+const ST={akt:"aktiv",ohne:"ohne Sportsachen",unf:"sportunfähig",abw:"nicht anwesend"};
+function okAtt(a){try{return !!a&&okId(a.id)&&okId(a.gid)&&okId(a.sid)&&Object.hasOwn(ST,a.st)&&okDate(a.d)&&okNum(a.upd)}catch(e){return false}}
+const msOf=g=>g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code));
+const profTag=s=>(s.profil||"r")==="zd"?'<span class="tag zd">LE</span>':(s.profil==="na"?'<span class="tag na">NA</span>':"");
+const bigSus=s=>`<div class="seqsus">${susIcon(s).replace('class="kic"','class="kic big"')}<span><span class="code">${esc(s.code)}</span>${nm(s)}</span>${profTag(s)}</div>`;
+/* Namen: getrennt von den Noten unter eigenem Speicherplatz (KEY+"-namen"), nur mit App-Sperre, verschlüsselt mit demselben Schlüssel.
+   Nicht in der normalen Sicherung; eigene Datei „Namensliste“. NSHOW = Namen in dieser Sitzung zeigen. */
+const NKEY=KEY+"-namen";let NAMES={},NSHOW=true;
+const okName=n=>typeof n==="string"&&n.trim().length>0&&n.length<=60;
+const okNames=o=>!!o&&typeof o==="object"&&!Array.isArray(o)&&Object.keys(o).length<=2000&&Object.entries(o).every(([k,v])=>okId(k)&&okName(v));
+const nm=s=>NSHOW&&NAMES[s.id]?`<span class="nm">${esc(NAMES[s.id])}</span>`:"";
+const hasNames=()=>Object.keys(NAMES).length>0;
+const nmBtn=()=>hasNames()?`<button class="btn ss${NSHOW?"":" on"}" onclick="NSHOW=!NSHOW;render()" aria-pressed="${!NSHOW}">${NSHOW?"Namen verbergen":"Namen zeigen"}</button>`:"";
+let NSAVEQ=Promise.resolve();
+function saveNames(){if(!db.lock||!LKEY)return;const key=LKEY,o={...NAMES};for(const k in o)if(!db.sus.some(x=>x.id===k))delete o[k];
+  NSAVEQ=NSAVEQ.then(async()=>{if(!Object.keys(o).length)return localStorage.removeItem(NKEY);localStorage.setItem(NKEY,JSON.stringify({somiEnc:1,...await gcm(key,enc(JSON.stringify(o)))}))}).catch(()=>toast("Namen konnten nicht gespeichert werden."))}
+async function loadNames(key){NAMES={};try{const raw=JSON.parse(localStorage.getItem(NKEY)||"null");if(!raw?.somiEnc)return;const o=JSON.parse(dec(await ungcm(key,raw)));if(okNames(o))NAMES=o}catch(e){}}
+function dropNames(){NAMES={};try{localStorage.removeItem(NKEY)}catch(e){}}
+// Halbjahre: 1. HJ ab 1. August, 2. HJ ab 1. Februar
+const hjStart=()=>{const d=new Date(),y=d.getFullYear(),m=d.getMonth();return m>=7?`${y}-08-01`:m>=1?`${y}-02-01`:`${y-1}-08-01`};
+const sjStart=()=>`${syNow().slice(0,4)}-08-01`;
+const daysAgo=n=>iso(new Date(Date.now()-n*864e5));
+const mean=a=>a.length?a.reduce((s,o)=>s+oWert(o),0)/a.length:null;
+/* Ab 0.2.5: Notenvorschlag = erst Mittelwert je Kriterium, dann gewichteter Mittelwert der Kriterien (Gewicht 1–3, Einstellungen). */
+const kgw=k=>(db.kgw&&db.kgw[k])||1;
+const fmtW=x=>String(x).replace(".",",");
+/* Notenvorschlag erst ab 3 zählenden Beobachtungen in mind. 2 Kriterien (Nicks Entscheidung 04.11.2026) */
+const genug=a=>a.length>=3&&new Set(a.map(o=>o.k)).size>=2;
+const vorschlag=a=>genug(a)?noteTxt(noteMean(a)):"–";
+function noteMean(a){let s=0,w=0;for(const k of new Set(a.map(o=>o.k))){const g=kgw(k);s+=g*mean(a.filter(o=>o.k===k));w+=g}return w?s/w:null}
+const fmt1=x=>x==null?"–":x.toFixed(1).replace(".",",");
+// Sichtschutz: Noten sind nach jedem Start verborgen, bis du sie zeigst
+let SHOW=false;
+const hid=s=>SHOW?s:`<span class="hide" aria-label="verborgen">●●</span>`;
+const EYE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="width:20px;height:20px;vertical-align:-4px"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>'+'</svg>';
+const ssBtn=()=>`<button class="btn ss${SHOW?" on":""}" onclick="SHOW=!SHOW;render()" aria-pressed="${SHOW}">${EYE} ${SHOW?"Noten verbergen":"Noten zeigen"}</button>`;
+const stale=g=>{const lim=daysAgo(14);return g.members.map(susById).filter(Boolean).filter(s=>!db.obs.some(o=>o.gid===g.id&&o.sid===s.id&&o.d>=lim)).sort((a,b)=>byNum(a.code,b.code))};
+
+// Modus: "e" einzeln (Kürzel antippen), "k" ganze Klasse nacheinander (i = Position, run = in diesem Durchgang erfasst)
+// ks = Kriterien der Runde (null = noch nicht gewählt), j = Position im Kriterium, pre = Auswahl vor dem Start
+const erNeu=(gid,mode)=>({gid,mode:mode||"e",sel:[],k:null,fb:false,d:today(),t:"",i:0,j:0,run:{},ks:null,pre:null});
+let ER=erNeu(null);
+function erStart(gid,mode){ER=erNeu(gid,mode);go({tab:view.tab,group:gid,erf:gid})}
+function erMode(m){ER.mode=m;ER.sel=[];render()}
+function erfV(){const g=groupById(view.erf);if(!g||g.arch){view={tab:view.tab,group:view.erf};return groupV()}
+  if(ER.gid!==g.id)ER=erNeu(g.id);
+  if(g.fach==="Sport")return sportV(g);
+  const ks=kritList();let k=ER.k||g.lastK||"qual";if(!ks.some(x=>x.k===k))k="qual";const K=KMAP[k];
+  const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code));
+  const todayK=new Set(db.obs.filter(o=>o.gid===g.id&&o.d===ER.d&&o.k===k).map(o=>o.sid));
+  const st=stale(g);
+  const cell=null;
+  const plus=[1,2,3,4,5].map(i=>i+"+").concat([null]),mid=[1,2,3,4,5,6].map(String),minus=[1,2,3,4,5].map(i=>i+"-").concat([null]);
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
+  <div class="between"><h1 style="margin-bottom:4px">Erfassen</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>
+  <div class="pick" style="grid-template-columns:1fr 1fr;margin-bottom:10px">${[["k","Ganze Klasse nacheinander"],["e","Einzeln bewerten"]].map(([m,t])=>`<button class="${ER.mode===m?"on":""}" aria-pressed="${ER.mode===m}" onclick="erMode('${m}')">${t}</button>`).join("")}</div>
+  ${ER.mode==="k"?"":`<div class="card"><div class="chips" role="group" aria-label="Kriterium">${ks.map(x=>`<button class="${x.k===k?"on":""}" aria-pressed="${x.k===k}" onclick="ER.k='${x.k}';render()">${esc(x.t)}</button>`).join("")}</div>
+  ${K.hint?`<p class="small" style="margin:10px 0 0;color:var(--sigt);font-weight:700">${esc(K.hint)}</p>`:""}
+  <details style="margin-top:8px"><summary class="small" style="font-weight:700;cursor:pointer">Ankertexte aus dem SILP</summary>
+  <div class="two small" style="margin-top:6px"><div><b>gut</b><ul class="anc">${K.gut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div><b>ausreichend</b><ul class="anc">${K.aus.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div></details></div>`}
+  ${ER.mode==="k"?seqCard(g,ms,cell,plus,mid,minus):`<div class="card">
+  <div class="between" style="flex-wrap:wrap"><b>${ER.sel.length?`${ER.sel.length} ausgewählt`:"Kürzel antippen"}</b>${ER.sel.length?`<button class="btn ghost small" onclick="ER.sel=[];render()">Auswahl aufheben</button>`:""}</div>
+  <div class="tiles">${ms.map(s=>`<button class="tile${ER.sel.includes(s.id)?" on":""}" aria-pressed="${ER.sel.includes(s.id)}" onclick="erSel(${ja(s.id)})">${susIcon(s)}<span style="min-width:0"><span class="code" style="display:block">${esc(s.code)}</span>${nm(s)}</span>${todayK.has(s.id)?'<span class="done" aria-label="heute schon erfasst">✓</span>':""}${(s.profil||"r")==="zd"?'<span class="tag zd">LE</span>':(s.profil==="na"?'<span class="tag na">NA</span>':"")}</button>`).join("")||`<p class="muted">Noch niemand in dieser Gruppe.</p>`}</div>
+  <div class="padwrap"><div class="pad st" role="group" aria-label="Stufe">${padH()}</div></div>
+  ${erExtras()}</div>`}
+  ${st.length?`<div class="card"><b>Seit 2 Wochen ohne Eintrag</b><p class="small" style="margin:6px 0 0">${st.map(s=>esc(s.code)).join(", ")}</p></div>`:""}
+  <p><button class="btn block" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht ${esc(gName(g))}</button></p>`}
+const padH=()=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" onclick="addObs('${v}')" aria-label="${x.l}, Notenwert ${fmtW(stw()[v])}"><b>${x.t}</b><span>${x.l}</span><span class="nt">= ${fmtW(stw()[v])}</span></button>`).join("");
+const erExtras=()=>`<label for="erT">Stichwort <span class="muted small">(freiwillig, vor der Stufe eintragen; Diktat über die Tastatur geht auch)</span></label><input id="erT" maxlength="300" value="${esc(ER.t)}" oninput="ER.t=this.value" placeholder="z. B. Lösungsweg an der Tafel erklärt">
+  <label class="swr"><span class="grow">Nur Rückmeldung<span class="sub">Zählt nicht für die Note, z. B. in Übungsphasen.</span></span><input type="checkbox" class="sw" ${ER.fb?"checked":""} onchange="ER.fb=this.checked"></label>
+  <div class="row"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${ER.d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();render()"></div>`;
+const ancBox=K=>`${K.hint?`<p class="small" style="margin:6px 0 0;color:var(--sigt);font-weight:700;text-align:center">${esc(K.hint)}</p>`:""}
+  <details style="margin-top:6px"><summary class="small" style="font-weight:700;cursor:pointer">Ankertexte aus dem SILP</summary>
+  <div class="two small" style="margin-top:6px"><div><b>gut</b><ul class="anc">${K.gut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div><b>ausreichend</b><ul class="anc">${K.aus.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div></details>`;
+function seqSetup(g){const ks=kritList();if(!ER.pre)ER.pre=(g.lastKs||[g.lastK||"qual"]).filter(k=>ks.some(x=>x.k===k));const pre=ER.pre;
+  return `<div class="card"><b>Was hast du heute beobachtet?</b><p class="small muted" style="margin:4px 0 10px">Tippe die Kriterien an, die du in dieser Stunde wirklich gesehen hast. Die Runde fragt bei jedem Kürzel nur diese ab.</p>
+  <div class="chips" role="group" aria-label="Kriterien für die Runde">${ks.map(x=>`<button class="${pre.includes(x.k)?"on":""}" aria-pressed="${pre.includes(x.k)}" onclick="seqPre('${x.k}')">${esc(x.t)}</button>`).join("")}</div>
+  <p style="margin-bottom:0"><button class="btn pri block" ${pre.length?"":"disabled"} onclick="seqGo()">Runde starten${pre.length?` (${pre.length} ${pre.length===1?"Kriterium":"Kriterien"})`:""}</button></p></div>`}
+function seqPre(k){const p=ER.pre||[],i=p.indexOf(k);if(i>=0)p.splice(i,1);else p.push(k);ER.pre=KRIT.map(x=>x.k).filter(x=>p.includes(x));render()}
+function seqGo(){const g=groupById(ER.gid);if(!g||!ER.pre?.length)return;ER.ks=[...ER.pre];ER.j=0;g.lastKs=[...ER.ks];save();render()}
+function seqCard(g,ms,cell,plus,mid,minus){if(!ms.length)return `<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
+  if(!ER.ks)return seqSetup(g);
+  const ks=ER.ks,runs=Object.values(ER.run),nA=runs.filter(v=>v==="abw").length,nB=runs.filter(v=>v!=="abw"&&Object.values(v).some(x=>x!=="skip")).length;
+  const sum=`${nB} bewertet${nA?` · ${nA} nicht anwesend`:""}`;
+  if(ER.i>=ms.length)return `<div class="card seqdone"><b style="font-size:1.2rem">Fertig</b><p>${nB} bewertet${nA?`, ${nA} nicht anwesend`:""}.</p>
+    <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="seqPrev()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.j=0;ER.run={};ER.pre=[...ER.ks];ER.ks=null;render()">Neue Runde</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
+  if(ER.j>=ks.length)ER.j=0;
+  const s=ms[ER.i],r=ER.run[s.id],k=ks[ER.j],K=KMAP[k],had=r&&r!=="abw"?r[k]:null,o=had&&had!=="skip"?db.obs.find(x=>x.id===had):null;
+  const note=r==="abw"?"In dieser Runde: nicht anwesend.":had==="skip"?"In dieser Runde übersprungen.":o?`In dieser Runde schon bewertet: ${hid(oTxt(o))}. Eine neue Stufe ersetzt sie.`:"";
+  return `<div class="card"><div class="between"><b>${ER.i+1} von ${ms.length}</b><span class="muted small">${sum}</span></div>
+  <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
+  ${bigSus(s)}
+  <p class="seqk"><b>${esc(K.t)}</b>${ks.length>1?` <span class="muted small">(${ER.j+1} von ${ks.length})</span>`:""}</p>
+  ${ancBox(k==="koop"?{...K,hint:null}:K)}
+  ${note?`<p class="small" style="text-align:center;margin:6px 0 0">${note}</p>`:""}
+  <div class="padwrap"><div class="pad st" role="group" aria-label="Stufe">${padH()}</div>
+  <div class="three" style="margin-top:6px"><button class="btn" ${ER.i||ER.j?"":"disabled"} onclick="seqPrev()">‹ Zurück</button><button class="btn abw" onclick="seqSkip()">überspringen</button><button class="btn abw" onclick="seqAbw()">nicht anwesend</button></div></div>
+  ${erExtras()}
+  <p style="margin:12px 0 0"><button class="btn ghost small" onclick="ER.pre=[...ER.ks];ER.ks=null;render()">Kriterien ändern</button></p></div>`}
+function seqStep(sid){if(ER.run[sid]==="abw"||ER.j>=ER.ks.length-1){ER.i++;ER.j=0}else ER.j++}
+function seqPrev(){if(ER.j>0)ER.j--;else if(ER.i>0){ER.i--;const ms=msOf(groupById(ER.gid));ER.j=ER.run[ms[ER.i]?.id]==="abw"?0:Math.max(0,(ER.ks?.length||1)-1)}render()}
+function seqDropK(sid,k){const r=ER.run[sid];if(r==="abw"){ER.run[sid]={};return}if(r&&r[k]&&r[k]!=="skip")db.obs=db.obs.filter(o=>o.id!==r[k]);if(r)delete r[k]}
+function seqDropAll(sid){const r=ER.run[sid];if(r&&r!=="abw"){const ids=new Set(Object.values(r));db.obs=db.obs.filter(o=>!ids.has(o.id))}delete ER.run[sid]}
+function seqCur(){const g=groupById(ER.gid);return g&&ER.ks?msOf(g)[ER.i]:null}
+function seqSkip(){const s=seqCur();if(!s)return;const k=ER.ks[ER.j];seqDropK(s.id,k);(ER.run[s.id]??={})[k]="skip";seqStep(s.id);save();render()}
+function seqAbw(){const s=seqCur();if(!s)return;seqDropAll(s.id);ER.run[s.id]="abw";ER.i++;ER.j=0;save();render()}
+function erSel(id){const i=ER.sel.indexOf(id);if(i>=0)ER.sel.splice(i,1);else ER.sel.push(id);render()}
+function addObs(v){const g=groupById(ER.gid);if(!g||!Object.hasOwn(STUF,v))return;const st=STUF[v].t;
+  if(ER.mode==="k"){const s=seqCur(),k=ER.ks?.[ER.j];if(!s||!k)return;const t=ER.t.trim().slice(0,300);
+    if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
+    seqDropK(s.id,k);const o=touch({id:uid(),gid:g.id,sid:s.id,k,s:v,fb:!!ER.fb,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});
+    db.obs.push(o);(ER.run[s.id]??={})[k]=o.id;g.lastK=k;ER.t="";seqStep(s.id);save();render();toast(`${s.code} · ${KMAP[k].t} gespeichert${SHOW?": "+st:""}`);return}
+  if(!ER.sel.length)return toast("Tippe zuerst ein oder mehrere Kürzel an.");
+  const ks=kritList(),k=ks.some(x=>x.k===(ER.k||g.lastK))?(ER.k||g.lastK):"qual",t=ER.t.trim().slice(0,300);
+  if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
+  const neu=ER.sel.filter(id=>g.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,k,s:v,fb:!!ER.fb,d:ER.d||today(),t,...(g.demo?{demo:true}:{})}));
+  db.obs.push(...neu);g.lastK=k;ER.k=k;ER.sel=[];ER.t="";save();render();
+  const ids=new Set(neu.map(o=>o.id));
+  undoToast(`${neu.length} ${neu.length===1?"Eintrag":"Einträge"} gespeichert${SHOW?": "+st:""}${ER.fb?" (nur Rückmeldung)":""}`,()=>{db.obs=db.obs.filter(o=>!ids.has(o.id));save();render()})}
+
+function sportV(g){const ms=msOf(g),d=ER.d||today(),day=new Map(db.att.filter(a=>a.gid===g.id&&a.d===d).map(a=>[a.sid,a]));
+  const cnt=Object.keys(ST).map(k=>[k,ms.filter(s=>day.get(s.id)?.st===k).length]).filter(x=>x[1]);
+  const head=`<button class="btn ghost" onclick="back()">‹ Zurück</button><div class="between"><h1 style="margin-bottom:4px">Stundenstatus</h1>${nmBtn()}</div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>`;
+  const dat=`<div class="row" style="margin-top:12px"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();ER.i=0;render()"></div>`;
+  const sum=cnt.map(([k,n])=>`${n} ${ST[k]}`).join(" · ")||"noch nichts erfasst";
+  if(!ms.length)return head+`<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
+  if(ER.i>=ms.length)return head+`<div class="card seqdone"><b style="font-size:1.2rem">Fertig</b><p>${esc(sum)}.</p>
+    <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="ER.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;render()">Von vorn</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p>${dat}</div>`;
+  const s=ms[ER.i],a=day.get(s.id),rest=ms.slice(ER.i).filter(x=>!day.has(x.id)).length;
+  return head+`<div class="card"><div class="between"><b>${ER.i+1} von ${ms.length}</b><span class="muted small">${esc(sum)}</span></div>
+  <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
+  ${bigSus(s)}
+  ${a?`<p class="small" style="text-align:center;margin:0 0 6px">An diesem Tag schon erfasst: ${esc(ST[a.st])}. Tippen ersetzt es.</p>`:""}
+  <div class="stgrid">${Object.entries(ST).map(([k,t])=>`<button class="btn${k==="akt"?" pri":k==="abw"?" abw":""}${a?.st===k?" cur":""}" onclick="setAtt('${k}')">${t}</button>`).join("")}</div>
+  <div class="two" style="margin-top:8px"><button class="btn" ${ER.i?"":"disabled"} onclick="ER.i--;render()">‹ Zurück</button><button class="btn" ${rest?"":"disabled"} onclick="attRest()">Alle übrigen: aktiv</button></div>
+  ${dat}</div>`}
+function setAtt(st){const g=groupById(ER.gid);if(!g||!Object.hasOwn(ST,st))return;const s=msOf(g)[ER.i];if(!s)return;const d=ER.d||today();
+  const a=db.att.find(x=>x.gid===g.id&&x.sid===s.id&&x.d===d);if(a){a.st=st;touch(a)}else db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st,...(g.demo?{demo:true}:{})}));
+  ER.i++;save();render()}
+function attRest(){const g=groupById(ER.gid);if(!g)return;const d=ER.d||today(),ms=msOf(g);let n=0;
+  for(const s of ms.slice(ER.i))if(!db.att.some(x=>x.gid===g.id&&x.sid===s.id&&x.d===d)){db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st:"akt",...(g.demo?{demo:true}:{})}));n++}
+  ER.i=ms.length;save();render();toast(`${n} als aktiv gespeichert`)}
+function attOvV(g){const from=OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00",all=db.att.filter(a=>a.gid===g.id&&a.d>=from),ms=msOf(g);
+  const nT=new Set(all.map(a=>a.d)).size;
+  const rows=ms.map(s=>{const m=all.filter(a=>a.sid===s.id);return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span> ${profTag(s)}${nm(s)}</th>${Object.keys(ST).map(k=>{const n=m.filter(a=>a.st===k).length;return `<td class="num${k!=="akt"&&n>=3?" old":""}">${n||"–"}</td>`}).join("")}</tr>`}).join("");
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button><h1 style="margin-bottom:4px">Übersicht</h1><p class="muted" style="margin-top:0">${esc(gName(g))} · Stundenstatus · ${nT} ${nT===1?"Stunde":"Stunden"} erfasst</p>
+  <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
+  ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">aktiv</th><th class="num">ohne Sachen</th><th class="num">sport&shy;unfähig</th><th class="num">nicht da</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="small muted">Ab 3 Stunden ohne Sachen, sportunfähig oder nicht da ist die Zahl markiert.</p>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
+  ${g.arch?"":`<p><button class="btn pri block" onclick="erStart(${ja(g.id)},'k')">Stundenstatus erfassen</button></p>`}`}
+
+let OVP="hj";
+function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.ov};return groupV()}
+  if(g.fach==="Sport")return attOvV(g);
+  const from=OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00";
+  const all=obsOf(g.id).filter(o=>o.d>=from);
+  const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code)),lim=daysAgo(14);
+  const rows=ms.map(s=>{const os=all.filter(o=>o.sid===s.id).sort((a,b)=>a.d.localeCompare(b.d)||a.upd-b.upd),z=os.filter(o=>!o.fb);
+    const last=os.length?os[os.length-1].d:null,old=!os.some(o=>o.d>=lim);
+    return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span>${(s.profil||"r")!=="r"?` <span class="tag ${s.profil}">${s.profil==="zd"?"LE":"NA"}</span>`:""}${nm(s)}</th>
+    <td class="num">${z.length}${os.length>z.length?`<span class="muted small"> +${os.length-z.length}</span>`:""}</td><td class="num">${genug(z)?hid(vorschlag(z)):"–"}</td>
+    <td class="verl">${z.slice(-6).map(o=>hid(oTxt(o))).join(" ")||"–"}</td><td class="small${old?" old":""}">${last?dDEy(last).slice(0,6):"–"}</td></tr>`}).join("");
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
+  <div class="between"><h1 style="margin-bottom:4px">Übersicht</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · Sonstige Mitarbeit</p>
+  <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
+  ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">Einträge</th><th class="num">Note</th><th>Verlauf</th><th>zuletzt</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
+  <p class="muted small">Verlauf: neueste Stufe rechts (++ + o −). „+2“ heißt: 2 weitere Einträge als „nur Rückmeldung“, die nicht zählen. Rot: seit 2 Wochen kein Eintrag. „Note“ ist ein rechnerischer Vorschlag aus den Stufen (Umrechnung unter Einstellungen). Laut SILP zählt die Gesamtentwicklung: Du entscheidest die Note.</p>
+  ${g.arch?"":`<p><button class="btn pri block" onclick="erStart(${ja(g.id)})">Erfassen</button></p>`}`}
+
+// Auf der Seite einer Schülerin, eines Schülers: Einträge dieser Lerngruppe
+function susObsV(s,g){if(g.fach!=="Mathe")return "";const os=obsOf(g.id,s.id).sort((a,b)=>b.d.localeCompare(a.d)||b.upd-a.upd),z=os.filter(o=>!o.fb),ro=!!g.arch;
+  const per=kritList().map(K=>{const a=z.filter(o=>o.k===K.k);return a.length?`<span class="tag">${esc(K.t)}: ${hid(noteTxt(mean(a)))} (${a.length})</span>`:""}).join(" ");
+  return `<div class="card"><div class="between"><b>Sonstige Mitarbeit in ${esc(gName(g))}</b>${ssBtn()}</div>
+  <p class="small muted" style="margin:6px 0">${z.length} zählende ${z.length===1?"Beobachtung":"Beobachtungen"}${os.length>z.length?`, ${os.length-z.length} nur Rückmeldung`:""} · ${genug(z)?`Notenvorschlag ${hid(vorschlag(z))}`:"Notenvorschlag ab 3 Beobachtungen in 2 Kriterien"}</p>${per?`<p style="display:flex;flex-wrap:wrap;gap:6px">${per}</p>`:""}
+  ${os.length?`<ul class="obsl">${os.map(o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(KMAP[o.k].t)}</span><br><b>${o.fb?`<span class="muted">Rückmeldung</span> ${hid(oTxt(o))}`:hid(oTxt(o))}</b>${o.t?` <span class="small">${esc(o.t)}</span>`:""}</div>
+  ${ro?"":`<button class="btn ghost small" aria-label="${o.fb?"Zählt nicht. Tippen: zählt":"Zählt. Tippen: nur Rückmeldung"}" onclick="obsFb(${ja(o.id)})">${o.fb?"zählt nicht":"zählt ✓"}</button><button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="obsDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul>`:`<p class="muted small">Noch keine Einträge.</p>`}
+  ${ro?"":`<p style="margin-bottom:0"><button class="btn" onclick="ER={...erNeu(${ja(g.id)},'e'),sel:[${ja(s.id)}]};go({tab:view.tab,group:${ja(g.id)},erf:${ja(g.id)}})">Für ${esc(s.code)} erfassen</button></p>`}</div>`}
+function setKgw(k,n){if(!Object.hasOwn(KMAP,k)||![1,2,3].includes(n))return;const o={...(db.kgw||{})};if(n===1)delete o[k];else o[k]=n;if(Object.keys(o).length)db.kgw=o;else delete db.kgw;save();render()}
+function setStw(v,t){const x=parseFloat(String(t).replace(",","."));if(!(x>=1&&x<=6))return render(),toast("Bitte einen Wert von 1 bis 6.");db.stw={...(db.stw||{}),[v]:Math.round(x*10)/10};save();render();toast("Umrechnung gespeichert")}
+function obsFb(id){const o=db.obs.find(x=>x.id===id);if(!o)return;o.fb=!o.fb;touch(o);save();render();toast(o.fb?"Zählt jetzt nicht für die Note":"Zählt jetzt für die Note")}
+function obsDel(id){const o=db.obs.find(x=>x.id===id);if(!o)return;db.obs=db.obs.filter(x=>x.id!==id);db.del.push(id);save();render();
+  undoToast("Eintrag gelöscht",()=>{db.del=db.del.filter(x=>x!==id);db.obs.push(touch(o));save();render()})}
+function demoObs(g){const d=[[0,"2","qual"],[0,"3+","qual"],[1,"1-","selbst"],[2,"4","qual"],[3,"2+","fach"],[4,"3","koop"],[5,"3","koop"],[6,"2-","qual"],[7,"5+","selbst"],[0,"2","fach"],[2,"3-","kont"],[4,"2","werk"],[6,"3","port"],[1,"2","qual"]];
+  const st=n=>({"1":"4","2":"3","3":"2"})[n[0]]||"1";
+  return d.map(([i,n,k],j)=>({id:uid(),gid:g.id,sid:g.members[i],k,s:st(n),fb:j===3,d:daysAgo(2+j*2),t:j===0?"Fiktiv: Lösungsweg an der Tafel erklärt.":"",upd:Date.now(),demo:true}))}
+
 /* ===== Navigation ===== */
 let view={tab:"heute"};
 const LOGO='<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#DCEDE4"/><path d="M20 46v12l3-2.6 3 2.6v-12z" fill="#7FC4A6"/><rect x="14" y="8" width="36" height="44" rx="5" fill="#2E6B57"/><rect x="41" y="7" width="4" height="46" rx="1.5" fill="#1E4A3B"/><rect x="19" y="13" width="17" height="12" rx="2.5" fill="#F5F6F1"/><path d="M23.5 19.2l2.6 2.6 5.2-6" fill="none" stroke="#2E6B57" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -172,13 +430,16 @@ gruppen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width
 profil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1"/></svg>'};
 function renderNav(){$("#nav").innerHTML=[["heute","Heute"],["gruppen","Lerngruppen"],["profil","Einstellungen"]].map(([k,t])=>`<button class="${view.tab===k?"on":""}" ${view.tab===k?'aria-current="page"':""} onclick="navTo('${k}')">${ICON[k].replace("<svg ",'<svg aria-hidden="true" ')}${t}</button>`).join("")}
 // Verlauf der Ansichten: „Zurück“ führt dorthin, wo man herkam
-let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,!!v.imp]);
+let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.names,!!v.imp]);
 function go(v){const i=HIST.findIndex(h=>vkey(h)===vkey(v));if(i>=0)HIST.length=i;else if(view&&vkey(view)!==vkey(v))HIST.push(view);view=v;render();window.scrollTo(0,0)}
 function back(){view=HIST.pop()||{tab:view.tab};render();window.scrollTo(0,0)}
 function navTo(k){HIST=[];go({tab:k})}
 function render(){
   renderNav();const a=$("#app");
   if(view.imp)a.innerHTML=importV();
+  else if(view.names)a.innerHTML=namesV();
+  else if(view.erf)a.innerHTML=erfV();
+  else if(view.ov)a.innerHTML=ovV();
   else if(view.sus)a.innerHTML=susV();
   else if(view.group)a.innerHTML=groupV();
   else a.innerHTML={heute:heuteV,gruppen:gruppenV,profil:profilV}[view.tab]();
@@ -241,8 +502,9 @@ function heuteV(){
   let h=`<div class="head">${LOGO}<span class="kl"><b>HBG Köln</b> · SoMi</span></div><p class="muted">${dateLong}</p><h1>Heute</h1>${envHint()}${setupCard()}${backupHint()}${dueHint()}`;
   h+=`<div class="stat"><div>Lerngruppen<b>${act.length}</b><span class="muted small">aktiv</span></div><div>Schüler:innen<b>${new Set(act.flatMap(g=>g.members)).size}</b><span class="muted small">in aktiven Gruppen</span></div><div>Archiv<b>${db.groups.filter(g=>g.arch).length}</b><span class="muted small">Gruppen</span></div></div>`;
   if(!act.length)return h+`<div class="card"><p>Noch keine Lerngruppen.</p><p class="muted">Lege unter „Lerngruppen“ eine Gruppe an oder lade unter „Einstellungen“ die fiktive Beispielklasse.</p><p><button class="btn pri" onclick="go({tab:'gruppen',adding:true})">Lerngruppe anlegen</button></p></div>`;
+  if(act.length)h+=`<div class="card"><b>Schnell erfassen</b><p class="row" style="flex-wrap:wrap;margin:8px 0 0">${act.map(g=>g.fach==="Mathe"?`<span class="row" style="gap:6px"><button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: ganze Klasse</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln</button></span>`:`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: Stundenstatus</button>`).join("")}</p></div>`;
   h+=`<h2>Deine Lerngruppen</h2>`+act.map(groupCard).join("");
-  return h+`<p class="muted small">Version 0.1: Lerngruppen und Kürzel. Noten, Klassenarbeiten, Arbeits- und Sozialverhalten und Rücklauf-Listen folgen in den nächsten Versionen.</p>`}
+  return h+`<p class="muted small">Version 0.2: Sonstige Mitarbeit in Mathe, Stundenstatus in Sport. Klassenarbeiten, Arbeits- und Sozialverhalten, Rücklauf-Listen und Sport folgen in den nächsten Versionen.</p>`}
 const groupCard=g=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)}})"><div class="grow"><div class="code">${esc(gName(g))}${g.demo?' <span class="tag">Beispiel</span>':""}</div><div class="muted small">${esc(g.sy)} · ${g.members.length} Schüler:innen${g.arch?` · archiviert am ${dDEy(g.arch)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`;
 
 /* ===== Lerngruppen ===== */
@@ -265,6 +527,15 @@ function addGroup(){const cls=GD.cls.trim().toUpperCase();if(!cls)return toast("
   const g=touch({id:uid(),fach:GD.fach,cls,kurs:GD.kurs,sy:syNow(),members:[],arch:null});db.groups.push(g);GD=null;save();go({tab:"gruppen",group:g.id})}
 let SD=null; // Entwurf „Schüler:in hinzufügen“
 const nextCode=cls=>{let i=1;const taken=new Set(db.sus.map(s=>s.code.toLowerCase()));while(taken.has(`${cls}-${String(i).padStart(2,"0")}`.toLowerCase()))i++;return `${cls}-${String(i).padStart(2,"0")}`};
+function namesV(){const g=groupById(view.names);if(!g){view={tab:"gruppen",group:view.names};return groupV()}const ms=msOf(g);
+  const head=`<button class="btn ghost" onclick="back()">‹ Zurück</button><h1 style="margin-bottom:4px">Namen</h1><p class="muted" style="margin-top:0">${esc(gName(g))}</p>`;
+  if(!db.lock||!LKEY)return head+`<div class="card"><p>Namen gehen nur mit App-Sperre. So sind sie verschlüsselt und nur nach Eingabe deines Codes sichtbar.</p><p style="margin-bottom:0"><button class="btn pri" onclick="go({tab:'profil'})">Zur App-Sperre</button></p></div>`;
+  return head+`<div class="card"><p class="small muted" style="margin-top:0">Die Namen liegen nur auf diesem Gerät, verschlüsselt und getrennt von den Noten. Sie stehen nicht in der normalen Sicherung. Sichere sie unter „Einstellungen“ → „Namensliste sichern“.</p>
+  ${ms.map(s=>`<label class="row" style="margin:8px 0;font-weight:600"><span class="code" style="min-width:5.5em">${esc(s.code)}</span><input class="grow" data-sid="${esc(s.id)}" maxlength="60" autocomplete="off" autocorrect="off" spellcheck="false" value="${esc(NAMES[s.id]||"")}" placeholder="Name" aria-label="Name zu ${esc(s.code)}"></label>`).join("")}
+  <p style="margin-bottom:0"><button class="btn pri block" onclick="saveNamesV()">Namen speichern</button></p></div>`}
+function saveNamesV(){if(!db.lock||!LKEY)return;let n=0;
+  document.querySelectorAll("#app input[data-sid]").forEach(i=>{const sid=i.dataset.sid,v=i.value.trim().slice(0,60);if(!susById(sid))return;if(v){NAMES[sid]=v;n++}else delete NAMES[sid]});
+  saveNames();back();toast(n?`${n} ${n===1?"Name":"Namen"} gespeichert`:"Namen entfernt")}
 function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};return gruppenV()}
   const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code)),ro=!!g.arch;
   const others=db.sus.filter(s=>!g.members.includes(s.id)&&s.cls===g.cls).sort((a,b)=>byNum(a.code,b.code));
@@ -273,11 +544,12 @@ function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};retu
   ${ro?`<div class="card" style="border:2px solid var(--line)"><b>Archiviert am ${dDEy(g.arch)}</b><p class="small" style="margin:6px 0">Aufbewahren bis ${dDEy(keepUntil(g))}. Danach fragt SoMi, ob du die Gruppe löschen möchtest.</p>
     <p class="row" style="flex-wrap:wrap;margin:0"><button class="btn" onclick="unarchive(${ja(g.id)})">Wieder aktivieren</button><button class="btn ghost danger" onclick="delGroup(${ja(g.id)})">Löschen</button></p></div>`:""}
   ${ro?"":SD?`<div class="card"><b>Schüler:in hinzufügen</b>
-    <div class="sub" style="margin-top:6px">Nur Kürzel nach dem Muster Klasse-Nummer, keine Namen, keine Initialen.</div>
+    <div class="sub" style="margin-top:6px">Nur Kürzel nach dem Muster Klasse-Nummer. Namen trägst du getrennt unter „Namen eintragen“ ein.</div>
     <label for="scode">Kürzel</label><input id="scode" value="${esc(SD.code)}" maxlength="40" oninput="SD.code=this.value">
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="SD=null;render()">Abbrechen</button><button class="btn pri" onclick="addSus(${ja(g.id)})">Hinzufügen</button></div></div>`
-    :`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="SD={code:nextCode(${ja(g.cls)})};render();$('#scode')?.focus()">+ Schüler:in</button>${others.length?`<button class="btn" onclick="addExisting(${ja(g.id)})">Aus Klasse ${esc(g.cls)} übernehmen</button>`:""}</p>`}
-  ${ms.length?ms.map(s=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)},sus:${ja(s.id)}})">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${(s.profil||"r")!=="r"?`<span class="tag ${s.profil}">${esc(PROFILE[s.profil])}${s.profil==="zd"?(s.zdNote?" · mit Note":" · Bericht"):""}</span>`:`<span class="muted small">Regel</span>`}</div><span aria-hidden="true" class="muted">›</span></button>`).join(""):`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
+    :`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="SD={code:nextCode(${ja(g.cls)})};render();$('#scode')?.focus()">+ Schüler:in</button>${others.length?`<button class="btn" onclick="addExisting(${ja(g.id)})">Aus Klasse ${esc(g.cls)} übernehmen</button>`:""}${ms.length?`<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},names:${ja(g.id)}})">Namen eintragen</button>`:""}</p>`}
+  ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button></p>`:`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Stundenstatus erfassen</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Stundenstatus</button></p><p class="muted small">Noten für Sport kommen in Version 0.5.</p>`}
+  ${ms.length?ms.map(s=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)},sus:${ja(s.id)}})">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${nm(s)}${(s.profil||"r")!=="r"?`<span class="tag ${s.profil}">${esc(PROFILE[s.profil])}${s.profil==="zd"?(s.zdNote?" · mit Note":" · Bericht"):""}</span>`:`<span class="muted small">Regel</span>`}</div><span aria-hidden="true" class="muted">›</span></button>`).join(""):`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   ${ro?"":`<div class="card"><b>Schuljahresende</b><p class="small muted" style="margin:6px 0 10px">Archivieren macht die Gruppe nur noch lesbar. Die Daten bleiben ${FRIST_JAHRE} Jahre erhalten (VO-DV I § 9). Gelöscht wird erst nach deiner Bestätigung.</p><button class="btn" onclick="archive(${ja(g.id)})">Lerngruppe archivieren</button></div>`}`}
 function addSus(gid){const g=groupById(gid),code=SD.code.trim();if(!code)return toast("Bitte ein Kürzel eintragen.");
   if(looksLikeName(code)||!/\d/.test(code)||!/^[A-Za-z0-9ÄÖÜäöü_-]{2,20}$/.test(code))return toast("Bitte nur ein Kürzel wie 7B-01 verwenden, keinen Namen.");
@@ -300,26 +572,27 @@ async function delGroup(gid){const g=groupById(gid),early=!g.demo&&g.arch&&keepU
   if(early&&!await ask("Wirklich vor Ablauf der Frist löschen?",{ok:"Ja, löschen",danger:true}))return;
   // Schüler:innen, die in keiner anderen Gruppe sind, gehen mit
   const keep=new Set(db.groups.filter(x=>x.id!==gid).flatMap(x=>x.members)),gone=g.members.filter(id=>!keep.has(id));
-  db.groups=db.groups.filter(x=>x.id!==gid);db.sus=db.sus.filter(s=>!gone.includes(s.id));db.del.push(gid,...gone);save();go({tab:"gruppen"});toast("Gelöscht")}
+  db.groups=db.groups.filter(x=>x.id!==gid);db.sus=db.sus.filter(s=>!gone.includes(s.id));db.obs=db.obs.filter(o=>o.gid!==gid);db.att=db.att.filter(a=>a.gid!==gid);db.del.push(gid,...gone);save();saveNames();go({tab:"gruppen"});toast("Gelöscht")}
 
 /* ===== Schüler:in ===== */
 function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){view={tab:"gruppen",group:view.group};return groupV()}
   const ro=!!g.arch,p=s.profil||"r",dis=ro?"disabled":"";
   const inG=db.groups.filter(x=>x.members.includes(s.id)).map(gName);
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
-  <div class="row" style="margin:6px 0 12px"><button class="kic" style="--kc:${susColor(s)};width:52px;height:52px;font-size:1.8rem" aria-label="Symbol ändern" ${dis} onclick="setIcon(${ja(s.id)})">${esc(s.icon||"•")}</button><h1 class="grow" style="margin:0">${esc(s.code)}</h1></div>
+  <div class="row" style="margin:6px 0 12px"><button class="kic" style="--kc:${susColor(s)};width:52px;height:52px;font-size:1.8rem" aria-label="Symbol ändern" ${dis} onclick="setIcon(${ja(s.id)})">${esc(s.icon||"•")}</button><h1 class="grow" style="margin:0">${esc(s.code)}${nm(s)}</h1></div>
   <p class="muted small">In: ${inG.map(esc).join(", ")}</p>
   <div class="card"><b>Profil</b><div class="sub" style="margin-top:6px">Gilt in allen Lerngruppen. Der Förderschwerpunkt wird bewusst nicht gespeichert.</div>
   <div class="pick" style="margin-top:8px">${Object.entries(PROFILE).map(([k,t])=>`<button class="${p===k?"on":""}" ${dis} onclick="setProfil(${ja(s.id)},'${k}')">${t}</button>`).join("")}</div>
   ${p==="na"?`<label for="na">Nachteilsausgleich</label><div class="sub">Z. B. mehr Zeit, mündlich statt schriftlich, Ersatzaufgabe im Sport. Keine Diagnosen eintragen.</div><textarea id="na" ${dis} maxlength="2000" onchange="setNA(${ja(s.id)},this.value)">${esc(s.na)}</textarea>`:""}
   ${p==="zd"?`<label class="swr"><span class="grow">Note im Zeugnis<span class="sub">Aus: Leistungsbeschreibung als Bericht. An: Note auf Grundlage der Förderplanziele.</span></span><input type="checkbox" class="sw" ${s.zdNote?"checked":""} ${dis} onchange="setZd(${ja(s.id)},this.checked)"></label><p class="muted small">Die Förderplanziele als Bewertungskriterien kommen in einer späteren Version.</p>`:""}</div>
+  ${susObsV(s,g)}
   ${ro?"":`<p><button class="btn ghost danger" onclick="removeFromGroup(${ja(g.id)},${ja(s.id)})">Aus ${esc(gName(g))} entfernen</button></p>`}`}
 async function setIcon(id){const s=susById(id),i=await pickIcon(s.icon,s.cls);if(!i)return;s.icon=i;touch(s);save();render()}
 function setProfil(id,p){const s=susById(id);s.profil=p;touch(s);save();render()}
 function setNA(id,v){const s=susById(id);if(looksLikeName(v.split(/\s+/)[0]||""))toast("Bitte keine Namen eintragen.");s.na=v.trim();touch(s);save();toast("Gespeichert")}
 function setZd(id,v){const s=susById(id);s.zdNote=v;touch(s);save();render()}
 async function removeFromGroup(gid,sid){const g=groupById(gid),s=susById(sid);
-  if(!await ask(`${s.code} aus ${gName(g)} entfernen?`,{ok:"Entfernen"}))return;
+  if(!await ask(`${s.code} aus ${gName(g)} entfernen?`,{ok:"Entfernen",sub:"Die Einträge bleiben gespeichert und sind wieder da, wenn du das Kürzel erneut hinzufügst."}))return;
   const old=g.members.slice();g.members=g.members.filter(x=>x!==sid);touch(g);save();back();
   undoToast(`${s.code} entfernt`,()=>{g.members=old;touch(g);save();render()})}
 
@@ -329,9 +602,18 @@ function profilV(){
   <div class="card"><b>Erscheinungsbild</b><div class="pick" style="margin-top:10px">${[["system","Wie Gerät"],["light","Hell"],["dark","Dunkel"]].map(([k,t])=>`<button class="${(db.theme||"system")===k?"on":""}" onclick="db.theme='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div>
   <div class="sub" style="margin:14px 0 6px;font-weight:700">Schriftgröße</div><div class="pick">${[["m","Normal"],["l","Groß"],["xl","Sehr groß"]].map(([k,t])=>`<button class="${(db.fs||"m")===k?"on":""}" onclick="db.fs='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div></div>
   ${lockV()}
-  <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen auf diesem Gerät</p>
+  <div class="card"><h2 style="margin-top:0">Kriterien Mathe</h2><p class="small muted" style="margin:0">Nach SILP Mathe 4.2. Ankertexte siehst du beim Erfassen.</p>
+  <label class="swr"><span class="grow">Hausaufgaben (LZ-Aufgaben) bewerten<span class="sub">Aus, solange es an der Schule keine Hausaufgaben gibt.</span></span><input type="checkbox" class="sw" ${db.hausa?"checked":""} onchange="db.hausa=this.checked;save();render()"></label>
+  <div class="sub" style="margin:14px 0 4px;font-weight:700">Gewicht im Notenvorschlag</div><p class="small muted" style="margin:0 0 6px">Jedes Kriterium zählt einmal, egal wie oft du es erfasst. Hier kannst du ein Kriterium doppelt oder dreifach zählen lassen.</p>
+  ${kritList().map(K=>`<div class="row" style="margin:6px 0;flex-wrap:wrap"><span class="grow">${esc(K.t)}</span><div class="pick" role="group" aria-label="Gewicht ${esc(K.t)}">${[1,2,3].map(n=>`<button class="${kgw(K.k)===n?"on":""}" aria-pressed="${kgw(K.k)===n}" onclick="setKgw(${ja(K.k)},${n})">${n}×</button>`).join("")}</div></div>`).join("")}
+  ${db.kgw?`<p style="margin:6px 0 0"><button class="btn ghost small" onclick="delete db.kgw;save();render()">Alle auf 1× zurücksetzen</button></p>`:""}</div>
+  <div class="card"><h2 style="margin-top:0">Umrechnung Stufen → Note</h2><p class="small muted" style="margin:0 0 8px">Jede Stufe zählt mit diesem Notenwert. SoMi mittelt erst je Kriterium, dann über die Kriterien (mit Gewicht). Das Ergebnis wird auf Drittel gerundet: 2,33 → 2−, 2,67 → 3+. Das Ergebnis ist ein Vorschlag.</p>
+  ${Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<div class="row" style="margin:6px 0"><label for="stw${v}" class="grow" style="margin:0"><b>${x.t}</b> ${x.l}</label><input id="stw${v}" inputmode="decimal" style="width:6em;text-align:right" value="${String(stw()[v]).replace(".",",")}" onchange="setStw('${v}',this.value)"></div>`).join("")}
+  <p class="small muted" style="margin:6px 0 0">Der Notenwert steht klein auf jedem Knopf. Einen Notenvorschlag gibt es ab 3 Beobachtungen in mindestens 2 Kriterien. Bezug zum SILP: „erfüllt“ heißt Anker „gut“ erreicht, „kaum erfüllt“ heißt Anker „ausreichend“ nicht erreicht.${db.stw?` <button class="btn ghost small" onclick="delete db.stw;save();render()">Zurücksetzen</button>`:""}</p></div>
+  <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length} Einträge auf diesem Gerät</p>
   ${mtip("backup")}<p class="row" style="flex-wrap:wrap"><button class="btn pri${mk("backup")}" onclick="exportJSON()">Sicherung speichern</button><button class="btn" onclick="$('#imp').click()">Sicherung laden</button></p>
   <input type="file" id="imp" accept=".json,application/json" hidden onchange="importJSON(this)">
+  ${db.lock&&LKEY?`<p class="row" style="flex-wrap:wrap"><button class="btn" ${hasNames()?"":"disabled"} onclick="exportNames()">Namensliste sichern</button><button class="btn" onclick="$('#imp').click()">Namensliste laden</button></p><p class="muted small">${Object.keys(NAMES).length} Namen auf diesem Gerät. Die Namensliste ist eine eigene Datei mit demselben Passwort. Bewahre sie getrennt von der Sicherung auf.</p>`:""}
   <p class="muted small">${db.lastBackup?`Letzte Sicherung: ${dDEy(iso(new Date(db.lastBackup)))}. `:""}Sichere spätestens alle 3 Tage und vor jedem Gerätewechsel. Laden ergänzt nur: Neues kommt dazu, bei gleichen Einträgen gilt die neuere Fassung.</p>
   ${db.bsalt?`<p class="small">Sicherungs-Passwort ist auf diesem Gerät gemerkt. <button class="btn ghost small" onclick="forgetBackupPw()">Vergessen</button></p>`:""}
   ${mtip("demo")}<p class="row" style="flex-wrap:wrap">${db.groups.some(g=>g.demo)?`<button class="btn" onclick="delDemo()">Beispielklasse entfernen</button>`:`<button class="btn${mk("demo")}" onclick="demo()">Fiktive Beispielklasse laden</button>`}</p>
@@ -339,10 +621,9 @@ function profilV(){
   <div class="card"><h2 style="margin-top:0">Aufbewahrung</h2><p class="small">Noten und Beobachtungen bewahrst du ${FRIST_JAHRE} Jahre auf, gerechnet ab Ende des Kalenderjahres, in dem die Lerngruppe archiviert wurde (VO-DV I § 9 Abs. 1). SoMi erinnert dich, wenn die Frist abgelaufen ist. Gelöscht wird nur nach deiner Bestätigung.</p><p class="muted small">Die Frist bitte mit der:dem Datenschutzbeauftragten bestätigen.</p></div>
   <div class="card"><h2 style="margin-top:0">Datenschutz</h2>
   <p>Die Daten liegen nur auf diesem Gerät. Sie verlassen es nur als verschlüsselte Sicherungsdatei.</p>
-  <p>Lege Schüler:innen nur mit Kürzel an (z. B. 7B-01). Keine Namen, keine Initialen. Die Zuordnung Kürzel zu Name liegt außerhalb der App.</p>
+  <p>Schüler:innen haben ein Kürzel (z. B. 7B-01). Namen kannst du getrennt eintragen: nur mit App-Sperre, verschlüsselt, nicht in der normalen Sicherung.</p>
   <p>Der Förderschwerpunkt wird nicht gespeichert, nur das Profil.</p>
-  <p>Sicherungen nur auf dienstlichem Speicher ablegen, nicht in einer privaten Cloud. Nutze nur dienstliche Geräte mit Code-Sperre.</p>
-  <p>Vor dem Einsatz mit echten Noten: Absprache mit Schulleitung und Datenschutzbeauftragten.</p></div>
+  <p>Sicherungen nur auf dienstlichem Speicher ablegen, nicht in einer privaten Cloud. Nutze nur dienstliche Geräte mit Code-Sperre.</p></div>
   <p class="muted small" style="text-align:center">SoMi ${SOMI_VERSION} · Stand ${SOMI_STAND} · nur für den eigenen Unterricht</p>`}
 function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
 async function giveFile(name,txt,type="application/json"){const file=new File([txt],name,{type});
@@ -375,10 +656,14 @@ async function openFile(o){if(o.somi!==1||!o.salt)throw new Error("format");
   for(;;){const pw=await askText("Passwort der Sicherung","Passwort","password");if(!pw)return null;
     try{return JSON.parse(dec(await ungcm(await pwKey(pw,unb64(o.salt)),o)))}catch(e){toast("Passwort falsch")}}}
 const backupName=()=>`somi-sicherung-${today()}.json`;
+async function exportNames(){if(!crypto.subtle||!hasNames())return;const ki=await backupKey();if(!ki)return;
+  const own=Object.fromEntries(Object.entries(NAMES).filter(([k])=>{const x=susById(k);return x&&!x.demo}));
+  const body=await gcm(ki.key,enc({namen:own}));
+  if(await giveFile(`somi-namen-${today()}.json`,JSON.stringify({somi:1,art:"namen",erstellt:new Date().toISOString(),salt:ki.salt,...body})))toast("Namensliste gesichert. Lege sie getrennt von der Sicherung ab.")}
 async function exportJSON(){if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
   const ki=await backupKey();if(!ki)return;
   if(!db.backupTip&&!await backupTip())return;
-  const {bsalt,lock,...rest}=db,payload={...rest,groups:db.groups.filter(g=>!g.demo),sus:db.sus.filter(s=>!s.demo)};
+  const {bsalt,lock,...rest}=db,payload={...rest,groups:db.groups.filter(g=>!g.demo),sus:db.sus.filter(s=>!s.demo),obs:db.obs.filter(o=>!o.demo),att:db.att.filter(a=>!a.demo)};
   if(!await giveFile(backupName(),await sealFile(payload,ki)))return;
   db.lastBackup=Date.now();db.backupTip=1;save();render();toast(isIOS?"Sicherung erstellt. Sie liegt in „Dateien“ → „Auf meinem iPad“.":"Sicherung erstellt.")}
 async function backupTip(){const steps=isIOS?[`Gleich öffnet sich das Teilen-Fenster. Tippe dort auf <b>„In Dateien sichern“</b>.`,`Wähle <b>„Auf meinem iPad“</b>. Lege beim ersten Mal einen Ordner <b>„SoMi“</b> an und öffne ihn.`,`Tippe auf <b>„Sichern“</b>. Bei späteren Sicherungen wählst du wieder diesen Ordner.`]
@@ -397,31 +682,36 @@ async function importJSON(inp){const f=inp.files[0];inp.value="";if(!f)return;le
   try{o=JSON.parse(await f.text())}catch(e){return toast("Datei nicht lesbar")}
   if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
   try{d=await openFile(o)}catch(e){return toast("Keine SoMi-Sicherung")}if(!d)return;
+  if(o.art==="namen"||d.namen){if(!db.lock||!LKEY)return toast("Namen gehen nur mit App-Sperre. Schalte sie zuerst ein.");if(!okNames(d.namen))return toast("Namensliste beschädigt");
+    let n=0;for(const [k,v] of Object.entries(d.namen))if(susById(k)){NAMES[k]=v.trim();n++}saveNames();render();return toast(n?`${n} Namen übernommen`:"Keine passenden Kürzel. Lade zuerst die Sicherung.")}
   if(!Array.isArray(d.groups)||!Array.isArray(d.sus))return toast("Keine SoMi-Sicherung");
-  const ng=d.groups.length,ns=d.sus.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);
-  const bad=ng-d.groups.length+ns-d.sus.length;if(bad)toast(`${bad} beschädigte Einträge nicht übernommen`);
+  if(!Array.isArray(d.obs))d.obs=[];if(!Array.isArray(d.att))d.att=[];
+  const ng=d.groups.length,ns=d.sus.length,no=d.obs.length,na=d.att.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);d.obs=d.obs.filter(okObs);d.att=d.att.filter(okAtt);
+  const bad=ng-d.groups.length+ns-d.sus.length+no-d.obs.length+na-d.att.length;if(bad)toast(`${bad} beschädigte Einträge nicht übernommen`);
   d.del=(Array.isArray(d.del)?d.del:[]).filter(okId);
   IMP={o,d,settings:!db.groups.some(g=>!g.demo)};go({tab:"profil",imp:true})}
 function importV(){if(!IMP){view={tab:"profil"};return profilV()}const {o,d}=IMP;
   const neu=d.groups.filter(g=>!groupById(g.id)).length;
   return `<button class="btn ghost" onclick="IMP=null;go({tab:'profil'})">‹ Abbrechen</button><h1>Sicherung laden</h1>
-  <p class="muted">Erstellt am ${dDEy((o.erstellt||"").slice(0,10))} · ${d.groups.length} Lerngruppen · ${d.sus.length} Schüler:innen</p>
+  <p class="muted">Erstellt am ${dDEy((o.erstellt||"").slice(0,10))} · ${d.groups.length} Lerngruppen · ${d.sus.length} Schüler:innen · ${d.obs.length} Einträge</p>
   <div class="card"><p class="small">${neu} Lerngruppe${neu===1?"":"n"} sind neu auf diesem Gerät. Vorhandenes wird <b>ergänzt</b>: Bei gleichen Einträgen gilt die neuere Fassung. Nichts wird ersetzt, was hier neuer ist.</p>
-  <label class="row" style="margin:12px 0;font-weight:600"><input type="checkbox" style="width:auto" ${IMP.settings?"checked":""} onchange="IMP.settings=this.checked"> Auch Einstellungen übernehmen (Erscheinungsbild, Schriftgröße)</label></div>
+  <label class="row" style="margin:12px 0;font-weight:600"><input type="checkbox" style="width:auto" ${IMP.settings?"checked":""} onchange="IMP.settings=this.checked"> Auch Einstellungen übernehmen (Erscheinungsbild, Schriftgröße, Kriterien)</label></div>
   <p><button class="btn pri block" onclick="applyImport()">Übernehmen</button></p>`}
 function applyImport(){const d=IMP.d,dels=new Set([...db.del,...d.del]);
-  const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
-  if(IMP.settings)for(const f of ["theme","fs"])if(d[f]!=null&&okSetting[f](d[f]))db[f]=d[f];
-  IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen neu oder aktualisiert`);go({tab:"gruppen"})}
+  const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels),c=mergeList(db.obs,d.obs,dels),e=mergeList(db.att,d.att,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
+  const gids=new Set(db.groups.map(g=>g.id)),sids=new Set(db.sus.map(x=>x.id));db.obs=c.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.att=e.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));
+  if(IMP.settings)for(const f of ["theme","fs","hausa","stw"])if(d[f]!=null&&okSetting[f](d[f]))db[f]=d[f];
+  IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen, ${c.n+e.n} Einträge neu oder aktualisiert`);go({tab:"gruppen"})}
 async function wipe(){if(!await ask("Wirklich alle Daten auf diesem Gerät löschen?",{ok:"Alles löschen",danger:true,sub:"Speichere vorher eine Sicherung. Die Aufbewahrungsfrist gilt auch hier."}))return;
-  const keep={theme:db.theme,fs:db.fs,bsalt:db.bsalt,lock:db.lock,setupDone:db.setupDone};db={...leer(),...keep};save();go({tab:"heute"})}
+  const keep={theme:db.theme,fs:db.fs,bsalt:db.bsalt,lock:db.lock,setupDone:db.setupDone};db={...leer(),...keep};dropNames();save();go({tab:"heute"})}
 async function delDemo(){if(!await ask("Die fiktive Beispielklasse entfernen? Deine eigenen Lerngruppen bleiben.",{ok:"Entfernen"}))return;
-  db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);save();render();toast("Beispielklasse entfernt")}
+  db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);db.obs=db.obs.filter(o=>!o.demo);db.att=db.att.filter(a=>!a.demo);save();render();toast("Beispielklasse entfernt")}
 function demo(){if(db.groups.some(g=>g.demo))return toast("Beispielklasse ist schon da");
   const prof=["r","r","na","r","zd","r","r","na"],sus=prof.map((p,i)=>touch({id:uid(),code:`DEMO-${String(i+1).padStart(2,"0")}`,cls:"DEMO",icon:ICONS[i*5%ICONS.length],profil:p,
     na:p==="na"?(i===2?"Fiktiv: 10 Minuten mehr Zeit bei Klassenarbeiten.":"Fiktiv: Ersatzaufgabe im Sport (Schiedsrichter, Helfen)."):"",zdNote:p==="zd",demo:true}));
   db.sus.push(...sus);
-  db.groups.push(touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true}),
+  const gm=touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true});db.obs.push(...demoObs(gm));
+  db.groups.push(gm,
     touch({id:uid(),fach:"Sport",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.slice(0,6).map(s=>s.id),arch:null,demo:true}));
   save();toast("Beispielklasse geladen");go(view.mark?{tab:"profil",mark:"demo"}:{tab:"gruppen"})}
 
@@ -450,10 +740,10 @@ async function setLock(change){if(!crypto.subtle){toast("In dieser Ansicht nicht
   const a=await askCode(change?"Neuen Code festlegen":"Code für SoMi festlegen","4 bis 6 Ziffern, nicht dein Gerätecode. Du gibst ihn bei jedem Start ein. Vergessen heißt: Die Daten auf diesem Gerät sind weg. Speichere deshalb regelmäßig eine Sicherung.");
   if(a==null)return render();if(!/^\d{4,6}$/.test(a)){render();return toast("Bitte 4 bis 6 Ziffern.")}
   if(await askCode("Code wiederholen")!==a){render();return toast("Die Codes stimmen nicht überein.")}
-  const salt=b64(rnd(16));LKEY=await codeKey(a,salt);db.lock={salt,len:a.length,after:db.lock?.after??1};save();await SAVEQ;render();toast(change?"Code geändert":"SoMi ist jetzt gesperrt und verschlüsselt")}
-async function offLock(){if(!await ask("App-Sperre wirklich ausschalten?",{ok:"Ausschalten",danger:true,sub:"Danach liegen Noten und Beobachtungen unverschlüsselt im Speicher dieses Geräts."}))return render();
+  const salt=b64(rnd(16));LKEY=await codeKey(a,salt);db.lock={salt,len:a.length,after:db.lock?.after??1};save();saveNames();await SAVEQ;await NSAVEQ;render();toast(change?"Code geändert":"SoMi ist jetzt gesperrt und verschlüsselt")}
+async function offLock(){if(!await ask("App-Sperre wirklich ausschalten?",{ok:"Ausschalten",danger:true,sub:"Danach liegen Noten und Beobachtungen unverschlüsselt im Speicher dieses Geräts. Eingetragene Namen werden gelöscht."}))return render();
   const c=await askCode("Zum Ausschalten Code eingeben");
-  if(c!=null&&await tryCode(c)){delete db.lock;LKEY=null;save();render();toast("App-Sperre ist aus")}else{render();if(c)toast("Code falsch")}}
+  if(c!=null&&await tryCode(c)){delete db.lock;LKEY=null;dropNames();save();render();toast("App-Sperre ist aus")}else{render();if(c)toast("Code falsch")}}
 function lockNow(){if(!db.lock)return;LOCKED=true;LOCKIN="";document.body.classList.add("locked");document.activeElement?.blur?.();renderLock()}
 function renderLock(msg,busy){let el=$("#lock");if(!LOCKED){el?.remove();return}
   if(!el){el=document.createElement("div");el.id="lock";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","SoMi ist gesperrt");document.body.appendChild(el)}
@@ -466,12 +756,12 @@ function renderLock(msg,busy){let el=$("#lock");if(!LOCKED){el?.remove();return}
 let LOCKBUSY=false;
 async function lockPress(d){if(LOCKWAIT>Date.now()||LOCKBUSY)return;const len=db.lock.len||4;if(LOCKIN.length>=len)return;LOCKIN+=d;renderLock();if(LOCKIN.length<len)return;
   LOCKBUSY=true;renderLock("",true);const r=await tryCode(LOCKIN);LOCKBUSY=false;LOCKIN="";
-  if(r){LOCKFAIL=0;LOCKWAIT=0;saveFail();LKEY=r.key;if(ENCWAIT){ENCWAIT=null;db=r.data;migrate();applyTheme()}LOCKED=false;document.body.classList.remove("locked");renderLock();render();return}
+  if(r){LOCKFAIL=0;LOCKWAIT=0;saveFail();LKEY=r.key;if(ENCWAIT){ENCWAIT=null;db=r.data;migrate();applyTheme();await loadNames(r.key)}LOCKED=false;document.body.classList.remove("locked");renderLock();render();return}
   LOCKFAIL++;if(LOCKFAIL>=5)LOCKWAIT=Date.now()+30000*2**Math.min(LOCKFAIL-5,10);saveFail();try{navigator.vibrate?.(80)}catch(e){}renderLock("Falscher Code. Versuch es noch einmal.")}
 async function lockForgot(){if(!await ask("Code vergessen?",{ok:"Alles löschen",danger:true,sub:"Ohne Code lassen sich die Daten nicht entschlüsseln. Du kannst alles auf diesem Gerät löschen und danach deine letzte Sicherung laden."}))return;
   const keep=ENCWAIT?{}:db;ENCWAIT=null;LKEY=null;
   db={...leer(),theme:keep.theme,fs:keep.fs,bsalt:keep.bsalt,setupDone:keep.setupDone};migrate();
-  localStorage.removeItem(KEY);save();LOCKED=false;document.body.classList.remove("locked");renderLock();applyTheme();go({tab:"profil"});toast("Alles gelöscht. Lade jetzt deine letzte Sicherung und schalte die Sperre wieder ein.")}
+  localStorage.removeItem(KEY);dropNames();save();LOCKED=false;document.body.classList.remove("locked");renderLock();applyTheme();go({tab:"profil"});toast("Alles gelöscht. Lade jetzt deine letzte Sicherung und schalte die Sperre wieder ein.")}
 document.addEventListener("visibilitychange",()=>{if(!db?.lock)return;if(document.hidden){HIDDEN_AT=Date.now();if(!db.lock.after)lockNow()}
   else if(!LOCKED&&HIDDEN_AT&&Date.now()-HIDDEN_AT>=db.lock.after*6e4)lockNow()});
 document.addEventListener("keydown",e=>{if(!LOCKED||e.target.closest?.(".cele"))return;if(/^\d$/.test(e.key))lockPress(e.key);else if(e.key==="Backspace"){LOCKIN=LOCKIN.slice(0,-1);renderLock()}});
