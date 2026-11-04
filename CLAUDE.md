@@ -42,7 +42,7 @@ Weicht der Code von diesen Dateien ab, gilt der Code. Weise auf die Abweichung h
 ## Datenschutz (feste Regeln)
 
 - Daten nur lokal auf dem Dienstgerät. Kein Server, keine Cloud. OneDrive wird nicht genutzt und nicht erwähnt.
-- Keine Namen, keine Initialen. Nur Kürzel `Klasse-Nummer` (z. B. `7B-01`) plus neutrales Symbol.
+- Schlüssel ist immer das Kürzel `Klasse-Nummer` (z. B. `7B-01`) plus neutrales Symbol. Namen gibt es nur in der getrennten Namensliste (ab 0.2.3, Nicks Entscheidung vom 04.11.2026): eigener Speicherplatz `<KEY>-namen`, nur mit App-Sperre, verschlüsselt, nicht in der normalen Sicherung, eigene Datei „Namensliste“, abschaltbar per „Namen verbergen“. Namen nie in Noten-Daten, Code, Repo, Tests oder Chat.
 - Kein Förderschwerpunkt in der App, nur das Profil (Regel, Nachteilsausgleich, zieldifferent).
 - Aufbewahrung 5 Jahre ab Ende des Kalenderjahres der Archivierung (VO-DV I § 9 Abs. 1, mit DSB zu bestätigen). SoMi löscht nie automatisch, nur nach Rückfrage.
 - Keine echten Schülerdaten in Code, Repo, Tests oder Chat. Nur die fiktive Beispielklasse (`DEMO-…`).

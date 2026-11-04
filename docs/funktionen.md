@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.2.2, Stand 03.11.2026)
+# SoMi – Funktionen (Version 0.2.3, Stand 03.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -28,6 +28,13 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Runde durch die Gruppe: aktiv, ohne Sportsachen, sportunfähig, nicht anwesend. „Alle übrigen: aktiv“ füllt den Rest. Pro Tag ein Status je Kürzel; erneutes Tippen ersetzt ihn.
 - Übersicht pro Halbjahr/Schuljahr: Anzahl je Status, ab 3 markiert.
 - Daten: `db.att = [{id,gid,sid,d,st,upd}]`, geprüft mit `okAtt`, in Sicherung und Import enthalten.
+
+## Namensliste (ab 0.2.3)
+- In der Lerngruppe „Namen eintragen“: zu jedem Kürzel ein Name. Geht nur mit App-Sperre.
+- Gespeichert getrennt von den Noten (eigener Speicherplatz `somi-v1-namen` bzw. `somi-beta-namen`), verschlüsselt mit dem Schlüssel der App-Sperre. Nach dem Entsperren sichtbar.
+- Anzeige klein unter dem Kürzel (Kacheln, Runde, Übersicht, Lerngruppe, Kürzel-Seite). „Namen verbergen“ blendet sie für diese Sitzung aus.
+- Nicht in der normalen Sicherung. Eigene Datei unter Einstellungen → „Namensliste sichern“ (gleiches Passwort, Namen der Beispielklasse nicht dabei). Laden über „Namensliste laden“; übernimmt nur Namen zu vorhandenen Kürzeln.
+- App-Sperre ausschalten, „Code vergessen“ oder „Alles löschen“ löscht die Namen.
 
 ## Einrichtung
 Drei Schritte: Code für die App-Sperre, fiktive Beispielklasse, erste Sicherung.
