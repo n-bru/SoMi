@@ -1,4 +1,4 @@
-# Übergabe SoMi (Stand 03.11.2026)
+# Übergabe SoMi (Stand 04.11.2026)
 
 ## Wo was liegt
 
@@ -23,7 +23,7 @@
 
 1. **GitHub Pages einschalten** (Nick): Repo-Einstellungen → Pages → Branch `main`, Ordner `/`. Erst dann ist die Beta erreichbar.
 2. **Version 0.2.9 als Beta und Hauptversion** (Freigabe durch Nick am 04.11.2026; 0.2.9 entfernt nur den SL/DSB-Hinweis). 0.2.8: Knöpfe zeigen Notenwert, Vorschlag erst ab 3 Beobachtungen in 2 Kriterien (Nicks Entscheidung). 0.2.7: Notenvorschlag erst je Kriterium, dann gewichtet über die Kriterien (Gewicht 1×/2×/3×, Nicks Entscheidung 04.11.). Stufenknöpfe: übertroffen / erfüllt / teilweise erfüllt / kaum erfüllt mit Note darunter (Nicks Wahl 04.11.). o bleibt 3,5. Davor 0.2.4: Beobachtungen 4-stufig mit Notenvorschlag (Nicks Wunsch 04.11.). 0.2.3: Namensliste (getrennt, verschlüsselt, nur mit Sperre; Nicks Entscheidung 04.11.). Davor 0.2.2 (03.11.2026): Mathe Sonstige Mitarbeit mit „Ganze Klasse nacheinander“ (Kriterien vorab wählen, überspringen, nicht anwesend) und „Einzeln bewerten“; Sport-Stundenstatus.
-3. **Version 0.3:** Klassenarbeiten (Punkte, Notenschlüssel E/G/ohne, Nachteilsausgleich-Vermerk) und Notenvorschlag 40/60.
+3. **Version 0.3.0 als Beta** (04.11.2026): Klassenarbeiten (Punkte, Schlüssel SILP 4.3, NA-Vermerk, eigene Höchstpunktzahl zieldifferent, Notenspiegel) und Gesamtvorschlag 40/60. Tendenz +/− in Dritteln ist vorläufig an, Nicks Entscheidung steht aus. Nicht drin: Punkte je Aufgabe, Ordnungspunkte. Wartet auf Nicks Prüfung auf dem iPad.
 4. **Version 0.4:** Arbeits- und Sozialverhalten, Rücklauf-Listen.
 5. **Version 0.5:** Sport (Gewichtung offen, Vorschlag 50/10/20/20), LE-Förderplanziele, PDFs, Stundenplan.
 6. **Aufbewahrungsfrist** mit DSB bestätigen.

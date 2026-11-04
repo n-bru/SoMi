@@ -4,6 +4,7 @@ Neueste oben.
 
 | Datum | Version | Was | Beta/Haupt |
 |---|---|---|---|
+| 04.11.2026 | 0.3.0 | Klassenarbeiten in Mathe: anlegen (Titel, Datum, Höchstpunktzahl, Schlüssel), Punkte Kürzel für Kürzel eintragen, „nicht mitgeschrieben“, „schreibt nach“. Notenschlüssel SILP 4.3 (ohne Kurs 85/70/55/40/20 %, E/G 87/73/59/45/18 %), Tendenz +/− in Dritteln (abschaltbar). Vermerk Nachteilsausgleich, eigene Höchstpunktzahl bei zieldifferent. Notenspiegel, Gesamtvorschlag 40/60 in Übersicht und Kürzel-Seite. Sicherung laden übernimmt jetzt auch die Gewichte | Beta |
 | 04.11.2026 | 0.2.10 | iPhone: Stufenknöpfe gleich hoch ausgerichtet, auch wenn „teilweise erfüllt“ umbricht | Beta |
 | 04.11.2026 | 0.2.9 | Hinweis „Absprache mit Schulleitung und DSB“ entfernt (Nicks Entscheidung). Freigabe als Hauptversion | Beta + Haupt |
 | 04.11.2026 | 0.2.8 | Stufenknöpfe zeigen den Notenwert (= 1, = 2, = 3,5, = 5) statt der gerundeten Note. Notenvorschlag erst ab 3 zählenden Beobachtungen in mindestens 2 Kriterien, sonst „–“ | Beta |

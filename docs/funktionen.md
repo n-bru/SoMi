@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.2.4, Stand 03.11.2026)
+# SoMi – Funktionen (Version 0.3.0, Stand 04.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -33,6 +33,15 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Beobachtungen in 4 Stufen: ++ übertroffen, + erfüllt (SILP-Anker „gut“), o teilweise erfüllt, − kaum erfüllt (Anker „ausreichend“ nicht erreicht); unter jedem Knopf klein der Notenwert. Notenvorschlag erst ab 3 zählenden Beobachtungen in mind. 2 Kriterien. Notenvorschlag: Mittel je Kriterium, dann gewichtet (1×–3×, Einstellungen). Gespeichert als `o.s` ("4" bis "1"); alte Einträge mit Note `o.n` bleiben gültig.
 - Umrechnung: jede Stufe hat einen Notenwert (Standard 1 / 2 / 3,5 / 5, Einstellungen → „Umrechnung Stufen → Note“, gespeichert als `db.stw`). Der Mittelwert der zählenden Einträge wird auf Drittel gerundet: 2,33 → 2−, 2,67 → 3+; genau in der Mitte zugunsten der Schüler:innen.
 - Übersicht und Kürzel-Seite zeigen den Notenvorschlag, verborgen durch den Sichtschutz.
+
+## Klassenarbeiten Mathe (ab 0.3)
+- In der Lerngruppe „Klassenarbeiten“: anlegen mit Titel, Datum, Höchstpunktzahl und Notenschlüssel (vorbelegt nach Kurs der Gruppe, pro Arbeit änderbar).
+- Punkte eintragen Kürzel für Kürzel: Zahl tippen, Enter oder „Speichern und weiter“. Halbe Punkte mit Komma. „nicht mitgeschrieben“ und „schreibt nach“ statt Punkten. Tippen auf eine Zeile der Tabelle springt zu diesem Kürzel.
+- Notenschlüssel nach SILP Mathe 4.3 (Mindestprozent für 1 bis 5): ohne Kurs 85/70/55/40/20, E- und G-Kurs 87/73/59/45/18. Mindestpunkte auf halbe Punkte gerundet. Tendenz + und −: jede Note in drei gleich große Punktbereiche geteilt (nicht im SILP; abschaltbar unter Einstellungen → Klassenarbeiten, `db.kaTend`).
+- Profil Nachteilsausgleich: Schalter „gewährt“ plus kurzer Vermerk je Arbeit. Profil zieldifferent: eigene Höchstpunktzahl je Kürzel (angepasste Arbeit), gleicher Prozentschlüssel.
+- Notenspiegel (ganze Noten) und Schnitt, verborgen durch den Sichtschutz, ebenso Punkte und Noten in der Tabelle.
+- Gesamtvorschlag: Sonstige Mitarbeit 40 %, Klassenarbeiten 60 % (Schnitt der KA-Noten). Erscheint in der Übersicht (Spalten SoMi, KA, Gesamt, sobald es im Zeitraum eine Arbeit gibt) und auf der Kürzel-Seite. Nur wenn beides vorliegt.
+- Daten: `db.ka = [{id,gid,t,d,max,sk,r:{sid:{p,st,mx,na,nat}},upd}]`, geprüft mit `okKa`, in Sicherung und Import enthalten. Die Beispielklasse hat eine fiktive Arbeit.
 
 ## Namensliste (ab 0.2.3)
 - In der Lerngruppe „Namen eintragen“: zu jedem Kürzel ein Name. Geht nur mit App-Sperre.
