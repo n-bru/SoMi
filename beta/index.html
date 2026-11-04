@@ -129,7 +129,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.2.8 Beta",SOMI_STAND="04.11.2026";
+const SOMI_VERSION="0.2.9 Beta",SOMI_STAND="04.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -624,8 +624,7 @@ function profilV(){
   <p>Die Daten liegen nur auf diesem Gerät. Sie verlassen es nur als verschlüsselte Sicherungsdatei.</p>
   <p>Schüler:innen haben ein Kürzel (z. B. 7B-01). Namen kannst du getrennt eintragen: nur mit App-Sperre, verschlüsselt, nicht in der normalen Sicherung.</p>
   <p>Der Förderschwerpunkt wird nicht gespeichert, nur das Profil.</p>
-  <p>Sicherungen nur auf dienstlichem Speicher ablegen, nicht in einer privaten Cloud. Nutze nur dienstliche Geräte mit Code-Sperre.</p>
-  <p>Vor dem Einsatz mit echten Noten: Absprache mit Schulleitung und Datenschutzbeauftragten.</p></div>
+  <p>Sicherungen nur auf dienstlichem Speicher ablegen, nicht in einer privaten Cloud. Nutze nur dienstliche Geräte mit Code-Sperre.</p></div>
   <p class="muted small" style="text-align:center">SoMi ${SOMI_VERSION} · Stand ${SOMI_STAND} · nur für den eigenen Unterricht</p>`}
 function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
 async function giveFile(name,txt,type="application/json"){const file=new File([txt],name,{type});
