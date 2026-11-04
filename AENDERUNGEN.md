@@ -4,6 +4,7 @@ Neueste oben.
 
 | Datum | Version | Was | Beta/Haupt |
 |---|---|---|---|
+| 04.11.2026 | 0.2.8 | Stufenknöpfe zeigen den Notenwert (= 1, = 2, = 3,5, = 5) statt der gerundeten Note. Notenvorschlag erst ab 3 zählenden Beobachtungen in mindestens 2 Kriterien, sonst „–“ | Beta |
 | 04.11.2026 | 0.2.7 | Notenvorschlag: erst Mittelwert je Kriterium, dann Mittelwert über die Kriterien. Häufig erfasste Kriterien überdecken seltene nicht mehr. Gewicht je Kriterium (1×, 2×, 3×) unter Einstellungen → Kriterien Mathe. Stufenknöpfe heißen jetzt übertroffen / erfüllt / teilweise erfüllt / kaum erfüllt, darunter klein die umgerechnete Note (≈ 1, ≈ 2, ≈ 3−, ≈ 5) | Beta |
 | 04.11.2026 | 0.2.6 | iPhone: Inhalt beginnt unter der Uhrzeit-/Akku-Leiste, beim Scrollen verschwimmt oben nichts mehr (Leiste deckt ab). Sperrbildschirm ebenso | Beta |
 | 04.11.2026 | 0.2.4 | Beobachtungen in 4 Stufen (++ mehr als gut, + gut, o teilweise, − kaum) statt Noten. Übersicht zeigt einen Notenvorschlag mit + und − (Stufenwerte 1 / 2 / 3,5 / 5, unter Einstellungen änderbar, Mittelwert auf Drittel gerundet, Gleichstand zugunsten der Schüler:innen). Alte Einträge mit Note bleiben gültig | Beta |

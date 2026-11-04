@@ -113,6 +113,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.click("button:has-text('Noten zeigen')");ok(await p.locator(".tbl tr:has-text('DEMO-01')").innerText().then(t=>t.includes("+")),"Noten zeigen");
   ok(await p.evaluate(()=>noteOf(2)==="2"&&noteOf(2.34)==="2-"&&noteOf(2.66)==="3+"&&noteOf(1)==="1"&&noteOf(5.9)==="6"&&mean([{s:"4"},{s:"3"}])===1.5),"Umrechnung Stufen in Note mit + und −");
   ok(await p.evaluate(()=>{const z=[{k:"qual",s:"3"},{k:"qual",s:"3"},{k:"qual",s:"3"},{k:"port",s:"1"}];const a=noteMean(z)===3.5;db.kgw={qual:3};const b=noteMean(z)===2.75;const c=!okKgw({qual:4})&&!okKgw({xyz:2})&&okKgw({qual:2});delete db.kgw;return a&&b&&c}),"Notenvorschlag: erst je Kriterium, dann gewichtet");
+  ok(await p.evaluate(()=>!genug([{k:"qual"},{k:"qual"},{k:"qual"}])&&!genug([{k:"qual"},{k:"port"}])&&genug([{k:"qual"},{k:"qual"},{k:"port"}])),"Notenvorschlag erst ab 3 Beobachtungen in 2 Kriterien");
   ok(await p.evaluate(()=>okObs({id:"a",gid:"b",sid:"c",k:"qual",s:"3",d:"2026-01-01",upd:1})&&!okObs({id:"a",gid:"b",sid:"c",k:"qual",s:"5",d:"2026-01-01",upd:1})&&okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"2+",d:"2026-01-01",upd:1})),"Prüfhelfer: Stufe neu, Note alt gültig");
   ok(await p.locator(".tbl tr:has-text('DEMO-03')").innerText().then(t=>/ \+[12]/.test(t)),"Rückmeldung zählt nicht mit");
   await p.click(".tbl tr:has-text('DEMO-01')");ok(await p.locator("text=Sonstige Mitarbeit in DEMO Mathe").count()===1,"Einträge auf der Kürzel-Seite");
