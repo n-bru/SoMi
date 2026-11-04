@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.2.3, Stand 03.11.2026)
+# SoMi – Funktionen (Version 0.2.4, Stand 03.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -28,6 +28,11 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Runde durch die Gruppe: aktiv, ohne Sportsachen, sportunfähig, nicht anwesend. „Alle übrigen: aktiv“ füllt den Rest. Pro Tag ein Status je Kürzel; erneutes Tippen ersetzt ihn.
 - Übersicht pro Halbjahr/Schuljahr: Anzahl je Status, ab 3 markiert.
 - Daten: `db.att = [{id,gid,sid,d,st,upd}]`, geprüft mit `okAtt`, in Sicherung und Import enthalten.
+
+## Stufen und Notenvorschlag (ab 0.2.4)
+- Beobachtungen in 4 Stufen: ++ mehr als gut, + gut (SILP-Anker „gut“), o teilweise, − kaum (Anker „ausreichend“ nicht erreicht). Gespeichert als `o.s` ("4" bis "1"); alte Einträge mit Note `o.n` bleiben gültig.
+- Umrechnung: jede Stufe hat einen Notenwert (Standard 1 / 2 / 3,5 / 5, Einstellungen → „Umrechnung Stufen → Note“, gespeichert als `db.stw`). Der Mittelwert der zählenden Einträge wird auf Drittel gerundet: 2,33 → 2−, 2,67 → 3+; genau in der Mitte zugunsten der Schüler:innen.
+- Übersicht und Kürzel-Seite zeigen den Notenvorschlag, verborgen durch den Sichtschutz.
 
 ## Namensliste (ab 0.2.3)
 - In der Lerngruppe „Namen eintragen“: zu jedem Kürzel ein Name. Geht nur mit App-Sperre.

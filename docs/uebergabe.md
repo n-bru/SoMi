@@ -22,7 +22,7 @@
 ## Offene Punkte
 
 1. **GitHub Pages einschalten** (Nick): Repo-Einstellungen → Pages → Branch `main`, Ordner `/`. Erst dann ist die Beta erreichbar.
-2. **Version 0.2.3 als Beta** (04.11.2026): neu Namensliste (getrennt, verschlüsselt, nur mit Sperre; Nicks Entscheidung 04.11.). Davor 0.2.2 (03.11.2026): Mathe Sonstige Mitarbeit mit „Ganze Klasse nacheinander“ (Kriterien vorab wählen, überspringen, nicht anwesend) und „Einzeln bewerten“; Sport-Stundenstatus. Hauptversion noch 0.1.3. Wartet auf Nicks Prüfung auf dem iPad, danach ggf. Hauptversion.
+2. **Version 0.2.4 als Beta** (04.11.2026): Beobachtungen 4-stufig mit Notenvorschlag (Nicks Wunsch 04.11.). 0.2.3: Namensliste (getrennt, verschlüsselt, nur mit Sperre; Nicks Entscheidung 04.11.). Davor 0.2.2 (03.11.2026): Mathe Sonstige Mitarbeit mit „Ganze Klasse nacheinander“ (Kriterien vorab wählen, überspringen, nicht anwesend) und „Einzeln bewerten“; Sport-Stundenstatus. Hauptversion noch 0.1.3. Wartet auf Nicks Prüfung auf dem iPad, danach ggf. Hauptversion.
 3. **Version 0.3:** Klassenarbeiten (Punkte, Notenschlüssel E/G/ohne, Nachteilsausgleich-Vermerk) und Notenvorschlag 40/60.
 4. **Version 0.4:** Arbeits- und Sozialverhalten, Rücklauf-Listen.
 5. **Version 0.5:** Sport (Gewichtung offen, Vorschlag 50/10/20/20), LE-Förderplanziele, PDFs, Stundenplan.
