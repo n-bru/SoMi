@@ -88,7 +88,7 @@ nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
 .tile.on{border:2.5px solid var(--acc);background:var(--accs)}
 .tiles:has(.nm){grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.tile .done{position:absolute;top:4px;right:8px;color:var(--acc);font-weight:900}
 .padwrap{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));z-index:3;background:var(--card);margin:10px -8px 4px;padding:8px;border-radius:18px;box-shadow:0 -8px 16px -12px rgba(0,0,0,.35)}
-.pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.pad.st{grid-template-columns:repeat(4,1fr)}.pad.st button{min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.pad.st b{font-size:1.5rem;line-height:1}.pad.st span{font-size:.75rem;font-weight:600;color:var(--muted)}
+.pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.pad.st{grid-template-columns:repeat(4,1fr)}.pad.st .nt{opacity:.7;font-weight:600}.pad.st button{min-height:72px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.pad.st b{font-size:1.5rem;line-height:1}.pad.st span{font-size:.75rem;font-weight:600;color:var(--muted)}
 .bar{height:6px;border-radius:3px;background:var(--soft);margin:8px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
 .seqsus{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 8px}.seqsus .code{font-size:2rem}.kic.big{width:60px;height:60px;font-size:2rem}
 .btn.abw{border-style:dashed}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.three .btn{padding-left:4px;padding-right:4px}
@@ -128,7 +128,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.2.6",SOMI_STAND="04.11.2026";
+const SOMI_VERSION="0.2.7",SOMI_STAND="04.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -169,7 +169,7 @@ const okStr=(s,n=4000)=>s==null||typeof s==="string"&&s.length<=n,okNum=v=>v==nu
 const okSY=s=>typeof s==="string"&&/^\d{4}\/\d{2}$/.test(s);
 function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&okNum(s.upd)}catch(e){return false}}
 function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&(g.lastK==null||Object.hasOwn(KMAP,g.lastK))&&(g.lastKs==null||Array.isArray(g.lastKs)&&g.lastKs.length<=12&&g.lastKs.every(k=>Object.hasOwn(KMAP,k)))&&okNum(g.upd)}catch(e){return false}}
-const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f),hausa:v=>typeof v==="boolean",stw:v=>okStw(v)};
+const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f),hausa:v=>typeof v==="boolean",stw:v=>okStw(v),kgw:v=>okKgw(v)};
 const susById=id=>db.sus.find(s=>s.id===id);
 const groupById=id=>db.groups.find(g=>g.id===id);
 const gName=g=>`${g.cls} ${g.fach}${g.kurs&&g.kurs!=="-"?" "+g.kurs:""}`;
@@ -200,9 +200,10 @@ const nWert=n=>{const b=+n[0];return n[1]==="+"?b-.3:n[1]==="-"?b+.3:b};
 const nTxt=n=>n.replace("-","−");
 /* Ab 0.2.4: Beobachtungen in 4 Stufen (o.s), alte Einträge mit Note (o.n) bleiben gültig.
    Umrechnung: jede Stufe hat einen Notenwert (Einstellungen), der Mittelwert wird auf Drittel gerundet → Note mit + und −. */
-const STUF={"4":{t:"++",l:"mehr als gut"},"3":{t:"+",l:"gut"},"2":{t:"o",l:"teilweise"},"1":{t:"−",l:"kaum"}};
+const STUF={"4":{t:"++",l:"übertroffen"},"3":{t:"+",l:"erfüllt"},"2":{t:"o",l:"teilweise erfüllt"},"1":{t:"−",l:"kaum erfüllt"}};
 const STW0={"4":1,"3":2,"2":3.5,"1":5};
 const stw=()=>({...STW0,...(db.stw||{})});
+const okKgw=v=>!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).every(k=>Object.hasOwn(KMAP,k)&&[1,2,3].includes(v[k]));
 const okStw=v=>!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).every(k=>Object.hasOwn(STUF,k)&&typeof v[k]==="number"&&v[k]>=1&&v[k]<=6);
 const oWert=o=>o.s?stw()[o.s]:nWert(o.n);
 const oTxt=o=>o.s?STUF[o.s].t:nTxt(o.n);
@@ -257,6 +258,9 @@ const hjStart=()=>{const d=new Date(),y=d.getFullYear(),m=d.getMonth();return m>
 const sjStart=()=>`${syNow().slice(0,4)}-08-01`;
 const daysAgo=n=>iso(new Date(Date.now()-n*864e5));
 const mean=a=>a.length?a.reduce((s,o)=>s+oWert(o),0)/a.length:null;
+/* Ab 0.2.5: Notenvorschlag = erst Mittelwert je Kriterium, dann gewichteter Mittelwert der Kriterien (Gewicht 1–3, Einstellungen). */
+const kgw=k=>(db.kgw&&db.kgw[k])||1;
+function noteMean(a){let s=0,w=0;for(const k of new Set(a.map(o=>o.k))){const g=kgw(k);s+=g*mean(a.filter(o=>o.k===k));w+=g}return w?s/w:null}
 const fmt1=x=>x==null?"–":x.toFixed(1).replace(".",",");
 // Sichtschutz: Noten sind nach jedem Start verborgen, bis du sie zeigst
 let SHOW=false;
@@ -294,7 +298,7 @@ function erfV(){const g=groupById(view.erf);if(!g||g.arch){view={tab:view.tab,gr
   ${erExtras()}</div>`}
   ${st.length?`<div class="card"><b>Seit 2 Wochen ohne Eintrag</b><p class="small" style="margin:6px 0 0">${st.map(s=>esc(s.code)).join(", ")}</p></div>`:""}
   <p><button class="btn block" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht ${esc(gName(g))}</button></p>`}
-const padH=()=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" onclick="addObs('${v}')" aria-label="${x.t} ${x.l}"><b>${x.t}</b><span>${x.l}</span></button>`).join("");
+const padH=()=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" onclick="addObs('${v}')" aria-label="${x.l}, etwa Note ${noteTxt(stw()[v])}"><b>${x.t}</b><span>${x.l}</span><span class="nt">≈ ${noteTxt(stw()[v])}</span></button>`).join("");
 const erExtras=()=>`<label for="erT">Stichwort <span class="muted small">(freiwillig, vor der Stufe eintragen; Diktat über die Tastatur geht auch)</span></label><input id="erT" maxlength="300" value="${esc(ER.t)}" oninput="ER.t=this.value" placeholder="z. B. Lösungsweg an der Tafel erklärt">
   <label class="swr"><span class="grow">Nur Rückmeldung<span class="sub">Zählt nicht für die Note, z. B. in Übungsphasen.</span></span><input type="checkbox" class="sw" ${ER.fb?"checked":""} onchange="ER.fb=this.checked"></label>
   <div class="row"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${ER.d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();render()"></div>`;
@@ -387,7 +391,7 @@ function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.o
   const rows=ms.map(s=>{const os=all.filter(o=>o.sid===s.id).sort((a,b)=>a.d.localeCompare(b.d)||a.upd-b.upd),z=os.filter(o=>!o.fb);
     const last=os.length?os[os.length-1].d:null,old=!os.some(o=>o.d>=lim);
     return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span>${(s.profil||"r")!=="r"?` <span class="tag ${s.profil}">${s.profil==="zd"?"LE":"NA"}</span>`:""}${nm(s)}</th>
-    <td class="num">${z.length}${os.length>z.length?`<span class="muted small"> +${os.length-z.length}</span>`:""}</td><td class="num">${hid(noteTxt(mean(z)))}</td>
+    <td class="num">${z.length}${os.length>z.length?`<span class="muted small"> +${os.length-z.length}</span>`:""}</td><td class="num">${hid(noteTxt(noteMean(z)))}</td>
     <td class="verl">${z.slice(-6).map(o=>hid(oTxt(o))).join(" ")||"–"}</td><td class="small${old?" old":""}">${last?dDEy(last).slice(0,6):"–"}</td></tr>`}).join("");
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
   <div class="between"><h1 style="margin-bottom:4px">Übersicht</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · Sonstige Mitarbeit</p>
@@ -400,10 +404,11 @@ function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.o
 function susObsV(s,g){if(g.fach!=="Mathe")return "";const os=obsOf(g.id,s.id).sort((a,b)=>b.d.localeCompare(a.d)||b.upd-a.upd),z=os.filter(o=>!o.fb),ro=!!g.arch;
   const per=kritList().map(K=>{const a=z.filter(o=>o.k===K.k);return a.length?`<span class="tag">${esc(K.t)}: ${hid(noteTxt(mean(a)))} (${a.length})</span>`:""}).join(" ");
   return `<div class="card"><div class="between"><b>Sonstige Mitarbeit in ${esc(gName(g))}</b>${ssBtn()}</div>
-  <p class="small muted" style="margin:6px 0">${z.length} zählende ${z.length===1?"Beobachtung":"Beobachtungen"}${os.length>z.length?`, ${os.length-z.length} nur Rückmeldung`:""} · Notenvorschlag ${hid(noteTxt(mean(z)))}</p>${per?`<p style="display:flex;flex-wrap:wrap;gap:6px">${per}</p>`:""}
+  <p class="small muted" style="margin:6px 0">${z.length} zählende ${z.length===1?"Beobachtung":"Beobachtungen"}${os.length>z.length?`, ${os.length-z.length} nur Rückmeldung`:""} · Notenvorschlag ${hid(noteTxt(noteMean(z)))}</p>${per?`<p style="display:flex;flex-wrap:wrap;gap:6px">${per}</p>`:""}
   ${os.length?`<ul class="obsl">${os.map(o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(KMAP[o.k].t)}</span><br><b>${o.fb?`<span class="muted">Rückmeldung</span> ${hid(oTxt(o))}`:hid(oTxt(o))}</b>${o.t?` <span class="small">${esc(o.t)}</span>`:""}</div>
   ${ro?"":`<button class="btn ghost small" aria-label="${o.fb?"Zählt nicht. Tippen: zählt":"Zählt. Tippen: nur Rückmeldung"}" onclick="obsFb(${ja(o.id)})">${o.fb?"zählt nicht":"zählt ✓"}</button><button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="obsDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul>`:`<p class="muted small">Noch keine Einträge.</p>`}
   ${ro?"":`<p style="margin-bottom:0"><button class="btn" onclick="ER={...erNeu(${ja(g.id)},'e'),sel:[${ja(s.id)}]};go({tab:view.tab,group:${ja(g.id)},erf:${ja(g.id)}})">Für ${esc(s.code)} erfassen</button></p>`}</div>`}
+function setKgw(k,n){if(!Object.hasOwn(KMAP,k)||![1,2,3].includes(n))return;const o={...(db.kgw||{})};if(n===1)delete o[k];else o[k]=n;if(Object.keys(o).length)db.kgw=o;else delete db.kgw;save();render()}
 function setStw(v,t){const x=parseFloat(String(t).replace(",","."));if(!(x>=1&&x<=6))return render(),toast("Bitte einen Wert von 1 bis 6.");db.stw={...(db.stw||{}),[v]:Math.round(x*10)/10};save();render();toast("Umrechnung gespeichert")}
 function obsFb(id){const o=db.obs.find(x=>x.id===id);if(!o)return;o.fb=!o.fb;touch(o);save();render();toast(o.fb?"Zählt jetzt nicht für die Note":"Zählt jetzt für die Note")}
 function obsDel(id){const o=db.obs.find(x=>x.id===id);if(!o)return;db.obs=db.obs.filter(x=>x.id!==id);db.del.push(id);save();render();
@@ -594,10 +599,13 @@ function profilV(){
   <div class="sub" style="margin:14px 0 6px;font-weight:700">Schriftgröße</div><div class="pick">${[["m","Normal"],["l","Groß"],["xl","Sehr groß"]].map(([k,t])=>`<button class="${(db.fs||"m")===k?"on":""}" onclick="db.fs='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div></div>
   ${lockV()}
   <div class="card"><h2 style="margin-top:0">Kriterien Mathe</h2><p class="small muted" style="margin:0">Nach SILP Mathe 4.2. Ankertexte siehst du beim Erfassen.</p>
-  <label class="swr"><span class="grow">Hausaufgaben (LZ-Aufgaben) bewerten<span class="sub">Aus, solange es an der Schule keine Hausaufgaben gibt.</span></span><input type="checkbox" class="sw" ${db.hausa?"checked":""} onchange="db.hausa=this.checked;save();render()"></label></div>
-  <div class="card"><h2 style="margin-top:0">Umrechnung Stufen → Note</h2><p class="small muted" style="margin:0 0 8px">Jede Stufe zählt mit diesem Notenwert. Der Mittelwert wird auf Drittel gerundet: 2,33 → 2−, 2,67 → 3+. Das Ergebnis ist ein Vorschlag.</p>
+  <label class="swr"><span class="grow">Hausaufgaben (LZ-Aufgaben) bewerten<span class="sub">Aus, solange es an der Schule keine Hausaufgaben gibt.</span></span><input type="checkbox" class="sw" ${db.hausa?"checked":""} onchange="db.hausa=this.checked;save();render()"></label>
+  <div class="sub" style="margin:14px 0 4px;font-weight:700">Gewicht im Notenvorschlag</div><p class="small muted" style="margin:0 0 6px">Jedes Kriterium zählt einmal, egal wie oft du es erfasst. Hier kannst du ein Kriterium doppelt oder dreifach zählen lassen.</p>
+  ${kritList().map(K=>`<div class="row" style="margin:6px 0;flex-wrap:wrap"><span class="grow">${esc(K.t)}</span><div class="pick" role="group" aria-label="Gewicht ${esc(K.t)}">${[1,2,3].map(n=>`<button class="${kgw(K.k)===n?"on":""}" aria-pressed="${kgw(K.k)===n}" onclick="setKgw(${ja(K.k)},${n})">${n}×</button>`).join("")}</div></div>`).join("")}
+  ${db.kgw?`<p style="margin:6px 0 0"><button class="btn ghost small" onclick="delete db.kgw;save();render()">Alle auf 1× zurücksetzen</button></p>`:""}</div>
+  <div class="card"><h2 style="margin-top:0">Umrechnung Stufen → Note</h2><p class="small muted" style="margin:0 0 8px">Jede Stufe zählt mit diesem Notenwert. SoMi mittelt erst je Kriterium, dann über die Kriterien (mit Gewicht). Das Ergebnis wird auf Drittel gerundet: 2,33 → 2−, 2,67 → 3+. Das Ergebnis ist ein Vorschlag.</p>
   ${Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<div class="row" style="margin:6px 0"><label for="stw${v}" class="grow" style="margin:0"><b>${x.t}</b> ${x.l}</label><input id="stw${v}" inputmode="decimal" style="width:6em;text-align:right" value="${String(stw()[v]).replace(".",",")}" onchange="setStw('${v}',this.value)"></div>`).join("")}
-  <p class="small muted" style="margin:6px 0 0">Bezug zum SILP: „+“ heißt Anker „gut“ erreicht, „−“ heißt Anker „ausreichend“ nicht erreicht.${db.stw?` <button class="btn ghost small" onclick="delete db.stw;save();render()">Zurücksetzen</button>`:""}</p></div>
+  <p class="small muted" style="margin:6px 0 0">Die umgerechnete Note steht klein auf jedem Knopf. Bezug zum SILP: „erfüllt“ heißt Anker „gut“ erreicht, „kaum erfüllt“ heißt Anker „ausreichend“ nicht erreicht.${db.stw?` <button class="btn ghost small" onclick="delete db.stw;save();render()">Zurücksetzen</button>`:""}</p></div>
   <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length} Einträge auf diesem Gerät</p>
   ${mtip("backup")}<p class="row" style="flex-wrap:wrap"><button class="btn pri${mk("backup")}" onclick="exportJSON()">Sicherung speichern</button><button class="btn" onclick="$('#imp').click()">Sicherung laden</button></p>
   <input type="file" id="imp" accept=".json,application/json" hidden onchange="importJSON(this)">
