@@ -4,6 +4,7 @@ Neueste oben.
 
 | Datum | Version | Was | Beta/Haupt |
 |---|---|---|---|
+| 04.11.2026 | 0.2.6 | iPhone: Inhalt beginnt unter der Uhrzeit-/Akku-Leiste, beim Scrollen verschwimmt oben nichts mehr (Leiste deckt ab). Sperrbildschirm ebenso | Beta |
 | 04.11.2026 | 0.2.4 | Beobachtungen in 4 Stufen (++ mehr als gut, + gut, o teilweise, − kaum) statt Noten. Übersicht zeigt einen Notenvorschlag mit + und − (Stufenwerte 1 / 2 / 3,5 / 5, unter Einstellungen änderbar, Mittelwert auf Drittel gerundet, Gleichstand zugunsten der Schüler:innen). Alte Einträge mit Note bleiben gültig | Beta |
 | 04.11.2026 | 0.2.3 | Namensliste: Namen pro Lerngruppe eintragen („Namen eintragen“), getrennt von den Noten und verschlüsselt gespeichert, nur mit App-Sperre. Anzeige unter dem Kürzel, „Namen verbergen“ für den Beamer. Eigene Datei „Namensliste sichern/laden“, nicht in der normalen Sicherung. Sperre aus oder „Alles löschen“ löscht die Namen | Beta |
 | 03.11.2026 | 0.2.2 | Ganze Klasse: zu Beginn die heute beobachteten Kriterien wählen, Runde fragt pro Kürzel nur diese ab; neuer Knopf „überspringen“. Sport: Stundenstatus (aktiv, ohne Sportsachen, sportunfähig, nicht anwesend) als Runde mit „Alle übrigen: aktiv“ und Übersicht | Beta |
