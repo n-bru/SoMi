@@ -133,7 +133,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.4.3 Beta",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.4.4 Beta",SOMI_STAND="05.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -216,9 +216,9 @@ function noteOf(m){if(m==null)return null;const n=Math.min(6,Math.max(1,Math.cei
   if(b>=6)return "6";return d<-.01?b+"+":d>.01?b+"-":String(b)}
 const noteTxt=m=>m==null?"–":nTxt(noteOf(m));
 const KRIT=[
- {k:"qual",t:"Qualität der Beiträge",hint:"Fehler in Erarbeitungs- und Übungsphasen nicht abwerten (Kernlehrplan Mathe). Im Zweifel „nur Rückmeldung“.",
-  gut:["nennt richtige Lösungen und begründet sie nachvollziehbar","geht selbstständig auf andere Lösungen ein, findet Argumente und Begründungen","stellt Ergebnisse auf unterschiedliche Art und mit verschiedenen Medien dar"],
-  aus:["nennt teilweise richtige Lösungen, meist ohne nachvollziehbare Begründung","geht selten auf andere Lösungen ein, nennt Argumente, kann sie aber nicht begründen","stellt Ergebnisse nur auf eine Art dar"]},
+ {k:"qual",t:"Qualität der Beiträge",hint:"Dazu gehört auch die Fachsprache. Fehler in Erarbeitungs- und Übungsphasen nicht abwerten (Kernlehrplan Mathe). Im Zweifel „nur Rückmeldung“.",
+  gut:["nennt richtige Lösungen und begründet sie nachvollziehbar","geht selbstständig auf andere Lösungen ein, findet Argumente und Begründungen","stellt Ergebnisse auf unterschiedliche Art und mit verschiedenen Medien dar","verwendet Fachbegriffe sicher und korrekt"],
+  aus:["nennt teilweise richtige Lösungen, meist ohne nachvollziehbare Begründung","geht selten auf andere Lösungen ein, nennt Argumente, kann sie aber nicht begründen","stellt Ergebnisse nur auf eine Art dar","verwendet Fachbegriffe selten oder ungenau"]},
  {k:"kont",t:"Beteiligung",hint:"Beteiligung am Unterrichtsgespräch (SILP: Kontinuität). Nur bewerten, wenn du einen klaren Eindruck hast.",
   gut:["beteiligt sich regelmäßig am Unterrichtsgespräch"],aus:["nimmt eher selten am Unterrichtsgespräch teil"]},
  {k:"selbst",t:"Selbstständigkeit",
@@ -339,7 +339,7 @@ function seqCard(g,ms){if(!ms.length)return `<div class="card"><p class="muted">
 const padRow=(k,cur)=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" data-k="${k}" class="${cur===v?"cur":""}" aria-pressed="${cur===v}" onclick="seqSet('${k}','${v}')" aria-label="${esc(KMAP[k].t)}: ${x.l}, Notenwert ${fmtW(stw()[v])}"><b>${x.t}</b><span>${x.l}</span><span class="nt">= ${fmtW(stw()[v])}</span></button>`).join("");
 // Massive Unterrichtsstörung in der Runde (Mathe) und im Stundenstatus (Sport); gespeichert sofort, in ER.run unter "@st"
 function stRow(sid){const r=ER.run[sid],id=r&&r!=="abw"?r["@st"]:null,on=!!(id&&db.asv.some(a=>a.id===id));
-  return `<div class="seqrow"><button class="btn block abw stb${on?" cur":""}" aria-pressed="${on}" onclick="seqStoer(${ja(sid)})">${stBtnTxt(on)}</button><p class="small muted" style="margin:4px 0 0;text-align:center">Zählt nicht zur Note. Schreib ins Stichwort, was passiert ist.</p></div>`}
+  return `<div class="seqrow"><button class="btn block abw stb${on?" cur":""}" aria-pressed="${on}" onclick="seqStoer(${ja(sid)})">${stBtnTxt(on)}</button><p class="small muted" style="margin:4px 0 0;text-align:center">Zählt nicht zur Note. Eine Notiz ist Pflicht.</p></div>`}
 function seqRun(sid){let r=ER.run[sid];if(!r||r==="abw")r=ER.run[sid]={};return r}
 function seqSet(k,v){const g=groupById(ER.gid),s=seqCur();if(!g||!s||!Object.hasOwn(KMAP,k)||!Object.hasOwn(STUF,v))return;
   const r=seqRun(s.id),old=r[k]?db.obs.find(o=>o.id===r[k]):null;
@@ -349,8 +349,12 @@ function seqSet(k,v){const g=groupById(ER.gid),s=seqCur();if(!g||!s||!Object.has
 function seqStoer(sid){const g=groupById(ER.gid);if(!g||g.arch||!g.members.includes(sid))return;
   const r=seqRun(sid),old=r["@st"]?db.asv.find(a=>a.id===r["@st"]):null;
   if(old){db.asv=db.asv.filter(a=>a.id!==old.id);delete r["@st"];save();return render()}
-  const t=ER.t.trim().slice(0,300);
-  const a=touch({id:uid(),gid:g.id,sid,m:"stoer",v:"-",d:ER.d||today(),t,...(g.demo?{demo:true}:{})});db.asv.push(a);r["@st"]=a.id;save();render()}
+  stNote(t=>{if(seqRun(sid)["@st"])return;
+  const a=touch({id:uid(),gid:g.id,sid,m:"stoer",v:"-",d:ER.d||today(),t,...(g.demo?{demo:true}:{})});db.asv.push(a);seqRun(sid)["@st"]=a.id;save();render()})}
+// Störung nur mit Notiz: fragt, was passiert ist. Leer oder Abbrechen speichert nichts.
+async function stNote(fn){const v=await askText("Was ist passiert?","z. B. ruft dauerhaft rein, wirft Material");if(v==null)return;
+  const t=v.trim().slice(0,300);if(!t)return toast("Ohne Notiz wird keine Störung gespeichert.");
+  if(looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Notizen schreiben.");fn(t)}
 function seqNext(){const s=seqCur();if(!s)return;const t=ER.t.trim().slice(0,300),r=ER.run[s.id];
   if(t&&r&&r!=="abw")for(const id of Object.values(r)){const o=db.obs.find(x=>x.id===id)||db.asv.find(x=>x.id===id);if(o&&!o.t){o.t=t;touch(o)}}
   ER.t="";ER.i++;save();render();window.scrollTo(0,0)}
@@ -610,10 +614,10 @@ function asvDel(id){const a=db.asv.find(x=>x.id===id);if(!a)return;db.asv=db.asv
   undoToast("Eintrag gelöscht",()=>{db.del=db.del.filter(x=>x!==id);db.asv.push(touch(a));save();render()})}
 // Einzeln bewerten: Störung für die ausgewählten Kürzel
 function addStoer(){const g=groupById(ER.gid);if(!g||g.arch)return;if(!ER.sel.length)return toast("Tippe zuerst ein Kürzel an.");
-  const t=ER.t.trim().slice(0,300);if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
+  stNote(t=>{const g2=groupById(ER.gid);if(!g2||g2!==g)return;
   const neu=ER.sel.filter(id=>g.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,m:"stoer",v:"-",d:ER.d||today(),t,...(g.demo?{demo:true}:{})}));
-  db.asv.push(...neu);ER.sel=[];ER.t="";save();render();const ids=new Set(neu.map(a=>a.id));
-  undoToast(`Störung vermerkt${t?"":". Tipp: Stichwort dazuschreiben"}`,()=>{db.asv=db.asv.filter(a=>!ids.has(a.id));save();render()})}
+  db.asv.push(...neu);ER.sel=[];save();render();const ids=new Set(neu.map(a=>a.id));
+  undoToast("Störung vermerkt",()=>{db.asv=db.asv.filter(a=>!ids.has(a.id));save();render()})})}
 // Kürzel-Seite: Störungen dieser Gruppe, darunter alte Verhaltenseinträge (nur noch lesen und löschen)
 function stSusCard(s,g){const from=ovFrom(),st=stOf(g.id,s.id,from).sort((x,y)=>y.d.localeCompare(x.d)||y.upd-x.upd),alt=asvOf(g.id,s.id).filter(a=>a.m!=="stoer"),ro=!!g.arch;
   const li=o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(AMAP[o.m].t)}</span>${o.m==="stoer"?"":`<br><b>${AV[o.v].t}</b>`}${o.t?`<br><span class="small">${esc(o.t)}</span>`:""}</div>${ro?"":`<button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="asvDel(${ja(o.id)})">✕</button>`}</li>`;

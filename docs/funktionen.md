@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.4.3, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.4, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -47,7 +47,7 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 
 ## Kriterien und Runde (ab 0.4.3)
 - Runde „Ganze Klasse nacheinander“ ohne Kriterienwahl: pro Kürzel immer Qualität der Beiträge, Beteiligung (SILP: Kontinuität), Selbstständigkeit, Kooperation; dazu Werkzeuge und Hausaufgaben, wenn unter Einstellungen eingeschaltet (`db.werkz`, `db.hausa`). Darunter der Knopf „massive Unterrichtsstörung“. Dann „Weiter ›“.
-- Fachsprache und Kontinuität als eigene Kriterien entfallen bzw. heißen jetzt „Beteiligung“; alte Einträge zählen weiter.
+- Fachsprache und Kontinuität als eigene Kriterien entfallen bzw. heißen jetzt „Beteiligung“; alte Einträge zählen weiter. Fachsprache gehört ab 0.4.4 zur Qualität (Hinweis und Anker). „Werkzeuge“ (SILP: Geodreieck, Zirkel, Taschenrechner, GeoGebra, Tabellenkalkulation) ist zuschaltbar.
 - Gewicht: Qualität standardmäßig 2× (`KGW0`), alles andere 1×, unter Einstellungen änderbar.
 
 ## Präsentation, Heft, Übung (ab 0.4.3)
@@ -57,7 +57,7 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Daten: in `db.ka` mit Feld `k` (praes, port, sue); bei praes/port ohne `max`/`sk`, Ergebnis `r[sid].n`. Geprüft mit `okKa`.
 
 ## Massive Unterrichtsstörungen (ab 0.4.3)
-- Knopf in der Runde (Mathe), beim Einzeln-Bewerten und im Stundenstatus (Sport). Stichwort empfohlen. Zählt nicht zur Note.
+- Knopf in der Runde (Mathe), beim Einzeln-Bewerten und im Stundenstatus (Sport). Notiz ist Pflicht (ab 0.4.4): Der Knopf fragt „Was ist passiert?“, ohne Text wird nichts gespeichert. Zählt nicht zur Note.
 - Spalte „Stör.“ in den Übersichten, Liste auf der Kürzel-Seite (löschen mit Rückgängig), verborgen durch den Sichtschutz.
 - Daten: `db.asv` mit `m:"stoer"`, `v:"-"`. Einträge zu Arbeits-/Sozialverhalten aus 0.4.0–0.4.2 bleiben lesbar und löschbar.
 

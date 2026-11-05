@@ -15,7 +15,7 @@
 
 ## Stand
 
-- Hauptversion 0.3.3 (Freigabe durch Nick am 05.11.2026). Beta 0.4.3 (05.11.2026): Runde pro Kind auf einem Bildschirm mit festen Kriterien (Qualität 2×, Beteiligung, Selbstständigkeit, Kooperation), Knopf massive Unterrichtsstörung, Präsentation/Heft/Übung gesondert, Rücklauf-Listen. Arbeits- und Sozialverhalten wieder entfernt (Nick 05.11.). Beta 0.3.4 (Technik aus Pfad 1.2.6) steckt darin und ist noch ungetestet. Verlauf in `AENDERUNGEN.md`.
+- Hauptversion 0.3.3 (Freigabe durch Nick am 05.11.2026). Beta 0.4.4 (05.11.2026): Störung nur mit Pflicht-Notiz, Fachsprache unter Qualität. Davor 0.4.3: Runde pro Kind auf einem Bildschirm mit festen Kriterien (Qualität 2×, Beteiligung, Selbstständigkeit, Kooperation), Knopf massive Unterrichtsstörung, Präsentation/Heft/Übung gesondert, Rücklauf-Listen. Arbeits- und Sozialverhalten wieder entfernt (Nick 05.11.). Beta 0.3.4 (Technik aus Pfad 1.2.6) steckt darin und ist noch ungetestet. Verlauf in `AENDERUNGEN.md`.
 - Entscheidungen (03.11.2026): nur für Nick; eigene Adresse n-bru.github.io/SoMi; App-Sperre standardmäßig an; Klassenarbeiten gehören dazu; Hausaufgaben als abschaltbares Kriterium; Notenskala 1 bis 6 mit + und −; Aufbewahrung 5 Jahre, Löschen nur nach Rückfrage; LE kann Noten bekommen.
 - Kriterien: Mathe nach SILP Mathe 4.2/4.3 (Stand 09/2026), Sport nach SILP Sport Kap. 3 (Stand 03/2021, veraltet).
 
