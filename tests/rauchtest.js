@@ -174,6 +174,26 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Sport"}).click();await p.click("button:has-text('Schriftliche Überprüfungen')");
   await p.click("button:has-text('+ Schriftliche Überprüfung')");await p.fill("#kdt","Test Regeln");await p.fill("#kdm","20");await p.click("button:has-text('Anlegen')");
   await p.fill("#kp","18");await p.press("#kp","Enter");ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Test Regeln");return a&&groupById(a.gid).fach==="Sport"&&Object.keys(a.r).length===1}),"Schriftliche Überprüfung in Sport");
+  // 0.4 Arbeits- und Sozialverhalten: erfassen, Material fehlt, Übersicht, Kürzel-Seite, Sicherung
+  await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
+  const nAsv=await p.evaluate(()=>db.asv.length);ok(nAsv>0,"Beispielklasse hat fiktive Verhaltens-Einträge");
+  await p.click("button:has-text('Verhalten erfassen')");ok(await p.locator("h1",{hasText:"Verhalten erfassen"}).count()===1,"Verhalten erfassen geöffnet");
+  await p.click(".chips button:text-is('hilft anderen')");await p.locator(".tile",{hasText:"DEMO-01"}).click();await p.locator(".tile",{hasText:"DEMO-02"}).click();
+  await p.fill("#aeT","Fiktiv: Partner geholfen");await p.click(".pad.av button[data-v='+']");
+  ok(await p.evaluate(n=>db.asv.length===n+2&&db.asv.slice(-2).every(a=>a.m==="hilf"&&a.v==="+"&&a.t==="Fiktiv: Partner geholfen"),nAsv),"zwei Einträge „hilft anderen +“ gespeichert");
+  ok(await p.locator(".tile .done").count()===2,"Haken für heute erfasst");
+  await p.locator(".tile",{hasText:"DEMO-03"}).click();await p.click("button:has-text('Material fehlt')");
+  ok(await p.evaluate(()=>{const a=db.asv[db.asv.length-1];return a.m==="mat"&&a.v==="-"&&groupById(a.gid).lastM==="hilf"}),"Material fehlt als eigener Knopf, Merkmal bleibt");
+  await p.click(".pad.av button[data-v='-']");ok(await p.locator(".toast",{hasText:"Kürzel an"}).count()===1,"ohne Kürzel kein Eintrag");
+  ok(await p.evaluate(()=>!okAsv({id:"a1",gid:"g1",sid:"s1",m:"xx",v:"+",d:"2026-11-05"})&&!okAsv({id:"a1",gid:"g1",sid:"s1",m:"lb",v:"++",d:"2026-11-05"})&&okAsv({id:"a1",gid:"g1",sid:"s1",m:"lb",v:"o",d:"2026-11-05",t:""})),"okAsv prüft Fremddaten");
+  await p.click("button:has-text('Übersicht Verhalten')");if(await p.evaluate(()=>SHOW))await p.click("button:has-text('Noten verbergen')");ok(await p.locator(".tbl thead th",{hasText:"Sozial"}).count()===1&&await p.locator(".tbl .hide").count()>0,"Übersicht Verhalten, verborgen durch Sichtschutz");
+  await p.click("button:has-text('Noten zeigen')");ok(await p.locator(".tbl tbody tr",{hasText:"DEMO-01"}).locator("td",{hasText:"+2"}).count()===1,"Übersicht zählt Plus-Einträge");
+  await p.locator(".tbl tbody tr",{hasText:"DEMO-01"}).click();ok(await p.locator(".card b",{hasText:"Verhalten in DEMO Mathe"}).count()===1&&await p.locator(".obsl li",{hasText:"hilft anderen"}).filter({hasText:"+2 · ○0 · −0"}).count()===1&&await p.locator(".obsl li",{hasText:"eher +"}).count()>0,"Kürzel-Seite zeigt Verhalten je Merkmal");
+  await p.click("button:has-text('Noten verbergen')");
+  ok(await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe"),x={id:"zzasv1",gid:g.id,sid:g.members[0],m:"reg",v:"+",d:today(),t:"",upd:Date.now()};
+    IMP={d:{groups:[],sus:[],obs:[],att:[],ka:[],asv:[x,{...x,id:"zzasv2",m:"böse"}].filter(okAsv),del:[]},settings:false};applyImport();return db.asv.some(a=>a.id==="zzasv1")&&!db.asv.some(a=>a.id==="zzasv2")}),"Sicherung laden übernimmt Verhalten, prüft es vorher");
+  await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Sport"}).click();await p.click("button:has-text('Verhalten erfassen')");
+  ok(await p.locator("button:has-text('Material fehlt')").count()===0,"Sport: kein Knopf „Material fehlt“ (steht im Stundenstatus)");
   // Namen: getrennt, verschlüsselt, nicht in der Sicherung
   await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("button:has-text('Namen eintragen')");await p.locator("input[aria-label='Name zu DEMO-01']").fill("Fiktiv Testname");
