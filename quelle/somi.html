@@ -132,7 +132,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.4.0",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.4.1",SOMI_STAND="05.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -141,13 +141,13 @@ const FRIST_JAHRE=5; // VO-DV I § 9 Abs. 1: „alle übrigen Daten“, ab Ende 
 let db;
 // Mit App-Sperre liegt im Speicher nur ein verschlüsselter Umschlag {somiEnc,salt,iv,ct}; db bleibt bis zum Entsperren leer
 let ENCWAIT=null,LKEY=null;
-const leer=()=>({v:1,sus:[],groups:[],obs:[],att:[],ka:[],asv:[],del:[]});
+const leer=()=>({v:1,sus:[],groups:[],obs:[],att:[],ka:[],asv:[],rl:[],del:[]});
 function load(){try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
   if(db?.somiEnc){ENCWAIT=db;db={...leer(),lock:{salt:ENCWAIT.salt,after:ENCWAIT.after??1,len:ENCWAIT.len||4}}}
   migrate()}
-function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];if(!Array.isArray(db.obs))db.obs=[];if(!Array.isArray(db.att))db.att=[];if(!Array.isArray(db.ka))db.ka=[];if(!Array.isArray(db.asv))db.asv=[];
-  const n=db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);db.obs=db.obs.filter(okObs);db.att=db.att.filter(okAtt);db.ka=db.ka.filter(okKa);db.asv=db.asv.filter(okAsv);
-  if(db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
+function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];if(!Array.isArray(db.obs))db.obs=[];if(!Array.isArray(db.att))db.att=[];if(!Array.isArray(db.ka))db.ka=[];if(!Array.isArray(db.asv))db.asv=[];if(!Array.isArray(db.rl))db.rl=[];
+  const n=db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length+db.rl.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);db.obs=db.obs.filter(okObs);db.att=db.att.filter(okAtt);db.ka=db.ka.filter(okKa);db.asv=db.asv.filter(okAsv);db.rl=db.rl.filter(okRl);
+  if(db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length+db.rl.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
 function applyTheme(){const t=db?.theme,r=document.documentElement;if(t==="light"||t==="dark")r.dataset.theme=t;else delete r.dataset.theme;
   if(db?.fs==="l"||db?.fs==="xl")r.dataset.fs=db.fs;else delete r.dataset.fs;
   const dark=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.querySelector('meta[name=theme-color]')?.setAttribute("content",dark?"#14201b":"#f5f6f1")}
@@ -627,6 +627,73 @@ function asvSusCard(s,g){const from=ovFrom(),a=asvOf(g.id,s.id,from).sort((x,y)=
 function demoAsv(g){const d=[[0,"lb","+"],[0,"hilf","+"],[1,"selb","+"],[2,"mat","-"],[2,"lb","o"],[3,"zus","+"],[4,"reg","o"],[5,"sorg","+"],[6,"konf","-"],[6,"konf","o"],[7,"ausd","+"],[1,"zus","+"]];
   return d.map(([i,m,v],n)=>touch({id:uid(),gid:g.id,sid:g.members[i],m,v,d:daysAgo(2+n),t:n===0?"Fiktiv: hat freiwillig eine Lösung vorgestellt":"",demo:true}))}
 
+/* ===== Rücklauf-Listen (ab 0.4.1) =====
+   Gespeichert als db.rl=[{id,gid,t,art,aus,bis,ct,r:{sid:{st,pc}},arch,upd}]. art = RLART, ct = Betrag in Cent (nur Geld),
+   st = "ok" (erledigt) oder "teil" (nur Geld, pc = gezahlt in Cent). Kein Eintrag = offen. Keine Erinnerungen an Eltern. */
+const RLART={u:"Unterschrift",g:"Geld",f:"Formular"};
+const okCt=v=>Number.isInteger(v)&&v>=0&&v<=1e6;
+function okRlR(r,ct){return !!r&&typeof r==="object"&&!Array.isArray(r)&&Object.keys(r).length<=60&&Object.entries(r).every(([k,x])=>okId(k)&&!!x&&typeof x==="object"&&!Array.isArray(x)&&(x.st==="ok"&&x.pc==null||x.st==="teil"&&ct!=null&&okCt(x.pc)&&x.pc<ct))}
+function okRl(a){try{return !!a&&okId(a.id)&&okId(a.gid)&&typeof a.t==="string"&&a.t.trim().length>0&&a.t.length<=80&&Object.hasOwn(RLART,a.art)&&okDate(a.aus)&&(a.bis==null||okDate(a.bis))
+  &&(a.art==="g"?okCt(a.ct)&&a.ct>0:a.ct==null)&&okRlR(a.r,a.ct)&&(a.arch==null||okDate(a.arch))&&okNum(a.upd)}catch(e){return false}}
+const eur=c=>(c/100).toFixed(2).replace(".",",")+" €";
+const parseEur=t=>{const s=String(t??"").trim().replace(/\s*€$/,"").replace(",",".");if(!/^\d{1,5}(\.\d{1,2})?$/.test(s))return NaN;return Math.round(Number(s)*100)};
+const rlById=id=>db.rl.find(a=>a.id===id);
+const rlOf=gid=>db.rl.filter(a=>a.gid===gid);
+// Stand einer Liste, nur aktuelle Mitglieder der Gruppe
+function rlSt(a){const g=groupById(a.gid),ms=g?msOf(g):[],x=s=>a.r[s.id];
+  const open=ms.filter(s=>!x(s)),teil=ms.filter(s=>x(s)?.st==="teil"),ok=ms.filter(s=>x(s)?.st==="ok");
+  const paid=a.art==="g"?ok.length*a.ct+teil.reduce((n,s)=>n+x(s).pc,0):0;
+  return {ms,open,teil,ok,paid,soll:a.art==="g"?ms.length*a.ct:0}}
+const rlLate=a=>!a.arch&&a.bis&&a.bis<today()&&rlSt(a).open.length+rlSt(a).teil.length>0;
+let RD=null; // Entwurf „Rücklauf-Liste anlegen“
+function rlListV(){const g=groupById(view.rl);if(!g){view={tab:view.tab,group:view.rl};return groupV()}
+  const ro=!!g.arch,all=rlOf(g.id).sort((a,b)=>b.aus.localeCompare(a.aus)||b.upd-a.upd),act=all.filter(a=>!a.arch),arch=all.filter(a=>a.arch);
+  const card=a=>{const s=rlSt(a),rest=s.open.length+s.teil.length;return `<button class="card tap row" onclick="go({tab:view.tab,group:${ja(g.id)},rl:${ja(g.id)},rld:${ja(a.id)}})"><div class="grow"><div class="code">${esc(a.t)}</div><div class="small${rlLate(a)?" old":" muted"}">${RLART[a.art]}${a.art==="g"?` · ${eur(a.ct)}`:""} · ${a.arch?`abgeschlossen am ${dDEy(a.arch)}`:rest?`noch ${rest} offen`:"alle zurück"}${a.bis&&!a.arch?` · fällig ${dDEy(a.bis)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`};
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button><h1 style="margin-bottom:4px">Rückläufe</h1><p class="muted" style="margin-top:0">${esc(gName(g))} · Elternbriefe, Geld, Unterschriften, Formulare</p>
+  ${ro?"":RD?`<div class="card"><b>Neue Rücklauf-Liste</b>
+    <label for="rdt">Titel</label><input id="rdt" maxlength="80" value="${esc(RD.t)}" oninput="RD.t=this.value" placeholder="z. B. Elternbrief Wandertag">
+    <label>Art</label><div class="pick">${Object.entries(RLART).map(([k,t])=>`<button class="${RD.art===k?"on":""}" aria-pressed="${RD.art===k}" onclick="RD.art='${k}';render()">${t}</button>`).join("")}</div>
+    ${RD.art==="g"?`<label for="rdb">Betrag pro Kind in €</label><input id="rdb" inputmode="decimal" maxlength="9" value="${esc(RD.b)}" oninput="RD.b=this.value" placeholder="z. B. 12,50">`:""}
+    <div class="two"><div><label for="rda">Ausgegeben am</label><input id="rda" type="date" value="${RD.aus}" onchange="RD.aus=okDate(this.value)?this.value:today()"></div><div><label for="rdf">Fällig bis <span class="muted small">(freiwillig)</span></label><input id="rdf" type="date" value="${RD.bis||""}" onchange="RD.bis=okDate(this.value)?this.value:null"></div></div>
+    <div class="duo" style="margin-top:14px"><button class="btn" onclick="RD=null;render()">Abbrechen</button><button class="btn pri" onclick="addRl(${ja(g.id)})">Anlegen</button></div></div>`
+  :`<p><button class="btn pri" onclick="RD={t:'',art:'u',b:'',aus:today(),bis:null};render();$('#rdt')?.focus()">+ Rücklauf-Liste</button></p>`}
+  ${act.length?act.map(card).join(""):`<p class="muted">Keine offenen Listen.</p>`}
+  ${arch.length?`<details class="card"><summary style="font-weight:800">Abgeschlossen (${arch.length})</summary>${arch.map(card).join("")}</details>`:""}
+  <p class="muted small">Die Listen liegen nur auf diesem Gerät. SoMi schickt keine Erinnerungen an Eltern.</p>`}
+function addRl(gid){const g=groupById(gid);if(!g||g.arch||!RD)return;const t=RD.t.trim();if(!t)return toast("Bitte einen Titel eintragen.");
+  let ct=null;if(RD.art==="g"){ct=parseEur(RD.b);if(!(ct>0))return toast("Bitte einen Betrag eintragen, z. B. 12,50.")}
+  if(RD.bis&&RD.bis<RD.aus)return toast("„Fällig bis“ liegt vor „Ausgegeben am“.");
+  const a=touch({id:uid(),gid,t:t.slice(0,80),art:RD.art,aus:RD.aus,bis:RD.bis||null,ct,r:{},arch:null,...(g.demo?{demo:true}:{})});
+  if(!okRl(a))return toast("Bitte die Angaben prüfen.");db.rl.push(a);RD=null;save();go({tab:view.tab,group:gid,rl:gid,rld:a.id})}
+function rlV(){const a=rlById(view.rld),g=a&&groupById(a.gid);if(!a||!g){view={tab:view.tab,group:view.rl,rl:view.rl};return rlListV()}
+  const ro=!!(g.arch||a.arch),s=rlSt(a),rest=[...s.open,...s.teil].sort((x,y)=>byNum(x.code,y.code));
+  const stTxt=x=>{const r=a.r[x.id];return !r?"offen":r.st==="ok"?"erledigt":`teilweise · ${eur(r.pc)} gezahlt, fehlt ${eur(a.ct-r.pc)}`};
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
+  <div class="between"><h1 style="margin-bottom:4px">${esc(a.t)}</h1>${nmBtn()}</div>
+  <p class="muted" style="margin-top:0">${esc(gName(g))} · ${RLART[a.art]}${a.art==="g"?` · ${eur(a.ct)} pro Kind`:""} · ausgegeben ${dDEy(a.aus)}${a.bis?` · fällig ${dDEy(a.bis)}`:""}${a.arch?` · abgeschlossen am ${dDEy(a.arch)}`:""}</p>
+  <div class="card"${rlLate(a)?' style="border:2px solid var(--new)"':""}><b>${rest.length?`Fehlt noch: ${rest.length} von ${s.ms.length}`:"Alle zurück"}</b>
+  ${rest.length?`<p style="margin:6px 0 0">${rest.map(x=>`<span class="code">${esc(x.code)}</span>${a.r[x.id]?.st==="teil"?" (teilweise)":""}`).join(", ")}</p>`:""}
+  ${a.art==="g"?`<p class="small" style="margin:8px 0 0">Eingesammelt: <b>${eur(s.paid)}</b> von ${eur(s.soll)} · fehlt ${eur(s.soll-s.paid)}</p>`:""}</div>
+  <div class="card"><p class="small muted" style="margin:0 0 4px">${ro?"Nur lesbar.":"Tippe auf „erledigt“, wenn es zurück ist. Nochmal tippen macht es wieder offen."}</p>
+  <ul class="obsl">${s.ms.map(x=>{const r=a.r[x.id];return `<li><div class="grow"><span class="code">${esc(x.code)}</span>${nm(x)}<br><span class="small${r?.st==="ok"?"":" muted"}">${stTxt(x)}</span></div>
+    ${ro?"":`${a.art==="g"?`<button class="btn ghost small" onclick="rlTeil(${ja(x.id)})">Teil&shy;betrag</button>`:""}<button class="btn small${r?.st==="ok"?" pri":""}" aria-pressed="${r?.st==="ok"}" onclick="rlTog(${ja(x.id)})">${r?.st==="ok"?"erledigt ✓":"erledigt"}</button>`}</li>`}).join("")||`<li class="muted">Noch niemand in dieser Gruppe.</li>`}</ul></div>
+  ${g.arch?"":`<p class="row" style="flex-wrap:wrap">${a.arch?`<button class="btn" onclick="rlArch(false)">Wieder öffnen</button>`:`<button class="btn" onclick="rlArch(true)">Liste abschließen</button>`}<button class="btn ghost danger" onclick="rlDel()">Löschen</button></p>`}`}
+function rlCur(){const a=rlById(view.rld),g=a&&groupById(a.gid);return a&&g&&!g.arch&&!a.arch?a:null}
+function rlTog(sid){const a=rlCur();if(!a)return;if(a.r[sid]?.st==="ok")delete a.r[sid];else a.r[sid]={st:"ok"};touch(a);save();render()}
+async function rlTeil(sid){const a=rlCur();if(!a||a.art!=="g")return;const s=susById(sid);
+  const v=await askText(`${s.code}: Wie viel ist schon bezahlt? (von ${eur(a.ct)})`,"z. B. 5,00");if(v==null)return;const c=parseEur(v);
+  if(!(c>=0)||c>a.ct)return toast(`Bitte einen Betrag von 0 bis ${eur(a.ct)}.`);
+  if(c===0)delete a.r[sid];else if(c===a.ct)a.r[sid]={st:"ok"};else a.r[sid]={st:"teil",pc:c};touch(a);save();render()}
+async function rlArch(on){const a=rlById(view.rld);if(!a)return;
+  if(on&&rlSt(a).open.length+rlSt(a).teil.length&&!await ask("Liste abschließen, obwohl noch etwas fehlt?",{ok:"Abschließen",sub:"Sie ist danach nur lesbar. Du kannst sie wieder öffnen."}))return;
+  a.arch=on?today():null;touch(a);save();render();toast(on?"Abgeschlossen":"Wieder offen")}
+async function rlDel(){const a=rlById(view.rld);if(!a)return;if(!await ask(`„${a.t}“ löschen?`,{ok:"Löschen",danger:true}))return;
+  db.rl=db.rl.filter(x=>x.id!==a.id);db.del.push(a.id);save();back();undoToast("Liste gelöscht",()=>{db.del=db.del.filter(x=>x!==a.id);db.rl.push(touch(a));save();render()})}
+function rlHint(){const l=db.rl.filter(a=>!a.arch&&groupById(a.gid)&&!groupById(a.gid).arch).map(a=>[a,rlSt(a)]).filter(([,s])=>s.open.length+s.teil.length);if(!l.length)return "";
+  return `<div class="card"><b>Offene Rückläufe</b>${l.map(([a,s])=>`<button class="card tap row" style="margin:8px 0 0" onclick="go({tab:'heute',group:${ja(a.gid)},rl:${ja(a.gid)},rld:${ja(a.id)}})"><div class="grow"><div class="code">${esc(a.t)}</div><div class="small${rlLate(a)?" old":" muted"}">${esc(gName(groupById(a.gid)))} · noch ${s.open.length+s.teil.length} offen${a.bis?` · fällig ${dDEy(a.bis)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`).join("")}</div>`}
+function demoRl(g){const r={};g.members.forEach((id,i)=>{if(i<4)r[id]={st:"ok"};else if(i===5)r[id]={st:"teil",pc:500}});
+  return touch({id:uid(),gid:g.id,t:"Wandertag (fiktiv)",art:"g",aus:daysAgo(6),bis:daysAgo(-5),ct:850,r,arch:null,demo:true})}
+
 /* ===== Navigation ===== */
 let view={tab:"heute"};
 const LOGO='<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#DCEDE4"/><path d="M20 46v12l3-2.6 3 2.6v-12z" fill="#7FC4A6"/><rect x="14" y="8" width="36" height="44" rx="5" fill="#2E6B57"/><rect x="41" y="7" width="4" height="46" rx="1.5" fill="#1E4A3B"/><rect x="19" y="13" width="17" height="12" rx="2.5" fill="#F5F6F1"/><path d="M23.5 19.2l2.6 2.6 5.2-6" fill="none" stroke="#2E6B57" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -636,7 +703,7 @@ gruppen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width
 profil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1"/></svg>'};
 function renderNav(){$("#nav").innerHTML=[["heute","Heute"],["gruppen","Lerngruppen"],["profil","Einstellungen"]].map(([k,t])=>`<button class="${view.tab===k?"on":""}" ${view.tab===k?'aria-current="page"':""} onclick="navTo('${k}')">${ICON[k].replace("<svg ",'<svg aria-hidden="true" ')}${t}</button>`).join("")}
 // Verlauf der Ansichten: „Zurück“ führt dorthin, wo man herkam
-let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,v.kad,v.names,v.asv,v.asvo,!!v.imp]);
+let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,v.kad,v.names,v.asv,v.asvo,v.rl,v.rld,!!v.imp]);
 function go(v){const i=HIST.findIndex(h=>vkey(h)===vkey(v));if(i>=0)HIST.length=i;else if(view&&vkey(view)!==vkey(v))HIST.push(view);view=v;render();window.scrollTo(0,0)}
 function back(){view=HIST.pop()||{tab:view.tab};render();window.scrollTo(0,0)}
 function navTo(k){HIST=[];go({tab:k})}
@@ -647,6 +714,8 @@ function render(){
   else if(view.erf)a.innerHTML=erfV();
   else if(view.asv)a.innerHTML=asvV();
   else if(view.asvo)a.innerHTML=asvOvV();
+  else if(view.rld)a.innerHTML=rlV();
+  else if(view.rl)a.innerHTML=rlListV();
   else if(view.kad)a.innerHTML=kaV();
   else if(view.ka)a.innerHTML=kaListV();
   else if(view.ov)a.innerHTML=ovV();
@@ -714,11 +783,12 @@ function heuteV(){
   const dateLong=new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"});
   const act=db.groups.filter(g=>!g.arch).sort((a,b)=>byNum(gName(a),gName(b)));
   let h=`<div class="head">${LOGO}<span class="kl"><b>HBG Köln</b> · SoMi</span></div><p class="muted">${dateLong}</p><h1>Heute</h1>${envHint()}${setupCard()}${backupHint()}${dueHint()}`;
+  const rh=rlHint();
   h+=`<div class="stat"><div>Lerngruppen<b>${act.length}</b><span class="muted small">aktiv</span></div><div>Schüler:innen<b>${new Set(act.flatMap(g=>g.members)).size}</b><span class="muted small">in aktiven Gruppen</span></div><div>Archiv<b>${db.groups.filter(g=>g.arch).length}</b><span class="muted small">Gruppen</span></div></div>`;
   if(!act.length)return h+`<div class="card"><p>Noch keine Lerngruppen.</p><p class="muted">Lege unter „Lerngruppen“ eine Gruppe an oder lade unter „Einstellungen“ die fiktive Beispielklasse.</p><p><button class="btn pri" onclick="go({tab:'gruppen',adding:true})">Lerngruppe anlegen</button></p></div>`;
   if(act.length)h+=`<div class="card"><b>Schnell erfassen</b><p class="row" style="flex-wrap:wrap;margin:8px 0 0">${act.map(g=>`<span class="row" style="gap:6px;flex-wrap:wrap">${g.fach==="Mathe"?`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: ganze Klasse</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln</button>`:`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: Stundenstatus</button>`}<button class="btn" onclick="asvStart(${ja(g.id)})">Verhalten</button></span>`).join("")}</p></div>`;
-  h+=`<h2>Deine Lerngruppen</h2>`+act.map(groupCard).join("");
-  return h+`<p class="muted small">Version 0.4: Sonstige Mitarbeit und Klassenarbeiten in Mathe, Stundenstatus und schriftliche Überprüfungen in Sport, Arbeits- und Sozialverhalten in beiden Fächern. Rücklauf-Listen und Sport-Noten folgen in den nächsten Versionen.</p>`}
+  h+=rh+`<h2>Deine Lerngruppen</h2>`+act.map(groupCard).join("");
+  return h+`<p class="muted small">Version 0.4: Sonstige Mitarbeit und Klassenarbeiten in Mathe, Stundenstatus und schriftliche Überprüfungen in Sport, Arbeits- und Sozialverhalten und Rücklauf-Listen in beiden Fächern. Sport-Noten folgen in Version 0.5.</p>`}
 const groupCard=g=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)}})"><div class="grow"><div class="code">${esc(gName(g))}${g.demo?' <span class="tag">Beispiel</span>':""}</div><div class="muted small">${esc(g.sy)} · ${g.members.length} Schüler:innen${g.arch?` · archiviert am ${dDEy(g.arch)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`;
 
 /* ===== Lerngruppen ===== */
@@ -763,7 +833,7 @@ function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};retu
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="SD=null;render()">Abbrechen</button><button class="btn pri" onclick="addSus(${ja(g.id)})">Hinzufügen</button></div></div>`
     :`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="SD={code:nextCode(${ja(g.cls)})};render();$('#scode')?.focus()">+ Schüler:in</button>${others.length?`<button class="btn" onclick="addExisting(${ja(g.id)})">Aus Klasse ${esc(g.cls)} übernehmen</button>`:""}${ms.length?`<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},names:${ja(g.id)}})">Namen eintragen</button>`:""}</p>`}
   ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Klassenarbeiten${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`:`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Stundenstatus erfassen</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Stundenstatus</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Schriftliche Überprüfungen${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p><p class="muted small">Die übrigen Noten für Sport kommen in Version 0.5.</p>`}
-  <p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn" onclick="asvStart(${ja(g.id)})">Verhalten erfassen</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},asvo:${ja(g.id)}})">Übersicht Verhalten</button></p>
+  <p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn" onclick="asvStart(${ja(g.id)})">Verhalten erfassen</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},asvo:${ja(g.id)}})">Übersicht Verhalten</button><button class="btn" onclick="RD=null;go({tab:view.tab,group:${ja(g.id)},rl:${ja(g.id)}})">Rückläufe${rlOf(g.id).filter(a=>!a.arch).length?` (${rlOf(g.id).filter(a=>!a.arch).length})`:""}</button></p>
   ${ms.length?ms.map(s=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)},sus:${ja(s.id)}})">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${nm(s)}${(s.profil||"r")!=="r"?`<span class="tag ${s.profil}">${esc(PROFILE[s.profil])}${s.profil==="zd"?(s.zdNote?" · mit Note":" · Bericht"):""}</span>`:`<span class="muted small">Regel</span>`}</div><span aria-hidden="true" class="muted">›</span></button>`).join(""):`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   ${ro?"":`<div class="card"><b>Schuljahresende</b><p class="small muted" style="margin:6px 0 10px">Archivieren macht die Gruppe nur noch lesbar. Die Daten bleiben ${FRIST_JAHRE} Jahre erhalten (VO-DV I § 9). Gelöscht wird erst nach deiner Bestätigung.</p><button class="btn" onclick="archive(${ja(g.id)})">Lerngruppe archivieren</button></div>`}`}
 function addSus(gid){const g=groupById(gid),code=SD.code.trim();if(!code)return toast("Bitte ein Kürzel eintragen.");
@@ -787,7 +857,7 @@ async function delGroup(gid){const g=groupById(gid),early=!g.demo&&g.arch&&keepU
   if(early&&!await ask("Wirklich vor Ablauf der Frist löschen?",{ok:"Ja, löschen",danger:true}))return;
   // Schüler:innen, die in keiner anderen Gruppe sind, gehen mit
   const keep=new Set(db.groups.filter(x=>x.id!==gid).flatMap(x=>x.members)),gone=g.members.filter(id=>!keep.has(id));
-  db.groups=db.groups.filter(x=>x.id!==gid);db.sus=db.sus.filter(s=>!gone.includes(s.id));db.obs=db.obs.filter(o=>o.gid!==gid);db.att=db.att.filter(a=>a.gid!==gid);db.ka=db.ka.filter(a=>a.gid!==gid);db.asv=db.asv.filter(a=>a.gid!==gid);db.del.push(gid,...gone);save();saveNames();go({tab:"gruppen"});toast("Gelöscht")}
+  db.groups=db.groups.filter(x=>x.id!==gid);db.sus=db.sus.filter(s=>!gone.includes(s.id));db.obs=db.obs.filter(o=>o.gid!==gid);db.att=db.att.filter(a=>a.gid!==gid);db.ka=db.ka.filter(a=>a.gid!==gid);db.asv=db.asv.filter(a=>a.gid!==gid);db.rl=db.rl.filter(a=>a.gid!==gid);db.del.push(gid,...gone);save();saveNames();go({tab:"gruppen"});toast("Gelöscht")}
 
 /* ===== Schüler:in ===== */
 function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){view={tab:"gruppen",group:view.group};return groupV()}
@@ -830,7 +900,7 @@ function profilV(){
   <div class="sub" style="margin:14px 0 4px;font-weight:700">Anteil am Gesamtvorschlag</div><p class="small muted" style="margin:0 0 6px">Der Rest ist die Sonstige Mitarbeit. Mathe laut SILP: 60 %. Sport zählt erst ab Version 0.5.</p>
   ${FAECHER.map(f=>`<div style="margin:8px 0"><div class="small" style="font-weight:700;margin-bottom:4px">${f}</div><div class="pick" style="grid-template-columns:repeat(6,1fr)" role="group" aria-label="Anteil schriftlich ${f}">${[20,30,40,50,60,70].map(n=>`<button class="${kaw(f)===n?"on":""}" aria-pressed="${kaw(f)===n}" onclick="setKaw('${f}',${n})">${n} %</button>`).join("")}</div></div>`).join("")}
   <label class="swr"><span class="grow">Noten mit + und −<span class="sub">Jede Note wird in drei gleich große Punktbereiche geteilt. Das steht nicht im SILP, es ist deine Festlegung.</span></span><input type="checkbox" class="sw" ${kaTend()?"checked":""} onchange="db.kaTend=this.checked;save();render()"></label></div>
-  <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length+db.asv.length} Einträge · ${db.ka.length} Klassenarbeiten auf diesem Gerät</p>
+  <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length+db.asv.length} Einträge · ${db.ka.length} Klassenarbeiten · ${db.rl.length} Rücklauf-Listen auf diesem Gerät</p>
   ${mtip("backup")}<p class="row" style="flex-wrap:wrap"><button class="btn pri${mk("backup")}" onclick="exportJSON()">Sicherung speichern</button><button class="btn" onclick="$('#imp').click()">Sicherung laden</button></p>
   <input type="file" id="imp" accept=".json,application/json" hidden onchange="importJSON(this)">
   ${db.lock&&LKEY?`<p class="row" style="flex-wrap:wrap"><button class="btn" ${hasNames()?"":"disabled"} onclick="exportNames()">Namensliste sichern</button><button class="btn" onclick="$('#imp').click()">Namensliste laden</button></p><p class="muted small">${Object.keys(NAMES).length} Namen auf diesem Gerät. Die Namensliste ist eine eigene Datei mit demselben Passwort. Bewahre sie getrennt von der Sicherung auf.</p>`:""}
@@ -883,7 +953,7 @@ async function exportNames(){if(!crypto.subtle||!hasNames())return;const ki=awai
 async function exportJSON(){if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
   const ki=await backupKey();if(!ki)return;
   if(!db.backupTip&&!await backupTip())return;
-  const {bsalt,lock,...rest}=db,payload={...rest,groups:db.groups.filter(g=>!g.demo),sus:db.sus.filter(s=>!s.demo),obs:db.obs.filter(o=>!o.demo),att:db.att.filter(a=>!a.demo),ka:db.ka.filter(a=>!a.demo),asv:db.asv.filter(a=>!a.demo)};
+  const {bsalt,lock,...rest}=db,payload={...rest,groups:db.groups.filter(g=>!g.demo),sus:db.sus.filter(s=>!s.demo),obs:db.obs.filter(o=>!o.demo),att:db.att.filter(a=>!a.demo),ka:db.ka.filter(a=>!a.demo),asv:db.asv.filter(a=>!a.demo),rl:db.rl.filter(a=>!a.demo)};
   if(!await giveFile(backupName(),await sealFile(payload,ki)))return;
   db.lastBackup=Date.now();db.backupTip=1;save();render();toast(isIOS?"Sicherung erstellt. Sie liegt in „Dateien“ → „Auf meinem iPad“.":"Sicherung erstellt.")}
 async function backupTip(){const steps=isIOS?[`Gleich öffnet sich das Teilen-Fenster. Tippe dort auf <b>„In Dateien sichern“</b>.`,`Wähle <b>„Auf meinem iPad“</b>. Lege beim ersten Mal einen Ordner <b>„SoMi“</b> an und öffne ihn.`,`Tippe auf <b>„Sichern“</b>. Bei späteren Sicherungen wählst du wieder diesen Ordner.`]
@@ -905,9 +975,9 @@ async function importJSON(inp){const f=inp.files[0];inp.value="";if(!f)return;le
   if(o.art==="namen"||d.namen){if(!db.lock||!LKEY)return toast("Namen gehen nur mit App-Sperre. Schalte sie zuerst ein.");if(!okNames(d.namen))return toast("Namensliste beschädigt");
     let n=0;for(const [k,v] of Object.entries(d.namen))if(susById(k)){NAMES[k]=v.trim();n++}saveNames();render();return toast(n?`${n} Namen übernommen`:"Keine passenden Kürzel. Lade zuerst die Sicherung.")}
   if(!Array.isArray(d.groups)||!Array.isArray(d.sus))return toast("Keine SoMi-Sicherung");
-  if(!Array.isArray(d.obs))d.obs=[];if(!Array.isArray(d.att))d.att=[];if(!Array.isArray(d.ka))d.ka=[];if(!Array.isArray(d.asv))d.asv=[];
-  const ng=d.groups.length,ns=d.sus.length,no=d.obs.length,na=d.att.length,nk=d.ka.length,nv=d.asv.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);d.obs=d.obs.filter(okObs);d.att=d.att.filter(okAtt);d.ka=d.ka.filter(okKa);d.asv=d.asv.filter(okAsv);
-  const bad=ng-d.groups.length+ns-d.sus.length+no-d.obs.length+na-d.att.length+nk-d.ka.length+nv-d.asv.length;if(bad)toast(`${bad} beschädigte Einträge nicht übernommen`);
+  if(!Array.isArray(d.obs))d.obs=[];if(!Array.isArray(d.att))d.att=[];if(!Array.isArray(d.ka))d.ka=[];if(!Array.isArray(d.asv))d.asv=[];if(!Array.isArray(d.rl))d.rl=[];
+  const ng=d.groups.length,ns=d.sus.length,no=d.obs.length,na=d.att.length,nk=d.ka.length,nv=d.asv.length,nr=d.rl.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);d.obs=d.obs.filter(okObs);d.att=d.att.filter(okAtt);d.ka=d.ka.filter(okKa);d.asv=d.asv.filter(okAsv);d.rl=d.rl.filter(okRl);
+  const bad=ng-d.groups.length+ns-d.sus.length+no-d.obs.length+na-d.att.length+nk-d.ka.length+nv-d.asv.length+nr-d.rl.length;if(bad)toast(`${bad} beschädigte Einträge nicht übernommen`);
   d.del=(Array.isArray(d.del)?d.del:[]).filter(okId);
   IMP={o,d,settings:!db.groups.some(g=>!g.demo)};go({tab:"profil",imp:true})}
 function importV(){if(!IMP){view={tab:"profil"};return profilV()}const {o,d}=IMP;
@@ -918,19 +988,19 @@ function importV(){if(!IMP){view={tab:"profil"};return profilV()}const {o,d}=IMP
   <label class="row" style="margin:12px 0;font-weight:600"><input type="checkbox" style="width:auto" ${IMP.settings?"checked":""} onchange="IMP.settings=this.checked"> Auch Einstellungen übernehmen (Erscheinungsbild, Schriftgröße, Kriterien)</label></div>
   <p><button class="btn pri block" onclick="applyImport()">Übernehmen</button></p>`}
 function applyImport(){const d=IMP.d,dels=new Set([...db.del,...d.del]);
-  const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels),c=mergeList(db.obs,d.obs,dels),e=mergeList(db.att,d.att,dels),f=mergeList(db.ka,d.ka,dels),v=mergeList(db.asv,d.asv,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
-  const gids=new Set(db.groups.map(g=>g.id)),sids=new Set(db.sus.map(x=>x.id));db.obs=c.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.att=e.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.ka=f.list.filter(a=>gids.has(a.gid));db.asv=v.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));
+  const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels),c=mergeList(db.obs,d.obs,dels),e=mergeList(db.att,d.att,dels),f=mergeList(db.ka,d.ka,dels),v=mergeList(db.asv,d.asv,dels),w=mergeList(db.rl,d.rl,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
+  const gids=new Set(db.groups.map(g=>g.id)),sids=new Set(db.sus.map(x=>x.id));db.obs=c.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.att=e.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.ka=f.list.filter(a=>gids.has(a.gid));db.asv=v.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.rl=w.list.filter(a=>gids.has(a.gid));
   if(IMP.settings)for(const k of ["theme","fs","hausa","stw","kgw","kaTend","kaw"])if(d[k]!=null&&okSetting[k](d[k]))db[k]=d[k];
-  IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen, ${c.n+e.n+f.n+v.n} Einträge neu oder aktualisiert`);go({tab:"gruppen"})}
+  IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen, ${c.n+e.n+f.n+v.n+w.n} Einträge neu oder aktualisiert`);go({tab:"gruppen"})}
 async function wipe(){if(!await ask("Wirklich alle Daten auf diesem Gerät löschen?",{ok:"Alles löschen",danger:true,sub:"Speichere vorher eine Sicherung. Die Aufbewahrungsfrist gilt auch hier."}))return;
   const keep={theme:db.theme,fs:db.fs,bsalt:db.bsalt,lock:db.lock,setupDone:db.setupDone};db={...leer(),...keep};dropNames();save();go({tab:"heute"})}
 async function delDemo(){if(!await ask("Die fiktive Beispielklasse entfernen? Deine eigenen Lerngruppen bleiben.",{ok:"Entfernen"}))return;
-  db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);db.obs=db.obs.filter(o=>!o.demo);db.att=db.att.filter(a=>!a.demo);db.ka=db.ka.filter(a=>!a.demo);db.asv=db.asv.filter(a=>!a.demo);save();render();toast("Beispielklasse entfernt")}
+  db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);db.obs=db.obs.filter(o=>!o.demo);db.att=db.att.filter(a=>!a.demo);db.ka=db.ka.filter(a=>!a.demo);db.asv=db.asv.filter(a=>!a.demo);db.rl=db.rl.filter(a=>!a.demo);save();render();toast("Beispielklasse entfernt")}
 function demo(){if(db.groups.some(g=>g.demo))return toast("Beispielklasse ist schon da");
   const prof=["r","r","na","r","zd","r","r","na"],sus=prof.map((p,i)=>touch({id:uid(),code:`DEMO-${String(i+1).padStart(2,"0")}`,cls:"DEMO",icon:ICONS[i*5%ICONS.length],profil:p,
     na:p==="na"?(i===2?"Fiktiv: 10 Minuten mehr Zeit bei Klassenarbeiten.":"Fiktiv: Ersatzaufgabe im Sport (Schiedsrichter, Helfen)."):"",zdNote:p==="zd",demo:true}));
   db.sus.push(...sus);
-  const gm=touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true});db.obs.push(...demoObs(gm));db.ka.push(demoKa(gm));db.asv.push(...demoAsv(gm));
+  const gm=touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true});db.obs.push(...demoObs(gm));db.ka.push(demoKa(gm));db.asv.push(...demoAsv(gm));db.rl.push(demoRl(gm));
   db.groups.push(gm,
     touch({id:uid(),fach:"Sport",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.slice(0,6).map(s=>s.id),arch:null,demo:true}));
   save();toast("Beispielklasse geladen");go(view.mark?{tab:"profil",mark:"demo"}:{tab:"gruppen"})}

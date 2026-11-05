@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.4.0, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.1, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -54,6 +54,14 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - **Kürzel-Seite:** Tendenz je Merkmal, Positives zuerst; alle Einträge aufklappbar, löschen mit Rückgängig.
 - Sichtschutz verbirgt Zahlen und Tendenzen.
 - Daten: `db.asv = [{id,gid,sid,m,v,d,t,upd}]`, geprüft mit `okAsv`, in Sicherung und Import enthalten.
+
+## Rücklauf-Listen (ab 0.4.1)
+- In der Lerngruppe „Rückläufe“: Liste anlegen mit Titel, Art (Unterschrift, Geld, Formular), Betrag pro Kind (nur Geld), ausgegeben am, fällig bis (freiwillig).
+- Je Kürzel „erledigt“ antippen; nochmal tippen macht es wieder offen. Bei Geld „Teilbetrag“: gezahlter Betrag, die App zeigt, was fehlt.
+- Oben: wer noch fehlt; bei Geld eingesammelt, Soll, Fehlbetrag. Es zählen die aktuellen Mitglieder der Gruppe.
+- „Liste abschließen“: nur lesbar, unter „Abgeschlossen“; „Wieder öffnen“ geht. Löschen mit Rückgängig.
+- „Heute“ zeigt offene Listen; nach dem Fälligkeitsdatum rot. Keine Erinnerungen an Eltern.
+- Daten: `db.rl = [{id,gid,t,art,aus,bis,ct,r:{sid:{st,pc}},arch,upd}]` (Beträge in Cent), geprüft mit `okRl`, in Sicherung und Import enthalten.
 
 ## Namensliste (ab 0.2.3)
 - In der Lerngruppe „Namen eintragen“: zu jedem Kürzel ein Name. Geht nur mit App-Sperre.
