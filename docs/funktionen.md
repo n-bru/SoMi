@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.4.2, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.3, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -45,14 +45,21 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Gesamtvorschlag: Anteil schriftlich je Fach einstellbar (`db.kaw`, 20 bis 70 %, Standard Mathe 60 % nach SILP, Sport 20 %), Rest Sonstige Mitarbeit. Mit + und −, ins Zeugnis kommt eine ganze Note. Erscheint in der Übersicht (Spalten SoMi, KA, Gesamt, sobald es im Zeitraum eine Arbeit gibt) und auf der Kürzel-Seite. Nur wenn beides vorliegt.
 - Daten: `db.ka = [{id,gid,t,d,max,sk,r:{sid:{p,st,mx,na,nat}},upd}]`, geprüft mit `okKa`, in Sicherung und Import enthalten. Die Beispielklasse hat eine fiktive Arbeit.
 
-## Arbeits- und Sozialverhalten (ab 0.4)
-- Für alle Lerngruppen (Mathe und Sport). Ab 0.4.2 nur zwei Bereiche: Arbeitsverhalten und Sozialverhalten, je + (gut), ○ (teils), − (schwierig). Zählt nicht zur Note; Grundlage für Zeugnisbemerkung, Elternsprechtag, Klassenkonferenz. In Sport soll es ab 0.5 laut SILP in die Note eingehen.
-- **In der Runde:** Mathe „Ganze Klasse nacheinander“ und Sport „Stundenstatus“ zeigen beide Bereiche bei jedem Kind mit (Sport: Verhalten zuerst, der Status springt weiter).
-- **Einzeln** („Verhalten“ auf Heute, „Verhalten erfassen“ in der Lerngruppe): Kürzel antippen (auch „Alle auswählen“), dann + / ○ / − beim Bereich. Stichwort und Datum freiwillig. Rückgängig über den Hinweis.
-- **Übersicht Verhalten** je Lerngruppe (Halbjahr, Schuljahr, alles): pro Kürzel Anzahl + / ○ / − je Bereich, Tendenz ab 2 Einträgen (eher + / gemischt / eher −), letzter Eintrag.
-- **Kürzel-Seite:** Tendenz je Bereich; alle Einträge aufklappbar, löschen mit Rückgängig. Sichtschutz verbirgt Zahlen und Tendenzen.
-- Einträge aus Beta 0.4.0 mit Einzelmerkmalen (leistungsbereit usw.) bleiben lesbar und zählen zu ihrem Bereich.
-- Daten: `db.asv = [{id,gid,sid,m,v,d,t,upd}]`, m = `av` oder `sv` (alt: Merkmal), geprüft mit `okAsv`, in Sicherung und Import enthalten.
+## Kriterien und Runde (ab 0.4.3)
+- Runde „Ganze Klasse nacheinander“ ohne Kriterienwahl: pro Kürzel immer Qualität der Beiträge, Beteiligung (SILP: Kontinuität), Selbstständigkeit, Kooperation; dazu Werkzeuge und Hausaufgaben, wenn unter Einstellungen eingeschaltet (`db.werkz`, `db.hausa`). Darunter der Knopf „massive Unterrichtsstörung“. Dann „Weiter ›“.
+- Fachsprache und Kontinuität als eigene Kriterien entfallen bzw. heißen jetzt „Beteiligung“; alte Einträge zählen weiter.
+- Gewicht: Qualität standardmäßig 2× (`KGW0`), alles andere 1×, unter Einstellungen änderbar.
+
+## Präsentation, Heft, Übung (ab 0.4.3)
+- In der Mathe-Lerngruppe „Präsentation, Heft, Übung“: anlegen wie eine Klassenarbeit, Art Präsentation, Portfolio/Heft oder Schriftliche Übung.
+- Präsentation, Portfolio/Heft: je Kürzel direkt eine Note (1+ bis 6), „fehlt“, „holt nach“. Schriftliche Übung: Punkte mit Notenschlüssel wie Klassenarbeiten.
+- Zählen zur Sonstigen Mitarbeit als ihr Kriterium (Gewicht unter Einstellungen), nicht zu den Klassenarbeiten. Erscheinen in Übersicht und Kürzel-Seite als „gesondert“.
+- Daten: in `db.ka` mit Feld `k` (praes, port, sue); bei praes/port ohne `max`/`sk`, Ergebnis `r[sid].n`. Geprüft mit `okKa`.
+
+## Massive Unterrichtsstörungen (ab 0.4.3)
+- Knopf in der Runde (Mathe), beim Einzeln-Bewerten und im Stundenstatus (Sport). Stichwort empfohlen. Zählt nicht zur Note.
+- Spalte „Stör.“ in den Übersichten, Liste auf der Kürzel-Seite (löschen mit Rückgängig), verborgen durch den Sichtschutz.
+- Daten: `db.asv` mit `m:"stoer"`, `v:"-"`. Einträge zu Arbeits-/Sozialverhalten aus 0.4.0–0.4.2 bleiben lesbar und löschbar.
 
 ## Rücklauf-Listen (ab 0.4.1)
 - In der Lerngruppe „Rückläufe“: Liste anlegen mit Titel, Art (Unterschrift, Geld, Formular), Betrag pro Kind (nur Geld), ausgegeben am, fällig bis (freiwillig).
