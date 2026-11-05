@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.3.3, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.0, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -43,6 +43,17 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Ab 0.3.3 auch in Sport als „Schriftliche Überprüfungen“ (ohne Gesamtvorschlag bis Version 0.5).
 - Gesamtvorschlag: Anteil schriftlich je Fach einstellbar (`db.kaw`, 20 bis 70 %, Standard Mathe 60 % nach SILP, Sport 20 %), Rest Sonstige Mitarbeit. Mit + und −, ins Zeugnis kommt eine ganze Note. Erscheint in der Übersicht (Spalten SoMi, KA, Gesamt, sobald es im Zeitraum eine Arbeit gibt) und auf der Kürzel-Seite. Nur wenn beides vorliegt.
 - Daten: `db.ka = [{id,gid,t,d,max,sk,r:{sid:{p,st,mx,na,nat}},upd}]`, geprüft mit `okKa`, in Sicherung und Import enthalten. Die Beispielklasse hat eine fiktive Arbeit.
+
+## Arbeits- und Sozialverhalten (ab 0.4)
+- Für alle Lerngruppen (Mathe und Sport). Zählt nicht zur Note; Grundlage für Zeugnisbemerkung, Elternsprechtag, Klassenkonferenz. In Sport soll es ab 0.5 laut SILP in die Note eingehen.
+- **Erfassen** („Verhalten“ auf Heute, „Verhalten erfassen“ in der Lerngruppe): Merkmal wählen, ein oder mehrere Kürzel antippen (auch „Alle auswählen“), dann + (zeigt es), ○ (teilweise) oder − (noch nicht). Stichwort und Datum freiwillig. Die App merkt sich das letzte Merkmal pro Gruppe. Rückgängig über den Hinweis.
+  - Arbeitsverhalten: leistungsbereit, sorgfältig, ausdauernd, selbstständig, Material dabei.
+  - Sozialverhalten: arbeitet mit anderen, hält Regeln ein, löst Konflikte, hilft anderen.
+  - Schnellknopf „Material fehlt“ (speichert „Material dabei −“), nur in Mathe. In Sport steht das im Stundenstatus.
+- **Übersicht Verhalten** je Lerngruppe: Halbjahr, Schuljahr, alles. Pro Kürzel Anzahl + / ○ / − für Arbeits- und Sozialverhalten, Tendenz ab 2 Einträgen (eher + / gemischt / eher −), letzter Eintrag.
+- **Kürzel-Seite:** Tendenz je Merkmal, Positives zuerst; alle Einträge aufklappbar, löschen mit Rückgängig.
+- Sichtschutz verbirgt Zahlen und Tendenzen.
+- Daten: `db.asv = [{id,gid,sid,m,v,d,t,upd}]`, geprüft mit `okAsv`, in Sicherung und Import enthalten.
 
 ## Namensliste (ab 0.2.3)
 - In der Lerngruppe „Namen eintragen“: zu jedem Kürzel ein Name. Geht nur mit App-Sperre.

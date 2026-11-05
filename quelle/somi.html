@@ -90,7 +90,7 @@ nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
 .tile.on{border:2.5px solid var(--acc);background:var(--accs)}
 .tiles:has(.nm){grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.tile .done{position:absolute;top:4px;right:8px;color:var(--acc);font-weight:900}
 .padwrap{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));z-index:3;background:var(--card);margin:10px -8px 4px;padding:8px;border-radius:18px;box-shadow:0 -8px 16px -12px rgba(0,0,0,.35)}
-.pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.pad.st{grid-template-columns:repeat(4,1fr)}.pad.st .nt{opacity:.7;font-weight:600}.pad.st button{min-height:58px;display:grid;grid-template-rows:auto auto auto;align-content:start;justify-items:center;align-items:center;gap:2px;padding:6px 2px}.pad.st b{font-size:1.5rem;line-height:1}.pad.st span{font-size:.75rem;font-weight:600;color:var(--muted);line-height:1.2;text-align:center}
+.pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.pad.st{grid-template-columns:repeat(4,1fr)}.pad.st .nt{opacity:.7;font-weight:600}.pad.st button{min-height:58px;display:grid;grid-template-rows:auto auto auto;align-content:start;justify-items:center;align-items:center;gap:2px;padding:6px 2px}.pad.st b{font-size:1.5rem;line-height:1}.pad.st.av{grid-template-columns:repeat(3,1fr)}.pad.st span{font-size:.75rem;font-weight:600;color:var(--muted);line-height:1.2;text-align:center}
 .bar{height:6px;border-radius:3px;background:var(--soft);margin:8px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
 .seqsus{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 8px}.seqsus .code{font-size:2rem}.kic.big{width:60px;height:60px;font-size:2rem}
 .btn.abw{border-style:dashed}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.three .btn{padding-left:4px;padding-right:4px}
@@ -132,7 +132,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.3.4",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.4.0",SOMI_STAND="05.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -141,13 +141,13 @@ const FRIST_JAHRE=5; // VO-DV I § 9 Abs. 1: „alle übrigen Daten“, ab Ende 
 let db;
 // Mit App-Sperre liegt im Speicher nur ein verschlüsselter Umschlag {somiEnc,salt,iv,ct}; db bleibt bis zum Entsperren leer
 let ENCWAIT=null,LKEY=null;
-const leer=()=>({v:1,sus:[],groups:[],obs:[],att:[],ka:[],del:[]});
+const leer=()=>({v:1,sus:[],groups:[],obs:[],att:[],ka:[],asv:[],del:[]});
 function load(){try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
   if(db?.somiEnc){ENCWAIT=db;db={...leer(),lock:{salt:ENCWAIT.salt,after:ENCWAIT.after??1,len:ENCWAIT.len||4}}}
   migrate()}
-function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];if(!Array.isArray(db.obs))db.obs=[];if(!Array.isArray(db.att))db.att=[];if(!Array.isArray(db.ka))db.ka=[];
-  const n=db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);db.obs=db.obs.filter(okObs);db.att=db.att.filter(okAtt);db.ka=db.ka.filter(okKa);
-  if(db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
+function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];if(!Array.isArray(db.obs))db.obs=[];if(!Array.isArray(db.att))db.att=[];if(!Array.isArray(db.ka))db.ka=[];if(!Array.isArray(db.asv))db.asv=[];
+  const n=db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);db.obs=db.obs.filter(okObs);db.att=db.att.filter(okAtt);db.ka=db.ka.filter(okKa);db.asv=db.asv.filter(okAsv);
+  if(db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
 function applyTheme(){const t=db?.theme,r=document.documentElement;if(t==="light"||t==="dark")r.dataset.theme=t;else delete r.dataset.theme;
   if(db?.fs==="l"||db?.fs==="xl")r.dataset.fs=db.fs;else delete r.dataset.fs;
   const dark=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.querySelector('meta[name=theme-color]')?.setAttribute("content",dark?"#14201b":"#f5f6f1")}
@@ -172,7 +172,7 @@ const okId=s=>typeof s==="string"&&/^[A-Za-z0-9_-]{1,40}$/.test(s),okDate=s=>typ
 const okStr=(s,n=4000)=>s==null||typeof s==="string"&&s.length<=n,okNum=v=>v==null||typeof v==="number"&&isFinite(v);
 const okSY=s=>typeof s==="string"&&/^\d{4}\/\d{2}$/.test(s);
 function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&okNum(s.upd)}catch(e){return false}}
-function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&(g.lastK==null||Object.hasOwn(KMAP,g.lastK))&&(g.lastKs==null||Array.isArray(g.lastKs)&&g.lastKs.length<=12&&g.lastKs.every(k=>Object.hasOwn(KMAP,k)))&&okNum(g.upd)}catch(e){return false}}
+function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&(g.lastK==null||Object.hasOwn(KMAP,g.lastK))&&(g.lastKs==null||Array.isArray(g.lastKs)&&g.lastKs.length<=12&&g.lastKs.every(k=>Object.hasOwn(KMAP,k)))&&(g.lastM==null||Object.hasOwn(AMAP,g.lastM))&&okNum(g.upd)}catch(e){return false}}
 const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f),hausa:v=>typeof v==="boolean",stw:v=>okStw(v),kgw:v=>okKgw(v),kaTend:v=>typeof v==="boolean",kaw:v=>okKaw(v)};
 const susById=id=>db.sus.find(s=>s.id===id);
 const groupById=id=>db.groups.find(g=>g.id===id);
@@ -559,6 +559,74 @@ function kaSusV(s,g){const list=kaOf(g.id);if(!list.length)return "";
 function demoKa(g){const p=[34,28,22.5,17,14,null,12,30.5],a={id:uid(),gid:g.id,t:"KA 1 (fiktiv)",d:daysAgo(9),max:40,sk:"-",r:{},upd:Date.now(),demo:true};
   g.members.forEach((sid,i)=>{a.r[sid]=i===5?{st:"nach"}:{p:p[i]};if(i===4)a.r[sid].mx=20;if(i===2)a.r[sid]={...a.r[sid],na:true,nat:"Fiktiv: 10 Minuten mehr Zeit."}});return a}
 
+/* ===== Arbeits- und Sozialverhalten (ab 0.4) =====
+   Gespeichert als db.asv=[{id,gid,sid,m,v,d,t,upd}]. m = Merkmal (AMAP), v = "+", "o" oder "-".
+   Zählt nicht zur Fachnote. Grundlage für Zeugnisbemerkung, Elternsprechtag, Klassenkonferenz. */
+const ABER={av:"Arbeitsverhalten",sv:"Sozialverhalten"};
+const ASVM=[{m:"lb",b:"av",t:"leistungsbereit"},{m:"sorg",b:"av",t:"sorgfältig"},{m:"ausd",b:"av",t:"ausdauernd"},{m:"selb",b:"av",t:"selbstständig"},{m:"mat",b:"av",t:"Material dabei"},
+  {m:"zus",b:"sv",t:"arbeitet mit anderen"},{m:"reg",b:"sv",t:"hält Regeln ein"},{m:"konf",b:"sv",t:"löst Konflikte"},{m:"hilf",b:"sv",t:"hilft anderen"}];
+const AMAP=Object.fromEntries(ASVM.map(x=>[x.m,x]));
+const AV={"+":{t:"+",l:"zeigt es"},"o":{t:"○",l:"teilweise"},"-":{t:"−",l:"noch nicht"}};
+function okAsv(a){try{return !!a&&okId(a.id)&&okId(a.gid)&&okId(a.sid)&&Object.hasOwn(AMAP,a.m)&&Object.hasOwn(AV,a.v)&&okDate(a.d)&&okStr(a.t,300)&&okNum(a.upd)}catch(e){return false}}
+const asvOf=(gid,sid,from)=>db.asv.filter(a=>a.gid===gid&&(!sid||a.sid===sid)&&(!from||a.d>=from));
+// Tendenz: (Plus − Minus) / Anzahl; ab 2 Einträgen
+const asvScore=a=>a.length?(a.filter(x=>x.v==="+").length-a.filter(x=>x.v==="-").length)/a.length:0;
+const asvTend=a=>a.length<2?"":asvScore(a)>=1/3?"eher +":asvScore(a)<=-1/3?"eher −":"gemischt";
+const asvCnt=a=>{const n=v=>a.filter(x=>x.v===v).length;return a.length?`+${n("+")} · ○${n("o")} · −${n("-")}`:"–"};
+const ovFrom=()=>OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00";
+let AE={gid:null,m:null,sel:[],t:"",d:today()};
+function asvStart(gid,sel){AE={gid,m:null,sel:sel||[],t:"",d:today()};go({tab:view.tab,group:gid,asv:gid})}
+function asvM(g){return Object.hasOwn(AMAP,AE.m)?AE.m:Object.hasOwn(AMAP,g.lastM)?g.lastM:"lb"}
+function asvV(){const g=groupById(view.asv);if(!g||g.arch){view={tab:view.tab,group:view.asv};return groupV()}
+  if(AE.gid!==g.id)AE={gid:g.id,m:null,sel:[],t:"",d:today()};
+  const m=asvM(g),ms=msOf(g),todayM=new Set(db.asv.filter(a=>a.gid===g.id&&a.d===AE.d&&a.m===m).map(a=>a.sid));
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
+  <div class="between"><h1 style="margin-bottom:4px">Verhalten erfassen</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · Arbeits- und Sozialverhalten${g.demo?" · fiktives Beispiel":""}</p>
+  <div class="card">${Object.entries(ABER).map(([b,bt])=>`<div class="sub" style="margin:${b==="av"?0:12}px 0 6px;font-weight:700">${bt}</div><div class="chips" role="group" aria-label="${bt}">${ASVM.filter(x=>x.b===b).map(x=>`<button class="${x.m===m?"on":""}" aria-pressed="${x.m===m}" onclick="AE.m='${x.m}';render()">${esc(x.t)}</button>`).join("")}</div>`).join("")}
+  <p class="small muted" style="margin:10px 0 0">Zählt nicht zur Note${g.fach==="Sport"?" (in Sport ab Version 0.5 Teil der Note laut SILP)":""}. Notiere Gelungenes genauso oft wie Schwieriges.</p></div>
+  <div class="card"><div class="between" style="flex-wrap:wrap"><b>${AE.sel.length?`${AE.sel.length} ausgewählt`:"Kürzel antippen"}</b>${AE.sel.length?`<button class="btn ghost small" onclick="AE.sel=[];render()">Auswahl aufheben</button>`:`<button class="btn ghost small" ${ms.length?"":"disabled"} onclick="AE.sel=msOf(groupById(AE.gid)).map(s=>s.id);render()">Alle auswählen</button>`}</div>
+  <div class="tiles">${ms.map(s=>`<button class="tile${AE.sel.includes(s.id)?" on":""}" aria-pressed="${AE.sel.includes(s.id)}" onclick="asvSel(${ja(s.id)})">${susIcon(s)}<span style="min-width:0"><span class="code" style="display:block">${esc(s.code)}</span>${nm(s)}</span>${todayM.has(s.id)?'<span class="done" aria-label="heute schon erfasst">✓</span>':""}${profTag(s)}</button>`).join("")||`<p class="muted">Noch niemand in dieser Gruppe.</p>`}</div>
+  <div class="padwrap"><p style="margin:0 0 6px;text-align:center"><b>${esc(AMAP[m].t)}</b></p><div class="pad st av" role="group" aria-label="Einschätzung ${esc(AMAP[m].t)}">${Object.entries(AV).map(([v,x])=>`<button data-v="${v}" onclick="addAsv('${v}')" aria-label="${esc(AMAP[m].t)}: ${x.l}"><b>${x.t}</b><span>${x.l}</span></button>`).join("")}</div>
+  ${g.fach==="Sport"?"":`<button class="btn block" style="margin-top:6px" onclick="asvMat()">Material fehlt</button>`}</div>
+  <label for="aeT">Stichwort <span class="muted small">(freiwillig, vorher eintragen; Diktat über die Tastatur geht auch)</span></label><input id="aeT" maxlength="300" value="${esc(AE.t)}" oninput="AE.t=this.value" placeholder="z. B. hat der Nachbarin den Rechenweg erklärt">
+  <div class="row"><label for="aeD" style="margin:0" class="grow">Datum</label><input id="aeD" type="date" style="width:auto" max="${today()}" value="${AE.d}" onchange="AE.d=okDate(this.value)&&this.value<=today()?this.value:today();render()"></div></div>
+  ${g.fach==="Sport"?`<p class="small muted">Fehlende Sportsachen erfasst du im Stundenstatus.</p>`:""}
+  <p><button class="btn block" onclick="go({tab:view.tab,group:${ja(g.id)},asvo:${ja(g.id)}})">Übersicht Verhalten ${esc(gName(g))}</button></p>`}
+function asvSel(id){const i=AE.sel.indexOf(id);if(i>=0)AE.sel.splice(i,1);else AE.sel.push(id);render()}
+function asvSave(m,v){const g=groupById(AE.gid);if(!g||g.arch||!Object.hasOwn(AMAP,m)||!Object.hasOwn(AV,v))return;
+  if(!AE.sel.length)return toast("Tippe zuerst ein oder mehrere Kürzel an.");
+  const t=AE.t.trim().slice(0,300);if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
+  const neu=AE.sel.filter(id=>g.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,m,v,d:AE.d||today(),t,...(g.demo?{demo:true}:{})}));
+  db.asv.push(...neu);if(m!=="mat"||AE.m==="mat"){g.lastM=m;AE.m=m}AE.sel=[];AE.t="";save();render();
+  const ids=new Set(neu.map(a=>a.id));
+  undoToast(`${neu.length} ${neu.length===1?"Eintrag":"Einträge"} gespeichert: ${AMAP[m].t} ${AV[v].t}`,()=>{db.asv=db.asv.filter(a=>!ids.has(a.id));save();render()})}
+const addAsv=v=>{const g=groupById(AE.gid);if(g)asvSave(asvM(g),v)};
+const asvMat=()=>asvSave("mat","-");
+function asvDel(id){const a=db.asv.find(x=>x.id===id);if(!a)return;db.asv=db.asv.filter(x=>x.id!==id);db.del.push(id);save();render();
+  undoToast("Eintrag gelöscht",()=>{db.del=db.del.filter(x=>x!==id);db.asv.push(touch(a));save();render()})}
+function asvOvV(){const g=groupById(view.asvo);if(!g){view={tab:view.tab,group:view.asvo};return groupV()}
+  const from=ovFrom(),all=asvOf(g.id,null,from),ms=msOf(g);
+  const cell=a=>{const t=asvTend(a);return `<td class="num">${hid(asvCnt(a))}${t?`<br><span class="small muted">${hid(t)}</span>`:""}</td>`};
+  const rows=ms.map(s=>{const a=all.filter(x=>x.sid===s.id),last=a.reduce((m,x)=>x.d>m?x.d:m,"");
+    return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span> ${profTag(s)}${nm(s)}</th>${cell(a.filter(x=>AMAP[x.m].b==="av"))}${cell(a.filter(x=>AMAP[x.m].b==="sv"))}<td class="small">${last?dDEy(last).slice(0,6):"–"}</td></tr>`}).join("");
+  return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
+  <div class="between"><h1 style="margin-bottom:4px">Übersicht Verhalten</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · Arbeits- und Sozialverhalten · ${all.length} ${all.length===1?"Eintrag":"Einträge"}</p>
+  <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
+  ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">Arbeits&shy;verhalten</th><th class="num">Sozial&shy;verhalten</th><th>zuletzt</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
+  <p class="muted small">Zahlen: wie oft + (zeigt es), ○ (teilweise), − (noch nicht). Tendenz ab 2 Einträgen. Tippe auf ein Kürzel für die Merkmale im Einzelnen. Zählt nicht zur Note.</p>
+  ${g.arch?"":`<p><button class="btn pri block" onclick="asvStart(${ja(g.id)})">Verhalten erfassen</button></p>`}`}
+// Auf der Seite einer Schülerin, eines Schülers: Tendenz je Merkmal, Positives zuerst
+function asvSusCard(s,g){const from=ovFrom(),a=asvOf(g.id,s.id,from).sort((x,y)=>y.d.localeCompare(x.d)||y.upd-x.upd),ro=!!g.arch;
+  const per=b=>ASVM.filter(x=>x.b===b).map(x=>[x,a.filter(o=>o.m===x.m)]).filter(([,l])=>l.length).sort((p,q)=>asvScore(q[1])-asvScore(p[1]));
+  const block=b=>{const l=per(b);return `<div class="sub" style="margin:10px 0 4px;font-weight:700">${ABER[b]}</div>${l.length?`<ul class="obsl">${l.map(([x,o])=>`<li><div class="grow"><b>${esc(x.t)}</b> <span class="small">${hid(asvCnt(o))}</span></div><span class="small">${hid(asvTend(o)||"–")}</span></li>`).join("")}</ul>`:`<p class="small muted" style="margin:0">Noch keine Einträge.</p>`}`};
+  return `<div class="card"><div class="between"><b>Verhalten in ${esc(gName(g))}</b>${ssBtn()}</div>
+  <p class="small muted" style="margin:6px 0 0">${OVP==="hj"?"Dieses Halbjahr":OVP==="sj"?"Dieses Schuljahr":"Alle Einträge"} · ${a.length} ${a.length===1?"Eintrag":"Einträge"} · zählt nicht zur Note</p>
+  ${block("av")}${block("sv")}
+  ${a.length?`<details style="margin-top:10px"><summary class="small" style="font-weight:700;cursor:pointer">Alle Einträge</summary><ul class="obsl">${a.map(o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(AMAP[o.m].t)}</span><br><b>${hid(AV[o.v].t)}</b>${o.t?` <span class="small">${esc(o.t)}</span>`:""}</div>${ro?"":`<button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="asvDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul></details>`:""}
+  ${ro?"":`<p style="margin:10px 0 0"><button class="btn" onclick="asvStart(${ja(g.id)},[${ja(s.id)}])">Verhalten für ${esc(s.code)} erfassen</button></p>`}</div>`}
+function demoAsv(g){const d=[[0,"lb","+"],[0,"hilf","+"],[1,"selb","+"],[2,"mat","-"],[2,"lb","o"],[3,"zus","+"],[4,"reg","o"],[5,"sorg","+"],[6,"konf","-"],[6,"konf","o"],[7,"ausd","+"],[1,"zus","+"]];
+  return d.map(([i,m,v],n)=>touch({id:uid(),gid:g.id,sid:g.members[i],m,v,d:daysAgo(2+n),t:n===0?"Fiktiv: hat freiwillig eine Lösung vorgestellt":"",demo:true}))}
+
 /* ===== Navigation ===== */
 let view={tab:"heute"};
 const LOGO='<svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#DCEDE4"/><path d="M20 46v12l3-2.6 3 2.6v-12z" fill="#7FC4A6"/><rect x="14" y="8" width="36" height="44" rx="5" fill="#2E6B57"/><rect x="41" y="7" width="4" height="46" rx="1.5" fill="#1E4A3B"/><rect x="19" y="13" width="17" height="12" rx="2.5" fill="#F5F6F1"/><path d="M23.5 19.2l2.6 2.6 5.2-6" fill="none" stroke="#2E6B57" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -568,7 +636,7 @@ gruppen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width
 profil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1"/></svg>'};
 function renderNav(){$("#nav").innerHTML=[["heute","Heute"],["gruppen","Lerngruppen"],["profil","Einstellungen"]].map(([k,t])=>`<button class="${view.tab===k?"on":""}" ${view.tab===k?'aria-current="page"':""} onclick="navTo('${k}')">${ICON[k].replace("<svg ",'<svg aria-hidden="true" ')}${t}</button>`).join("")}
 // Verlauf der Ansichten: „Zurück“ führt dorthin, wo man herkam
-let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,v.kad,v.names,!!v.imp]);
+let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,v.kad,v.names,v.asv,v.asvo,!!v.imp]);
 function go(v){const i=HIST.findIndex(h=>vkey(h)===vkey(v));if(i>=0)HIST.length=i;else if(view&&vkey(view)!==vkey(v))HIST.push(view);view=v;render();window.scrollTo(0,0)}
 function back(){view=HIST.pop()||{tab:view.tab};render();window.scrollTo(0,0)}
 function navTo(k){HIST=[];go({tab:k})}
@@ -577,6 +645,8 @@ function render(){
   if(view.imp)a.innerHTML=importV();
   else if(view.names)a.innerHTML=namesV();
   else if(view.erf)a.innerHTML=erfV();
+  else if(view.asv)a.innerHTML=asvV();
+  else if(view.asvo)a.innerHTML=asvOvV();
   else if(view.kad)a.innerHTML=kaV();
   else if(view.ka)a.innerHTML=kaListV();
   else if(view.ov)a.innerHTML=ovV();
@@ -646,9 +716,9 @@ function heuteV(){
   let h=`<div class="head">${LOGO}<span class="kl"><b>HBG Köln</b> · SoMi</span></div><p class="muted">${dateLong}</p><h1>Heute</h1>${envHint()}${setupCard()}${backupHint()}${dueHint()}`;
   h+=`<div class="stat"><div>Lerngruppen<b>${act.length}</b><span class="muted small">aktiv</span></div><div>Schüler:innen<b>${new Set(act.flatMap(g=>g.members)).size}</b><span class="muted small">in aktiven Gruppen</span></div><div>Archiv<b>${db.groups.filter(g=>g.arch).length}</b><span class="muted small">Gruppen</span></div></div>`;
   if(!act.length)return h+`<div class="card"><p>Noch keine Lerngruppen.</p><p class="muted">Lege unter „Lerngruppen“ eine Gruppe an oder lade unter „Einstellungen“ die fiktive Beispielklasse.</p><p><button class="btn pri" onclick="go({tab:'gruppen',adding:true})">Lerngruppe anlegen</button></p></div>`;
-  if(act.length)h+=`<div class="card"><b>Schnell erfassen</b><p class="row" style="flex-wrap:wrap;margin:8px 0 0">${act.map(g=>g.fach==="Mathe"?`<span class="row" style="gap:6px"><button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: ganze Klasse</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln</button></span>`:`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: Stundenstatus</button>`).join("")}</p></div>`;
+  if(act.length)h+=`<div class="card"><b>Schnell erfassen</b><p class="row" style="flex-wrap:wrap;margin:8px 0 0">${act.map(g=>`<span class="row" style="gap:6px;flex-wrap:wrap">${g.fach==="Mathe"?`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: ganze Klasse</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln</button>`:`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: Stundenstatus</button>`}<button class="btn" onclick="asvStart(${ja(g.id)})">Verhalten</button></span>`).join("")}</p></div>`;
   h+=`<h2>Deine Lerngruppen</h2>`+act.map(groupCard).join("");
-  return h+`<p class="muted small">Version 0.3: Sonstige Mitarbeit und Klassenarbeiten in Mathe, Stundenstatus und schriftliche Überprüfungen in Sport. Arbeits- und Sozialverhalten, Rücklauf-Listen und Sport-Noten folgen in den nächsten Versionen.</p>`}
+  return h+`<p class="muted small">Version 0.4: Sonstige Mitarbeit und Klassenarbeiten in Mathe, Stundenstatus und schriftliche Überprüfungen in Sport, Arbeits- und Sozialverhalten in beiden Fächern. Rücklauf-Listen und Sport-Noten folgen in den nächsten Versionen.</p>`}
 const groupCard=g=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)}})"><div class="grow"><div class="code">${esc(gName(g))}${g.demo?' <span class="tag">Beispiel</span>':""}</div><div class="muted small">${esc(g.sy)} · ${g.members.length} Schüler:innen${g.arch?` · archiviert am ${dDEy(g.arch)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`;
 
 /* ===== Lerngruppen ===== */
@@ -693,6 +763,7 @@ function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};retu
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="SD=null;render()">Abbrechen</button><button class="btn pri" onclick="addSus(${ja(g.id)})">Hinzufügen</button></div></div>`
     :`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="SD={code:nextCode(${ja(g.cls)})};render();$('#scode')?.focus()">+ Schüler:in</button>${others.length?`<button class="btn" onclick="addExisting(${ja(g.id)})">Aus Klasse ${esc(g.cls)} übernehmen</button>`:""}${ms.length?`<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},names:${ja(g.id)}})">Namen eintragen</button>`:""}</p>`}
   ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Klassenarbeiten${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`:`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Stundenstatus erfassen</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Stundenstatus</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Schriftliche Überprüfungen${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p><p class="muted small">Die übrigen Noten für Sport kommen in Version 0.5.</p>`}
+  <p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn" onclick="asvStart(${ja(g.id)})">Verhalten erfassen</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},asvo:${ja(g.id)}})">Übersicht Verhalten</button></p>
   ${ms.length?ms.map(s=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)},sus:${ja(s.id)}})">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${nm(s)}${(s.profil||"r")!=="r"?`<span class="tag ${s.profil}">${esc(PROFILE[s.profil])}${s.profil==="zd"?(s.zdNote?" · mit Note":" · Bericht"):""}</span>`:`<span class="muted small">Regel</span>`}</div><span aria-hidden="true" class="muted">›</span></button>`).join(""):`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   ${ro?"":`<div class="card"><b>Schuljahresende</b><p class="small muted" style="margin:6px 0 10px">Archivieren macht die Gruppe nur noch lesbar. Die Daten bleiben ${FRIST_JAHRE} Jahre erhalten (VO-DV I § 9). Gelöscht wird erst nach deiner Bestätigung.</p><button class="btn" onclick="archive(${ja(g.id)})">Lerngruppe archivieren</button></div>`}`}
 function addSus(gid){const g=groupById(gid),code=SD.code.trim();if(!code)return toast("Bitte ein Kürzel eintragen.");
@@ -716,7 +787,7 @@ async function delGroup(gid){const g=groupById(gid),early=!g.demo&&g.arch&&keepU
   if(early&&!await ask("Wirklich vor Ablauf der Frist löschen?",{ok:"Ja, löschen",danger:true}))return;
   // Schüler:innen, die in keiner anderen Gruppe sind, gehen mit
   const keep=new Set(db.groups.filter(x=>x.id!==gid).flatMap(x=>x.members)),gone=g.members.filter(id=>!keep.has(id));
-  db.groups=db.groups.filter(x=>x.id!==gid);db.sus=db.sus.filter(s=>!gone.includes(s.id));db.obs=db.obs.filter(o=>o.gid!==gid);db.att=db.att.filter(a=>a.gid!==gid);db.ka=db.ka.filter(a=>a.gid!==gid);db.del.push(gid,...gone);save();saveNames();go({tab:"gruppen"});toast("Gelöscht")}
+  db.groups=db.groups.filter(x=>x.id!==gid);db.sus=db.sus.filter(s=>!gone.includes(s.id));db.obs=db.obs.filter(o=>o.gid!==gid);db.att=db.att.filter(a=>a.gid!==gid);db.ka=db.ka.filter(a=>a.gid!==gid);db.asv=db.asv.filter(a=>a.gid!==gid);db.del.push(gid,...gone);save();saveNames();go({tab:"gruppen"});toast("Gelöscht")}
 
 /* ===== Schüler:in ===== */
 function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){view={tab:"gruppen",group:view.group};return groupV()}
@@ -730,6 +801,7 @@ function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){vie
   ${p==="na"?`<label for="na">Nachteilsausgleich</label><div class="sub">Z. B. mehr Zeit, mündlich statt schriftlich, Ersatzaufgabe im Sport. Keine Diagnosen eintragen.</div><textarea id="na" ${dis} maxlength="2000" onchange="setNA(${ja(s.id)},this.value)">${esc(s.na)}</textarea>`:""}
   ${p==="zd"?`<label class="swr"><span class="grow">Note im Zeugnis<span class="sub">Aus: Leistungsbeschreibung als Bericht. An: Note auf Grundlage der Förderplanziele.</span></span><input type="checkbox" class="sw" ${s.zdNote?"checked":""} ${dis} onchange="setZd(${ja(s.id)},this.checked)"></label><p class="muted small">Die Förderplanziele als Bewertungskriterien kommen in einer späteren Version.</p>`:""}</div>
   ${susObsV(s,g)}
+  ${asvSusCard(s,g)}
   ${ro?"":`<p><button class="btn ghost danger" onclick="removeFromGroup(${ja(g.id)},${ja(s.id)})">Aus ${esc(gName(g))} entfernen</button></p>`}`}
 async function setIcon(id){const s=susById(id),i=await pickIcon(s.icon,s.cls);if(!i)return;s.icon=i;touch(s);save();render()}
 function setProfil(id,p){const s=susById(id);s.profil=p;touch(s);save();render()}
@@ -758,7 +830,7 @@ function profilV(){
   <div class="sub" style="margin:14px 0 4px;font-weight:700">Anteil am Gesamtvorschlag</div><p class="small muted" style="margin:0 0 6px">Der Rest ist die Sonstige Mitarbeit. Mathe laut SILP: 60 %. Sport zählt erst ab Version 0.5.</p>
   ${FAECHER.map(f=>`<div style="margin:8px 0"><div class="small" style="font-weight:700;margin-bottom:4px">${f}</div><div class="pick" style="grid-template-columns:repeat(6,1fr)" role="group" aria-label="Anteil schriftlich ${f}">${[20,30,40,50,60,70].map(n=>`<button class="${kaw(f)===n?"on":""}" aria-pressed="${kaw(f)===n}" onclick="setKaw('${f}',${n})">${n} %</button>`).join("")}</div></div>`).join("")}
   <label class="swr"><span class="grow">Noten mit + und −<span class="sub">Jede Note wird in drei gleich große Punktbereiche geteilt. Das steht nicht im SILP, es ist deine Festlegung.</span></span><input type="checkbox" class="sw" ${kaTend()?"checked":""} onchange="db.kaTend=this.checked;save();render()"></label></div>
-  <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length} Einträge · ${db.ka.length} Klassenarbeiten auf diesem Gerät</p>
+  <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length+db.asv.length} Einträge · ${db.ka.length} Klassenarbeiten auf diesem Gerät</p>
   ${mtip("backup")}<p class="row" style="flex-wrap:wrap"><button class="btn pri${mk("backup")}" onclick="exportJSON()">Sicherung speichern</button><button class="btn" onclick="$('#imp').click()">Sicherung laden</button></p>
   <input type="file" id="imp" accept=".json,application/json" hidden onchange="importJSON(this)">
   ${db.lock&&LKEY?`<p class="row" style="flex-wrap:wrap"><button class="btn" ${hasNames()?"":"disabled"} onclick="exportNames()">Namensliste sichern</button><button class="btn" onclick="$('#imp').click()">Namensliste laden</button></p><p class="muted small">${Object.keys(NAMES).length} Namen auf diesem Gerät. Die Namensliste ist eine eigene Datei mit demselben Passwort. Bewahre sie getrennt von der Sicherung auf.</p>`:""}
@@ -811,7 +883,7 @@ async function exportNames(){if(!crypto.subtle||!hasNames())return;const ki=awai
 async function exportJSON(){if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
   const ki=await backupKey();if(!ki)return;
   if(!db.backupTip&&!await backupTip())return;
-  const {bsalt,lock,...rest}=db,payload={...rest,groups:db.groups.filter(g=>!g.demo),sus:db.sus.filter(s=>!s.demo),obs:db.obs.filter(o=>!o.demo),att:db.att.filter(a=>!a.demo),ka:db.ka.filter(a=>!a.demo)};
+  const {bsalt,lock,...rest}=db,payload={...rest,groups:db.groups.filter(g=>!g.demo),sus:db.sus.filter(s=>!s.demo),obs:db.obs.filter(o=>!o.demo),att:db.att.filter(a=>!a.demo),ka:db.ka.filter(a=>!a.demo),asv:db.asv.filter(a=>!a.demo)};
   if(!await giveFile(backupName(),await sealFile(payload,ki)))return;
   db.lastBackup=Date.now();db.backupTip=1;save();render();toast(isIOS?"Sicherung erstellt. Sie liegt in „Dateien“ → „Auf meinem iPad“.":"Sicherung erstellt.")}
 async function backupTip(){const steps=isIOS?[`Gleich öffnet sich das Teilen-Fenster. Tippe dort auf <b>„In Dateien sichern“</b>.`,`Wähle <b>„Auf meinem iPad“</b>. Lege beim ersten Mal einen Ordner <b>„SoMi“</b> an und öffne ihn.`,`Tippe auf <b>„Sichern“</b>. Bei späteren Sicherungen wählst du wieder diesen Ordner.`]
@@ -833,32 +905,32 @@ async function importJSON(inp){const f=inp.files[0];inp.value="";if(!f)return;le
   if(o.art==="namen"||d.namen){if(!db.lock||!LKEY)return toast("Namen gehen nur mit App-Sperre. Schalte sie zuerst ein.");if(!okNames(d.namen))return toast("Namensliste beschädigt");
     let n=0;for(const [k,v] of Object.entries(d.namen))if(susById(k)){NAMES[k]=v.trim();n++}saveNames();render();return toast(n?`${n} Namen übernommen`:"Keine passenden Kürzel. Lade zuerst die Sicherung.")}
   if(!Array.isArray(d.groups)||!Array.isArray(d.sus))return toast("Keine SoMi-Sicherung");
-  if(!Array.isArray(d.obs))d.obs=[];if(!Array.isArray(d.att))d.att=[];if(!Array.isArray(d.ka))d.ka=[];
-  const ng=d.groups.length,ns=d.sus.length,no=d.obs.length,na=d.att.length,nk=d.ka.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);d.obs=d.obs.filter(okObs);d.att=d.att.filter(okAtt);d.ka=d.ka.filter(okKa);
-  const bad=ng-d.groups.length+ns-d.sus.length+no-d.obs.length+na-d.att.length+nk-d.ka.length;if(bad)toast(`${bad} beschädigte Einträge nicht übernommen`);
+  if(!Array.isArray(d.obs))d.obs=[];if(!Array.isArray(d.att))d.att=[];if(!Array.isArray(d.ka))d.ka=[];if(!Array.isArray(d.asv))d.asv=[];
+  const ng=d.groups.length,ns=d.sus.length,no=d.obs.length,na=d.att.length,nk=d.ka.length,nv=d.asv.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);d.obs=d.obs.filter(okObs);d.att=d.att.filter(okAtt);d.ka=d.ka.filter(okKa);d.asv=d.asv.filter(okAsv);
+  const bad=ng-d.groups.length+ns-d.sus.length+no-d.obs.length+na-d.att.length+nk-d.ka.length+nv-d.asv.length;if(bad)toast(`${bad} beschädigte Einträge nicht übernommen`);
   d.del=(Array.isArray(d.del)?d.del:[]).filter(okId);
   IMP={o,d,settings:!db.groups.some(g=>!g.demo)};go({tab:"profil",imp:true})}
 function importV(){if(!IMP){view={tab:"profil"};return profilV()}const {o,d}=IMP;
   const neu=d.groups.filter(g=>!groupById(g.id)).length;
   return `<button class="btn ghost" onclick="IMP=null;go({tab:'profil'})">‹ Abbrechen</button><h1>Sicherung laden</h1>
-  <p class="muted">Erstellt am ${dDEy((o.erstellt||"").slice(0,10))} · ${d.groups.length} Lerngruppen · ${d.sus.length} Schüler:innen · ${d.obs.length} Einträge${d.ka.length?` · ${d.ka.length} Klassenarbeiten`:""}</p>
+  <p class="muted">Erstellt am ${dDEy((o.erstellt||"").slice(0,10))} · ${d.groups.length} Lerngruppen · ${d.sus.length} Schüler:innen · ${d.obs.length+d.asv.length} Einträge${d.ka.length?` · ${d.ka.length} Klassenarbeiten`:""}</p>
   <div class="card"><p class="small">${neu} Lerngruppe${neu===1?"":"n"} sind neu auf diesem Gerät. Vorhandenes wird <b>ergänzt</b>: Bei gleichen Einträgen gilt die neuere Fassung. Nichts wird ersetzt, was hier neuer ist.</p>
   <label class="row" style="margin:12px 0;font-weight:600"><input type="checkbox" style="width:auto" ${IMP.settings?"checked":""} onchange="IMP.settings=this.checked"> Auch Einstellungen übernehmen (Erscheinungsbild, Schriftgröße, Kriterien)</label></div>
   <p><button class="btn pri block" onclick="applyImport()">Übernehmen</button></p>`}
 function applyImport(){const d=IMP.d,dels=new Set([...db.del,...d.del]);
-  const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels),c=mergeList(db.obs,d.obs,dels),e=mergeList(db.att,d.att,dels),f=mergeList(db.ka,d.ka,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
-  const gids=new Set(db.groups.map(g=>g.id)),sids=new Set(db.sus.map(x=>x.id));db.obs=c.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.att=e.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.ka=f.list.filter(a=>gids.has(a.gid));
+  const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels),c=mergeList(db.obs,d.obs,dels),e=mergeList(db.att,d.att,dels),f=mergeList(db.ka,d.ka,dels),v=mergeList(db.asv,d.asv,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
+  const gids=new Set(db.groups.map(g=>g.id)),sids=new Set(db.sus.map(x=>x.id));db.obs=c.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.att=e.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.ka=f.list.filter(a=>gids.has(a.gid));db.asv=v.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));
   if(IMP.settings)for(const k of ["theme","fs","hausa","stw","kgw","kaTend","kaw"])if(d[k]!=null&&okSetting[k](d[k]))db[k]=d[k];
-  IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen, ${c.n+e.n+f.n} Einträge neu oder aktualisiert`);go({tab:"gruppen"})}
+  IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen, ${c.n+e.n+f.n+v.n} Einträge neu oder aktualisiert`);go({tab:"gruppen"})}
 async function wipe(){if(!await ask("Wirklich alle Daten auf diesem Gerät löschen?",{ok:"Alles löschen",danger:true,sub:"Speichere vorher eine Sicherung. Die Aufbewahrungsfrist gilt auch hier."}))return;
   const keep={theme:db.theme,fs:db.fs,bsalt:db.bsalt,lock:db.lock,setupDone:db.setupDone};db={...leer(),...keep};dropNames();save();go({tab:"heute"})}
 async function delDemo(){if(!await ask("Die fiktive Beispielklasse entfernen? Deine eigenen Lerngruppen bleiben.",{ok:"Entfernen"}))return;
-  db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);db.obs=db.obs.filter(o=>!o.demo);db.att=db.att.filter(a=>!a.demo);db.ka=db.ka.filter(a=>!a.demo);save();render();toast("Beispielklasse entfernt")}
+  db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);db.obs=db.obs.filter(o=>!o.demo);db.att=db.att.filter(a=>!a.demo);db.ka=db.ka.filter(a=>!a.demo);db.asv=db.asv.filter(a=>!a.demo);save();render();toast("Beispielklasse entfernt")}
 function demo(){if(db.groups.some(g=>g.demo))return toast("Beispielklasse ist schon da");
   const prof=["r","r","na","r","zd","r","r","na"],sus=prof.map((p,i)=>touch({id:uid(),code:`DEMO-${String(i+1).padStart(2,"0")}`,cls:"DEMO",icon:ICONS[i*5%ICONS.length],profil:p,
     na:p==="na"?(i===2?"Fiktiv: 10 Minuten mehr Zeit bei Klassenarbeiten.":"Fiktiv: Ersatzaufgabe im Sport (Schiedsrichter, Helfen)."):"",zdNote:p==="zd",demo:true}));
   db.sus.push(...sus);
-  const gm=touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true});db.obs.push(...demoObs(gm));db.ka.push(demoKa(gm));
+  const gm=touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true});db.obs.push(...demoObs(gm));db.ka.push(demoKa(gm));db.asv.push(...demoAsv(gm));
   db.groups.push(gm,
     touch({id:uid(),fach:"Sport",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.slice(0,6).map(s=>s.id),arch:null,demo:true}));
   save();toast("Beispielklasse geladen");go(view.mark?{tab:"profil",mark:"demo"}:{tab:"gruppen"})}
