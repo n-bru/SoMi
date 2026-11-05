@@ -130,7 +130,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.3.0",SOMI_STAND="04.11.2026";
+const SOMI_VERSION="0.3.1",SOMI_STAND="05.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -202,7 +202,7 @@ const nWert=n=>{const b=+n[0];return n[1]==="+"?b-.3:n[1]==="-"?b+.3:b};
 const nTxt=n=>n.replace("-","−");
 /* Ab 0.2.4: Beobachtungen in 4 Stufen (o.s), alte Einträge mit Note (o.n) bleiben gültig.
    Umrechnung: jede Stufe hat einen Notenwert (Einstellungen), der Mittelwert wird auf Drittel gerundet → Note mit + und −. */
-const STUF={"4":{t:"++",l:"übertroffen"},"3":{t:"+",l:"erfüllt"},"2":{t:"o",l:"teilweise erfüllt"},"1":{t:"−",l:"kaum erfüllt"}};
+const STUF={"4":{t:"++",l:"übertroffen"},"3":{t:"+",l:"erfüllt"},"2":{t:"o",l:"teilweise"},"1":{t:"−",l:"kaum erfüllt"}};
 const STW0={"4":1,"3":2,"2":3.5,"1":5};
 const stw=()=>({...STW0,...(db.stw||{})});
 const okKgw=v=>!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).every(k=>Object.hasOwn(KMAP,k)&&[1,2,3].includes(v[k]));
