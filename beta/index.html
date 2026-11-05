@@ -90,7 +90,7 @@ nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
 .tile.on{border:2.5px solid var(--acc);background:var(--accs)}
 .tiles:has(.nm){grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.tile .done{position:absolute;top:4px;right:8px;color:var(--acc);font-weight:900}
 .padwrap{position:sticky;bottom:calc(66px + env(safe-area-inset-bottom));z-index:3;background:var(--card);margin:10px -8px 4px;padding:8px;border-radius:18px;box-shadow:0 -8px 16px -12px rgba(0,0,0,.35)}
-.pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.pad.st{grid-template-columns:repeat(4,1fr)}.pad.st .nt{opacity:.7;font-weight:600}.pad.st button{min-height:58px;display:grid;grid-template-rows:auto auto auto;align-content:start;justify-items:center;align-items:center;gap:2px;padding:6px 2px}.pad.st b{font-size:1.5rem;line-height:1}.pad.st.av{grid-template-columns:repeat(3,1fr)}.pad.st span{font-size:.75rem;font-weight:600;color:var(--muted);line-height:1.2;text-align:center}
+.pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.pad.st{grid-template-columns:repeat(4,1fr)}.pad.st .nt{opacity:.7;font-weight:600}.pad.st button{min-height:58px;display:grid;grid-template-rows:auto auto auto;align-content:start;justify-items:center;align-items:center;gap:2px;padding:6px 2px}.pad.st b{font-size:1.5rem;line-height:1}.pad.st.av{grid-template-columns:repeat(3,1fr)}.pad button.cur{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}.pad button.cur span{color:var(--acc-ink)}.seqrow{margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}.asvrow>div+div{margin-top:8px}.seqrow .seqk{margin:0 0 6px}.pad.st span{font-size:.75rem;font-weight:600;color:var(--muted);line-height:1.2;text-align:center}
 .bar{height:6px;border-radius:3px;background:var(--soft);margin:8px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
 .seqsus{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 8px}.seqsus .code{font-size:2rem}.kic.big{width:60px;height:60px;font-size:2rem}
 .btn.abw{border-style:dashed}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.three .btn{padding-left:4px;padding-right:4px}
@@ -133,7 +133,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.4.1 Beta",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.4.2 Beta",SOMI_STAND="05.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -291,8 +291,6 @@ function erfV(){const g=groupById(view.erf);if(!g||g.arch){view={tab:view.tab,gr
   const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code));
   const todayK=new Set(db.obs.filter(o=>o.gid===g.id&&o.d===ER.d&&o.k===k).map(o=>o.sid));
   const st=stale(g);
-  const cell=null;
-  const plus=[1,2,3,4,5].map(i=>i+"+").concat([null]),mid=[1,2,3,4,5,6].map(String),minus=[1,2,3,4,5].map(i=>i+"-").concat([null]);
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
   <div class="between"><h1 style="margin-bottom:4px">Erfassen</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>
   <div class="pick" style="grid-template-columns:1fr 1fr;margin-bottom:10px">${[["k","Ganze Klasse nacheinander"],["e","Einzeln bewerten"]].map(([m,t])=>`<button class="${ER.mode===m?"on":""}" aria-pressed="${ER.mode===m}" onclick="erMode('${m}')">${t}</button>`).join("")}</div>
@@ -300,7 +298,7 @@ function erfV(){const g=groupById(view.erf);if(!g||g.arch){view={tab:view.tab,gr
   ${K.hint?`<p class="small" style="margin:10px 0 0;color:var(--sigt);font-weight:700">${esc(K.hint)}</p>`:""}
   <details style="margin-top:8px"><summary class="small" style="font-weight:700;cursor:pointer">Ankertexte aus dem SILP</summary>
   <div class="two small" style="margin-top:6px"><div><b>gut</b><ul class="anc">${K.gut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div><b>ausreichend</b><ul class="anc">${K.aus.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div></details></div>`}
-  ${ER.mode==="k"?seqCard(g,ms,cell,plus,mid,minus):`<div class="card">
+  ${ER.mode==="k"?seqCard(g,ms):`<div class="card">
   <div class="between" style="flex-wrap:wrap"><b>${ER.sel.length?`${ER.sel.length} ausgewählt`:"Kürzel antippen"}</b>${ER.sel.length?`<button class="btn ghost small" onclick="ER.sel=[];render()">Auswahl aufheben</button>`:""}</div>
   <div class="tiles">${ms.map(s=>`<button class="tile${ER.sel.includes(s.id)?" on":""}" aria-pressed="${ER.sel.includes(s.id)}" onclick="erSel(${ja(s.id)})">${susIcon(s)}<span style="min-width:0"><span class="code" style="display:block">${esc(s.code)}</span>${nm(s)}</span>${todayK.has(s.id)?'<span class="done" aria-label="heute schon erfasst">✓</span>':""}${(s.profil||"r")==="zd"?'<span class="tag zd">LE</span>':(s.profil==="na"?'<span class="tag na">NA</span>':"")}</button>`).join("")||`<p class="muted">Noch niemand in dieser Gruppe.</p>`}</div>
   <div class="padwrap"><div class="pad st" role="group" aria-label="Stufe">${padH()}</div></div>
@@ -320,38 +318,51 @@ function seqSetup(g){const ks=kritList();if(!ER.pre)ER.pre=(g.lastKs||[g.lastK||
   <p style="margin-bottom:0"><button class="btn pri block" ${pre.length?"":"disabled"} onclick="seqGo()">Runde starten${pre.length?` (${pre.length} ${pre.length===1?"Kriterium":"Kriterien"})`:""}</button></p></div>`}
 function seqPre(k){const p=ER.pre||[],i=p.indexOf(k);if(i>=0)p.splice(i,1);else p.push(k);ER.pre=KRIT.map(x=>x.k).filter(x=>p.includes(x));render()}
 function seqGo(){const g=groupById(ER.gid);if(!g||!ER.pre?.length)return;ER.ks=[...ER.pre];ER.j=0;g.lastKs=[...ER.ks];save();render()}
-function seqCard(g,ms,cell,plus,mid,minus){if(!ms.length)return `<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
+// Runde (ab 0.4.2): pro Kürzel alle gewählten Kriterien plus Arbeits- und Sozialverhalten auf einem Bildschirm, dann „Weiter“
+function seqCard(g,ms){if(!ms.length)return `<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
   if(!ER.ks)return seqSetup(g);
-  const ks=ER.ks,runs=Object.values(ER.run),nA=runs.filter(v=>v==="abw").length,nB=runs.filter(v=>v!=="abw"&&Object.values(v).some(x=>x!=="skip")).length;
+  const ks=ER.ks,runs=Object.values(ER.run),nA=runs.filter(v=>v==="abw").length,nB=runs.filter(v=>v!=="abw"&&Object.keys(v).length).length;
   const sum=`${nB} bewertet${nA?` · ${nA} nicht anwesend`:""}`;
   if(ER.i>=ms.length)return `<div class="card seqdone"><b style="font-size:1.2rem">Fertig</b><p>${nB} bewertet${nA?`, ${nA} nicht anwesend`:""}.</p>
-    <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="seqPrev()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.j=0;ER.run={};ER.pre=[...ER.ks];ER.ks=null;render()">Neue Runde</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
-  if(ER.j>=ks.length)ER.j=0;
-  const s=ms[ER.i],r=ER.run[s.id],k=ks[ER.j],K=KMAP[k],had=r&&r!=="abw"?r[k]:null,o=had&&had!=="skip"?db.obs.find(x=>x.id===had):null;
-  const note=r==="abw"?"In dieser Runde: nicht anwesend.":had==="skip"?"In dieser Runde übersprungen.":o?`In dieser Runde schon bewertet: ${hid(oTxt(o))}. Eine neue Stufe ersetzt sie.`:"";
+    <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="ER.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.run={};ER.pre=[...ER.ks];ER.ks=null;render()">Neue Runde</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
+  const s=ms[ER.i],r=ER.run[s.id],abw=r==="abw";
+  const rows=ks.map(k=>{const K=KMAP[k],id=r&&!abw?r[k]:null,o=id?db.obs.find(x=>x.id===id):null;
+    return `<div class="seqrow"><p class="seqk"><b>${esc(K.t)}</b></p>${ancBox(k==="koop"?{...K,hint:null}:K)}<div class="pad st" role="group" aria-label="${esc(K.t)}">${padRow(k,o?.s)}</div></div>`}).join("");
   return `<div class="card"><div class="between"><b>${ER.i+1} von ${ms.length}</b><span class="muted small">${sum}</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
   ${bigSus(s)}
-  <p class="seqk"><b>${esc(K.t)}</b>${ks.length>1?` <span class="muted small">(${ER.j+1} von ${ks.length})</span>`:""}</p>
-  ${ancBox(k==="koop"?{...K,hint:null}:K)}
-  ${note?`<p class="small" style="text-align:center;margin:6px 0 0">${note}</p>`:""}
-  <div class="padwrap"><div class="pad st" role="group" aria-label="Stufe">${padH()}</div>
-  <div class="three" style="margin-top:6px"><button class="btn" ${ER.i||ER.j?"":"disabled"} onclick="seqPrev()">‹ Zurück</button><button class="btn abw" onclick="seqSkip()">überspringen</button><button class="btn abw" onclick="seqAbw()">nicht anwesend</button></div></div>
+  ${abw?`<p class="small" style="text-align:center;margin:6px 0 0">In dieser Runde: nicht anwesend. Eine Stufe tippen hebt das auf.</p>`:""}
+  ${rows}${asvRows(s.id)}
+  <p class="small muted" style="text-align:center;margin:8px 0 0">Nicht beobachtet? Einfach leer lassen. Nochmal tippen nimmt eine Stufe zurück.</p>
+  <div class="padwrap"><div class="three"><button class="btn" ${ER.i?"":"disabled"} onclick="seqPrev()">‹ Zurück</button><button class="btn abw" onclick="seqAbw()">nicht anwesend</button><button class="btn pri" onclick="seqNext()">Weiter ›</button></div></div>
   ${erExtras()}
   <p style="margin:12px 0 0"><button class="btn ghost small" onclick="ER.pre=[...ER.ks];ER.ks=null;render()">Kriterien ändern</button></p></div>`}
-function seqStep(sid){if(ER.run[sid]==="abw"||ER.j>=ER.ks.length-1){ER.i++;ER.j=0}else ER.j++}
-function seqPrev(){if(ER.j>0)ER.j--;else if(ER.i>0){ER.i--;const ms=msOf(groupById(ER.gid));ER.j=ER.run[ms[ER.i]?.id]==="abw"?0:Math.max(0,(ER.ks?.length||1)-1)}render()}
-function seqDropK(sid,k){const r=ER.run[sid];if(r==="abw"){ER.run[sid]={};return}if(r&&r[k]&&r[k]!=="skip")db.obs=db.obs.filter(o=>o.id!==r[k]);if(r)delete r[k]}
-function seqDropAll(sid){const r=ER.run[sid];if(r&&r!=="abw"){const ids=new Set(Object.values(r));db.obs=db.obs.filter(o=>!ids.has(o.id))}delete ER.run[sid]}
+const padRow=(k,cur)=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" data-k="${k}" class="${cur===v?"cur":""}" aria-pressed="${cur===v}" onclick="seqSet('${k}','${v}')" aria-label="${esc(KMAP[k].t)}: ${x.l}, Notenwert ${fmtW(stw()[v])}"><b>${x.t}</b><span>${x.l}</span><span class="nt">= ${fmtW(stw()[v])}</span></button>`).join("");
+// Arbeits- und Sozialverhalten in der Runde (Mathe) und im Stundenstatus (Sport); gespeichert sofort, in ER.run unter "@av"/"@sv"
+function asvRows(sid){const r=ER.run[sid],m=r&&r!=="abw"?r:{};
+  return `<div class="seqrow asvrow">${Object.entries(ABER).map(([b,bt])=>{const id=m["@"+b],a=id?db.asv.find(x=>x.id===id):null;
+    return `<div><p class="seqk"><b>${bt}</b></p><div class="pad st av" role="group" aria-label="${bt}">${Object.entries(AV).map(([v,x])=>`<button data-b="${b}" data-v="${v}" class="${a?.v===v?"cur":""}" aria-pressed="${a?.v===v}" onclick="seqAsv(${ja(sid)},'${b}','${v}')" aria-label="${bt}: ${x.l}"><b>${x.t}</b><span>${x.l}</span></button>`).join("")}</div></div>`}).join("")}
+  <p class="small muted" style="margin:6px 0 0;text-align:center">Verhalten zählt nicht zur Note.</p></div>`}
+function seqRun(sid){let r=ER.run[sid];if(!r||r==="abw")r=ER.run[sid]={};return r}
+function seqSet(k,v){const g=groupById(ER.gid),s=seqCur();if(!g||!s||!Object.hasOwn(KMAP,k)||!Object.hasOwn(STUF,v))return;
+  const r=seqRun(s.id),old=r[k]?db.obs.find(o=>o.id===r[k]):null;
+  if(old){db.obs=db.obs.filter(o=>o.id!==old.id);delete r[k];if(old.s===v){save();return render()}}
+  const t=ER.t.trim().slice(0,300);if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
+  const o=touch({id:uid(),gid:g.id,sid:s.id,k,s:v,fb:!!ER.fb,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});db.obs.push(o);r[k]=o.id;g.lastK=k;save();render()}
+function seqAsv(sid,b,v){const g=groupById(ER.gid);if(!g||g.arch||!g.members.includes(sid)||!Object.hasOwn(ABER,b)||!Object.hasOwn(AV,v))return;
+  const r=seqRun(sid),old=r["@"+b]?db.asv.find(a=>a.id===r["@"+b]):null;
+  if(old){db.asv=db.asv.filter(a=>a.id!==old.id);delete r["@"+b];if(old.v===v){save();return render()}}
+  const t=g.fach==="Mathe"?ER.t.trim().slice(0,300):"";
+  const a=touch({id:uid(),gid:g.id,sid,m:b,v,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});db.asv.push(a);r["@"+b]=a.id;save();render()}
+function seqNext(){const s=seqCur();if(!s)return;const t=ER.t.trim().slice(0,300),r=ER.run[s.id];
+  if(t&&r&&r!=="abw")for(const id of Object.values(r)){const o=db.obs.find(x=>x.id===id)||db.asv.find(x=>x.id===id);if(o&&!o.t){o.t=t;touch(o)}}
+  ER.t="";ER.i++;save();render();window.scrollTo(0,0)}
+function seqPrev(){if(ER.i>0)ER.i--;render();window.scrollTo(0,0)}
+function seqDropAll(sid){const r=ER.run[sid];if(r&&r!=="abw"){const ids=new Set(Object.values(r));db.obs=db.obs.filter(o=>!ids.has(o.id));db.asv=db.asv.filter(a=>!ids.has(a.id))}delete ER.run[sid]}
 function seqCur(){const g=groupById(ER.gid);return g&&ER.ks?msOf(g)[ER.i]:null}
-function seqSkip(){const s=seqCur();if(!s)return;const k=ER.ks[ER.j];seqDropK(s.id,k);(ER.run[s.id]??={})[k]="skip";seqStep(s.id);save();render()}
-function seqAbw(){const s=seqCur();if(!s)return;seqDropAll(s.id);ER.run[s.id]="abw";ER.i++;ER.j=0;save();render()}
+function seqAbw(){const s=seqCur();if(!s)return;seqDropAll(s.id);ER.run[s.id]="abw";ER.t="";ER.i++;save();render();window.scrollTo(0,0)}
 function erSel(id){const i=ER.sel.indexOf(id);if(i>=0)ER.sel.splice(i,1);else ER.sel.push(id);render()}
 function addObs(v){const g=groupById(ER.gid);if(!g||!Object.hasOwn(STUF,v))return;const st=STUF[v].t;
-  if(ER.mode==="k"){const s=seqCur(),k=ER.ks?.[ER.j];if(!s||!k)return;const t=ER.t.trim().slice(0,300);
-    if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
-    seqDropK(s.id,k);const o=touch({id:uid(),gid:g.id,sid:s.id,k,s:v,fb:!!ER.fb,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});
-    db.obs.push(o);(ER.run[s.id]??={})[k]=o.id;g.lastK=k;ER.t="";seqStep(s.id);save();render();toast(`${s.code} · ${KMAP[k].t} gespeichert${SHOW?": "+st:""}`);return}
   if(!ER.sel.length)return toast("Tippe zuerst ein oder mehrere Kürzel an.");
   const ks=kritList(),k=ks.some(x=>x.k===(ER.k||g.lastK))?(ER.k||g.lastK):"qual",t=ER.t.trim().slice(0,300);
   if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
@@ -363,7 +374,7 @@ function addObs(v){const g=groupById(ER.gid);if(!g||!Object.hasOwn(STUF,v))retur
 function sportV(g){const ms=msOf(g),d=ER.d||today(),day=new Map(db.att.filter(a=>a.gid===g.id&&a.d===d).map(a=>[a.sid,a]));
   const cnt=Object.keys(ST).map(k=>[k,ms.filter(s=>day.get(s.id)?.st===k).length]).filter(x=>x[1]);
   const head=`<button class="btn ghost" onclick="back()">‹ Zurück</button><div class="between"><h1 style="margin-bottom:4px">Stundenstatus</h1>${nmBtn()}</div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>`;
-  const dat=`<div class="row" style="margin-top:12px"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();ER.i=0;render()"></div>`;
+  const dat=`<div class="row" style="margin-top:12px"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();ER.i=0;ER.run={};render()"></div>`;
   const sum=cnt.map(([k,n])=>`${n} ${ST[k]}`).join(" · ")||"noch nichts erfasst";
   if(!ms.length)return head+`<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
   if(ER.i>=ms.length)return head+`<div class="card seqdone"><b style="font-size:1.2rem">Fertig</b><p>${esc(sum)}.</p>
@@ -372,7 +383,8 @@ function sportV(g){const ms=msOf(g),d=ER.d||today(),day=new Map(db.att.filter(a=
   return head+`<div class="card"><div class="between"><b>${ER.i+1} von ${ms.length}</b><span class="muted small">${esc(sum)}</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
   ${bigSus(s)}
-  ${a?`<p class="small" style="text-align:center;margin:0 0 6px">An diesem Tag schon erfasst: ${esc(ST[a.st])}. Tippen ersetzt es.</p>`:""}
+  ${asvRows(s.id)}
+  ${a?`<p class="small" style="text-align:center;margin:10px 0 6px">An diesem Tag schon erfasst: ${esc(ST[a.st])}. Tippen ersetzt es.</p>`:`<p class="small muted" style="text-align:center;margin:10px 0 6px">Verhalten zuerst, der Status springt weiter.</p>`}
   <div class="stgrid">${Object.entries(ST).map(([k,t])=>`<button class="btn${k==="akt"?" pri":k==="abw"?" abw":""}${a?.st===k?" cur":""}" onclick="setAtt('${k}')">${t}</button>`).join("")}</div>
   <div class="two" style="margin-top:8px"><button class="btn" ${ER.i?"":"disabled"} onclick="ER.i--;render()">‹ Zurück</button><button class="btn" ${rest?"":"disabled"} onclick="attRest()">Alle übrigen: aktiv</button></div>
   ${dat}</div>`}
@@ -564,10 +576,11 @@ function demoKa(g){const p=[34,28,22.5,17,14,null,12,30.5],a={id:uid(),gid:g.id,
    Gespeichert als db.asv=[{id,gid,sid,m,v,d,t,upd}]. m = Merkmal (AMAP), v = "+", "o" oder "-".
    Zählt nicht zur Fachnote. Grundlage für Zeugnisbemerkung, Elternsprechtag, Klassenkonferenz. */
 const ABER={av:"Arbeitsverhalten",sv:"Sozialverhalten"};
-const ASVM=[{m:"lb",b:"av",t:"leistungsbereit"},{m:"sorg",b:"av",t:"sorgfältig"},{m:"ausd",b:"av",t:"ausdauernd"},{m:"selb",b:"av",t:"selbstständig"},{m:"mat",b:"av",t:"Material dabei"},
+// Ab 0.4.2 nur noch die beiden Bereiche (Nicks Wunsch 05.11.). Die Merkmale aus Beta 0.4.0 bleiben lesbar und zählen zu ihrem Bereich.
+const ASVALT=[{m:"lb",b:"av",t:"leistungsbereit"},{m:"sorg",b:"av",t:"sorgfältig"},{m:"ausd",b:"av",t:"ausdauernd"},{m:"selb",b:"av",t:"selbstständig"},{m:"mat",b:"av",t:"Material dabei"},
   {m:"zus",b:"sv",t:"arbeitet mit anderen"},{m:"reg",b:"sv",t:"hält Regeln ein"},{m:"konf",b:"sv",t:"löst Konflikte"},{m:"hilf",b:"sv",t:"hilft anderen"}];
-const AMAP=Object.fromEntries(ASVM.map(x=>[x.m,x]));
-const AV={"+":{t:"+",l:"zeigt es"},"o":{t:"○",l:"teilweise"},"-":{t:"−",l:"noch nicht"}};
+const AMAP=Object.fromEntries([...Object.entries(ABER).map(([b,t])=>({m:b,b,t})),...ASVALT].map(x=>[x.m,x]));
+const AV={"+":{t:"+",l:"gut"},"o":{t:"○",l:"teils"},"-":{t:"−",l:"schwierig"}};
 function okAsv(a){try{return !!a&&okId(a.id)&&okId(a.gid)&&okId(a.sid)&&Object.hasOwn(AMAP,a.m)&&Object.hasOwn(AV,a.v)&&okDate(a.d)&&okStr(a.t,300)&&okNum(a.upd)}catch(e){return false}}
 const asvOf=(gid,sid,from)=>db.asv.filter(a=>a.gid===gid&&(!sid||a.sid===sid)&&(!from||a.d>=from));
 // Tendenz: (Plus − Minus) / Anzahl; ab 2 Einträgen
@@ -575,34 +588,28 @@ const asvScore=a=>a.length?(a.filter(x=>x.v==="+").length-a.filter(x=>x.v==="-")
 const asvTend=a=>a.length<2?"":asvScore(a)>=1/3?"eher +":asvScore(a)<=-1/3?"eher −":"gemischt";
 const asvCnt=a=>{const n=v=>a.filter(x=>x.v===v).length;return a.length?`+${n("+")} · ○${n("o")} · −${n("-")}`:"–"};
 const ovFrom=()=>OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00";
-let AE={gid:null,m:null,sel:[],t:"",d:today()};
-function asvStart(gid,sel){AE={gid,m:null,sel:sel||[],t:"",d:today()};go({tab:view.tab,group:gid,asv:gid})}
-function asvM(g){return Object.hasOwn(AMAP,AE.m)?AE.m:Object.hasOwn(AMAP,g.lastM)?g.lastM:"lb"}
+let AE={gid:null,sel:[],t:"",d:today()};
+function asvStart(gid,sel){AE={gid,sel:sel||[],t:"",d:today()};go({tab:view.tab,group:gid,asv:gid})}
 function asvV(){const g=groupById(view.asv);if(!g||g.arch){view={tab:view.tab,group:view.asv};return groupV()}
-  if(AE.gid!==g.id)AE={gid:g.id,m:null,sel:[],t:"",d:today()};
-  const m=asvM(g),ms=msOf(g),todayM=new Set(db.asv.filter(a=>a.gid===g.id&&a.d===AE.d&&a.m===m).map(a=>a.sid));
+  if(AE.gid!==g.id)AE={gid:g.id,sel:[],t:"",d:today()};
+  const ms=msOf(g),todayA=new Set(db.asv.filter(a=>a.gid===g.id&&a.d===AE.d).map(a=>a.sid));
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
-  <div class="between"><h1 style="margin-bottom:4px">Verhalten erfassen</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · Arbeits- und Sozialverhalten${g.demo?" · fiktives Beispiel":""}</p>
-  <div class="card">${Object.entries(ABER).map(([b,bt])=>`<div class="sub" style="margin:${b==="av"?0:12}px 0 6px;font-weight:700">${bt}</div><div class="chips" role="group" aria-label="${bt}">${ASVM.filter(x=>x.b===b).map(x=>`<button class="${x.m===m?"on":""}" aria-pressed="${x.m===m}" onclick="AE.m='${x.m}';render()">${esc(x.t)}</button>`).join("")}</div>`).join("")}
-  <p class="small muted" style="margin:10px 0 0">Zählt nicht zur Note${g.fach==="Sport"?" (in Sport ab Version 0.5 Teil der Note laut SILP)":""}. Notiere Gelungenes genauso oft wie Schwieriges.</p></div>
+  <div class="between"><h1 style="margin-bottom:4px">Verhalten erfassen</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · einzelne Kürzel${g.demo?" · fiktives Beispiel":""}</p>
+  <p class="small muted">Für die ganze Klasse geht es schneller in der Runde (${g.fach==="Mathe"?"„Ganze Klasse nacheinander“":"„Stundenstatus erfassen“"}): Dort steht das Verhalten bei jedem Kind mit drauf. Zählt nicht zur Note.</p>
   <div class="card"><div class="between" style="flex-wrap:wrap"><b>${AE.sel.length?`${AE.sel.length} ausgewählt`:"Kürzel antippen"}</b>${AE.sel.length?`<button class="btn ghost small" onclick="AE.sel=[];render()">Auswahl aufheben</button>`:`<button class="btn ghost small" ${ms.length?"":"disabled"} onclick="AE.sel=msOf(groupById(AE.gid)).map(s=>s.id);render()">Alle auswählen</button>`}</div>
-  <div class="tiles">${ms.map(s=>`<button class="tile${AE.sel.includes(s.id)?" on":""}" aria-pressed="${AE.sel.includes(s.id)}" onclick="asvSel(${ja(s.id)})">${susIcon(s)}<span style="min-width:0"><span class="code" style="display:block">${esc(s.code)}</span>${nm(s)}</span>${todayM.has(s.id)?'<span class="done" aria-label="heute schon erfasst">✓</span>':""}${profTag(s)}</button>`).join("")||`<p class="muted">Noch niemand in dieser Gruppe.</p>`}</div>
-  <div class="padwrap"><p style="margin:0 0 6px;text-align:center"><b>${esc(AMAP[m].t)}</b></p><div class="pad st av" role="group" aria-label="Einschätzung ${esc(AMAP[m].t)}">${Object.entries(AV).map(([v,x])=>`<button data-v="${v}" onclick="addAsv('${v}')" aria-label="${esc(AMAP[m].t)}: ${x.l}"><b>${x.t}</b><span>${x.l}</span></button>`).join("")}</div>
-  ${g.fach==="Sport"?"":`<button class="btn block" style="margin-top:6px" onclick="asvMat()">Material fehlt</button>`}</div>
+  <div class="tiles">${ms.map(s=>`<button class="tile${AE.sel.includes(s.id)?" on":""}" aria-pressed="${AE.sel.includes(s.id)}" onclick="asvSel(${ja(s.id)})">${susIcon(s)}<span style="min-width:0"><span class="code" style="display:block">${esc(s.code)}</span>${nm(s)}</span>${todayA.has(s.id)?'<span class="done" aria-label="heute schon erfasst">✓</span>':""}${profTag(s)}</button>`).join("")||`<p class="muted">Noch niemand in dieser Gruppe.</p>`}</div>
+  <div class="padwrap">${Object.entries(ABER).map(([b,bt],i)=>`<p style="margin:${i?8:0}px 0 4px;text-align:center"><b>${bt}</b></p><div class="pad st av" role="group" aria-label="${bt}">${Object.entries(AV).map(([v,x])=>`<button data-b="${b}" data-v="${v}" onclick="addAsv('${b}','${v}')" aria-label="${bt}: ${x.l}"><b>${x.t}</b><span>${x.l}</span></button>`).join("")}</div>`).join("")}</div>
   <label for="aeT">Stichwort <span class="muted small">(freiwillig, vorher eintragen; Diktat über die Tastatur geht auch)</span></label><input id="aeT" maxlength="300" value="${esc(AE.t)}" oninput="AE.t=this.value" placeholder="z. B. hat der Nachbarin den Rechenweg erklärt">
   <div class="row"><label for="aeD" style="margin:0" class="grow">Datum</label><input id="aeD" type="date" style="width:auto" max="${today()}" value="${AE.d}" onchange="AE.d=okDate(this.value)&&this.value<=today()?this.value:today();render()"></div></div>
-  ${g.fach==="Sport"?`<p class="small muted">Fehlende Sportsachen erfasst du im Stundenstatus.</p>`:""}
   <p><button class="btn block" onclick="go({tab:view.tab,group:${ja(g.id)},asvo:${ja(g.id)}})">Übersicht Verhalten ${esc(gName(g))}</button></p>`}
 function asvSel(id){const i=AE.sel.indexOf(id);if(i>=0)AE.sel.splice(i,1);else AE.sel.push(id);render()}
-function asvSave(m,v){const g=groupById(AE.gid);if(!g||g.arch||!Object.hasOwn(AMAP,m)||!Object.hasOwn(AV,v))return;
+function addAsv(b,v){const g=groupById(AE.gid);if(!g||g.arch||!Object.hasOwn(ABER,b)||!Object.hasOwn(AV,v))return;
   if(!AE.sel.length)return toast("Tippe zuerst ein oder mehrere Kürzel an.");
   const t=AE.t.trim().slice(0,300);if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
-  const neu=AE.sel.filter(id=>g.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,m,v,d:AE.d||today(),t,...(g.demo?{demo:true}:{})}));
-  db.asv.push(...neu);if(m!=="mat"||AE.m==="mat"){g.lastM=m;AE.m=m}AE.sel=[];AE.t="";save();render();
+  const neu=AE.sel.filter(id=>g.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,m:b,v,d:AE.d||today(),t,...(g.demo?{demo:true}:{})}));
+  db.asv.push(...neu);AE.sel=[];AE.t="";save();render();
   const ids=new Set(neu.map(a=>a.id));
-  undoToast(`${neu.length} ${neu.length===1?"Eintrag":"Einträge"} gespeichert: ${AMAP[m].t} ${AV[v].t}`,()=>{db.asv=db.asv.filter(a=>!ids.has(a.id));save();render()})}
-const addAsv=v=>{const g=groupById(AE.gid);if(g)asvSave(asvM(g),v)};
-const asvMat=()=>asvSave("mat","-");
+  undoToast(`${neu.length} ${neu.length===1?"Eintrag":"Einträge"} gespeichert: ${ABER[b]} ${AV[v].t}`,()=>{db.asv=db.asv.filter(a=>!ids.has(a.id));save();render()})}
 function asvDel(id){const a=db.asv.find(x=>x.id===id);if(!a)return;db.asv=db.asv.filter(x=>x.id!==id);db.del.push(id);save();render();
   undoToast("Eintrag gelöscht",()=>{db.del=db.del.filter(x=>x!==id);db.asv.push(touch(a));save();render()})}
 function asvOvV(){const g=groupById(view.asvo);if(!g){view={tab:view.tab,group:view.asvo};return groupV()}
@@ -614,18 +621,17 @@ function asvOvV(){const g=groupById(view.asvo);if(!g){view={tab:view.tab,group:v
   <div class="between"><h1 style="margin-bottom:4px">Übersicht Verhalten</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · Arbeits- und Sozialverhalten · ${all.length} ${all.length===1?"Eintrag":"Einträge"}</p>
   <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
   ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">Arbeits&shy;verhalten</th><th class="num">Sozial&shy;verhalten</th><th>zuletzt</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
-  <p class="muted small">Zahlen: wie oft + (zeigt es), ○ (teilweise), − (noch nicht). Tendenz ab 2 Einträgen. Tippe auf ein Kürzel für die Merkmale im Einzelnen. Zählt nicht zur Note.</p>
+  <p class="muted small">Zahlen: wie oft + (gut), ○ (teils), − (schwierig). Tendenz ab 2 Einträgen. Tippe auf ein Kürzel für die einzelnen Einträge. Zählt nicht zur Note.</p>
   ${g.arch?"":`<p><button class="btn pri block" onclick="asvStart(${ja(g.id)})">Verhalten erfassen</button></p>`}`}
 // Auf der Seite einer Schülerin, eines Schülers: Tendenz je Merkmal, Positives zuerst
 function asvSusCard(s,g){const from=ovFrom(),a=asvOf(g.id,s.id,from).sort((x,y)=>y.d.localeCompare(x.d)||y.upd-x.upd),ro=!!g.arch;
-  const per=b=>ASVM.filter(x=>x.b===b).map(x=>[x,a.filter(o=>o.m===x.m)]).filter(([,l])=>l.length).sort((p,q)=>asvScore(q[1])-asvScore(p[1]));
-  const block=b=>{const l=per(b);return `<div class="sub" style="margin:10px 0 4px;font-weight:700">${ABER[b]}</div>${l.length?`<ul class="obsl">${l.map(([x,o])=>`<li><div class="grow"><b>${esc(x.t)}</b> <span class="small">${hid(asvCnt(o))}</span></div><span class="small">${hid(asvTend(o)||"–")}</span></li>`).join("")}</ul>`:`<p class="small muted" style="margin:0">Noch keine Einträge.</p>`}`};
+  const rows=Object.entries(ABER).map(([b,bt])=>{const l=a.filter(o=>AMAP[o.m].b===b);return `<li><div class="grow"><b>${bt}</b> <span class="small">${hid(asvCnt(l))}</span></div><span class="small">${hid(asvTend(l)||"–")}</span></li>`}).join("");
   return `<div class="card"><div class="between"><b>Verhalten in ${esc(gName(g))}</b>${ssBtn()}</div>
   <p class="small muted" style="margin:6px 0 0">${OVP==="hj"?"Dieses Halbjahr":OVP==="sj"?"Dieses Schuljahr":"Alle Einträge"} · ${a.length} ${a.length===1?"Eintrag":"Einträge"} · zählt nicht zur Note</p>
-  ${block("av")}${block("sv")}
+  <ul class="obsl">${rows}</ul>
   ${a.length?`<details style="margin-top:10px"><summary class="small" style="font-weight:700;cursor:pointer">Alle Einträge</summary><ul class="obsl">${a.map(o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(AMAP[o.m].t)}</span><br><b>${hid(AV[o.v].t)}</b>${o.t?` <span class="small">${esc(o.t)}</span>`:""}</div>${ro?"":`<button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="asvDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul></details>`:""}
   ${ro?"":`<p style="margin:10px 0 0"><button class="btn" onclick="asvStart(${ja(g.id)},[${ja(s.id)}])">Verhalten für ${esc(s.code)} erfassen</button></p>`}</div>`}
-function demoAsv(g){const d=[[0,"lb","+"],[0,"hilf","+"],[1,"selb","+"],[2,"mat","-"],[2,"lb","o"],[3,"zus","+"],[4,"reg","o"],[5,"sorg","+"],[6,"konf","-"],[6,"konf","o"],[7,"ausd","+"],[1,"zus","+"]];
+function demoAsv(g){const d=[[0,"av","+"],[0,"sv","+"],[1,"av","+"],[2,"av","-"],[2,"av","o"],[3,"sv","+"],[4,"sv","o"],[5,"av","+"],[6,"sv","-"],[6,"sv","o"],[7,"av","+"],[1,"sv","+"]];
   return d.map(([i,m,v],n)=>touch({id:uid(),gid:g.id,sid:g.members[i],m,v,d:daysAgo(2+n),t:n===0?"Fiktiv: hat freiwillig eine Lösung vorgestellt":"",demo:true}))}
 
 /* ===== Rücklauf-Listen (ab 0.4.1) =====
