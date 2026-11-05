@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.4.1, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.2, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -18,10 +18,11 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Sport: Noten kommen in Version 0.5.
 
 ### Zwei Wege zum Erfassen (ab 0.2.1, Runde ab 0.2.2)
-- **Ganze Klasse nacheinander:** Zuerst „Was hast du heute beobachtet?“: ein oder mehrere Kriterien antippen (die letzte Auswahl ist vorbelegt), dann „Runde starten“. Die App zeigt ein Kürzel nach dem anderen und fragt bei jedem die gewählten Kriterien nacheinander ab. Note tippen speichert und springt weiter.
-  - „überspringen“: für dieses Kriterium nichts speichern (da, aber nichts beobachtet).
-  - „nicht anwesend“: das ganze Kürzel überspringen, nichts speichern.
-  - „‹ Zurück“ geht einen Schritt zurück; eine neue Note ersetzt die aus dieser Runde. „Kriterien ändern“ führt zurück zur Auswahl.
+- **Ganze Klasse nacheinander:** Zuerst „Was hast du heute beobachtet?“: ein oder mehrere Kriterien antippen (die letzte Auswahl ist vorbelegt), dann „Runde starten“. Ab 0.4.2 zeigt die App pro Kürzel alles auf einem Bildschirm: jedes gewählte Kriterium mit seinen vier Stufen, darunter immer Arbeitsverhalten und Sozialverhalten (+ / ○ / −). Dann „Weiter ›“.
+  - Tippen speichert sofort; eine andere Stufe ersetzt sie, nochmal tippen nimmt sie zurück. Nicht Beobachtetes leer lassen.
+  - „nicht anwesend“: das ganze Kürzel überspringen, Getipptes wird entfernt.
+  - „‹ Zurück“ zeigt das vorige Kürzel mit seiner Auswahl. „Kriterien ändern“ führt zurück zur Auswahl.
+  - Stichwort: gilt für alles, was du danach bei diesem Kind tippst; bei „Weiter“ auch für vorher Getipptes ohne Stichwort.
 - **Einzeln bewerten:** Kürzel-Kacheln antippen (auch mehrere), dann Note. Wie in 0.2.0.
 
 ## Sport: Stundenstatus (ab 0.2.2)
@@ -45,15 +46,13 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Daten: `db.ka = [{id,gid,t,d,max,sk,r:{sid:{p,st,mx,na,nat}},upd}]`, geprüft mit `okKa`, in Sicherung und Import enthalten. Die Beispielklasse hat eine fiktive Arbeit.
 
 ## Arbeits- und Sozialverhalten (ab 0.4)
-- Für alle Lerngruppen (Mathe und Sport). Zählt nicht zur Note; Grundlage für Zeugnisbemerkung, Elternsprechtag, Klassenkonferenz. In Sport soll es ab 0.5 laut SILP in die Note eingehen.
-- **Erfassen** („Verhalten“ auf Heute, „Verhalten erfassen“ in der Lerngruppe): Merkmal wählen, ein oder mehrere Kürzel antippen (auch „Alle auswählen“), dann + (zeigt es), ○ (teilweise) oder − (noch nicht). Stichwort und Datum freiwillig. Die App merkt sich das letzte Merkmal pro Gruppe. Rückgängig über den Hinweis.
-  - Arbeitsverhalten: leistungsbereit, sorgfältig, ausdauernd, selbstständig, Material dabei.
-  - Sozialverhalten: arbeitet mit anderen, hält Regeln ein, löst Konflikte, hilft anderen.
-  - Schnellknopf „Material fehlt“ (speichert „Material dabei −“), nur in Mathe. In Sport steht das im Stundenstatus.
-- **Übersicht Verhalten** je Lerngruppe: Halbjahr, Schuljahr, alles. Pro Kürzel Anzahl + / ○ / − für Arbeits- und Sozialverhalten, Tendenz ab 2 Einträgen (eher + / gemischt / eher −), letzter Eintrag.
-- **Kürzel-Seite:** Tendenz je Merkmal, Positives zuerst; alle Einträge aufklappbar, löschen mit Rückgängig.
-- Sichtschutz verbirgt Zahlen und Tendenzen.
-- Daten: `db.asv = [{id,gid,sid,m,v,d,t,upd}]`, geprüft mit `okAsv`, in Sicherung und Import enthalten.
+- Für alle Lerngruppen (Mathe und Sport). Ab 0.4.2 nur zwei Bereiche: Arbeitsverhalten und Sozialverhalten, je + (gut), ○ (teils), − (schwierig). Zählt nicht zur Note; Grundlage für Zeugnisbemerkung, Elternsprechtag, Klassenkonferenz. In Sport soll es ab 0.5 laut SILP in die Note eingehen.
+- **In der Runde:** Mathe „Ganze Klasse nacheinander“ und Sport „Stundenstatus“ zeigen beide Bereiche bei jedem Kind mit (Sport: Verhalten zuerst, der Status springt weiter).
+- **Einzeln** („Verhalten“ auf Heute, „Verhalten erfassen“ in der Lerngruppe): Kürzel antippen (auch „Alle auswählen“), dann + / ○ / − beim Bereich. Stichwort und Datum freiwillig. Rückgängig über den Hinweis.
+- **Übersicht Verhalten** je Lerngruppe (Halbjahr, Schuljahr, alles): pro Kürzel Anzahl + / ○ / − je Bereich, Tendenz ab 2 Einträgen (eher + / gemischt / eher −), letzter Eintrag.
+- **Kürzel-Seite:** Tendenz je Bereich; alle Einträge aufklappbar, löschen mit Rückgängig. Sichtschutz verbirgt Zahlen und Tendenzen.
+- Einträge aus Beta 0.4.0 mit Einzelmerkmalen (leistungsbereit usw.) bleiben lesbar und zählen zu ihrem Bereich.
+- Daten: `db.asv = [{id,gid,sid,m,v,d,t,upd}]`, m = `av` oder `sv` (alt: Merkmal), geprüft mit `okAsv`, in Sicherung und Import enthalten.
 
 ## Rücklauf-Listen (ab 0.4.1)
 - In der Lerngruppe „Rückläufe“: Liste anlegen mit Titel, Art (Unterschrift, Geld, Formular), Betrag pro Kind (nur Geld), ausgegeben am, fällig bis (freiwillig).
