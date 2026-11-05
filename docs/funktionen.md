@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.3.0, Stand 04.11.2026)
+# SoMi – Funktionen (Version 0.3.3, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -40,7 +40,8 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Notenschlüssel nach SILP Mathe 4.3 (Mindestprozent für 1 bis 5): ohne Kurs 85/70/55/40/20, E- und G-Kurs 87/73/59/45/18. Mindestpunkte auf halbe Punkte gerundet. Tendenz + und −: jede Note in drei gleich große Punktbereiche geteilt (nicht im SILP; abschaltbar unter Einstellungen → Klassenarbeiten, `db.kaTend`).
 - Profil Nachteilsausgleich: Schalter „gewährt“ plus kurzer Vermerk je Arbeit. Profil zieldifferent: eigene Höchstpunktzahl je Kürzel (angepasste Arbeit), gleicher Prozentschlüssel.
 - Notenspiegel (ganze Noten) und Schnitt, verborgen durch den Sichtschutz, ebenso Punkte und Noten in der Tabelle.
-- Gesamtvorschlag: Sonstige Mitarbeit 40 %, Klassenarbeiten 60 % (Schnitt der KA-Noten). Erscheint in der Übersicht (Spalten SoMi, KA, Gesamt, sobald es im Zeitraum eine Arbeit gibt) und auf der Kürzel-Seite. Nur wenn beides vorliegt.
+- Ab 0.3.3 auch in Sport als „Schriftliche Überprüfungen“ (ohne Gesamtvorschlag bis Version 0.5).
+- Gesamtvorschlag: Anteil schriftlich je Fach einstellbar (`db.kaw`, 20 bis 70 %, Standard Mathe 60 % nach SILP, Sport 20 %), Rest Sonstige Mitarbeit. Mit + und −, ins Zeugnis kommt eine ganze Note. Erscheint in der Übersicht (Spalten SoMi, KA, Gesamt, sobald es im Zeitraum eine Arbeit gibt) und auf der Kürzel-Seite. Nur wenn beides vorliegt.
 - Daten: `db.ka = [{id,gid,t,d,max,sk,r:{sid:{p,st,mx,na,nat}},upd}]`, geprüft mit `okKa`, in Sicherung und Import enthalten. Die Beispielklasse hat eine fiktive Arbeit.
 
 ## Namensliste (ab 0.2.3)
