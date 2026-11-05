@@ -25,7 +25,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.45 ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
-main{padding-top:max(16px,calc(env(safe-area-inset-top) + 12px))} /* iPhone: Inhalt unter Uhrzeit/Akku-Leiste beginnen */
+main{padding-top:max(16px,calc(env(safe-area-inset-top) + 40px))} /* iPhone: Inhalt unter Uhrzeit/Akku-Leiste und dem Unschärfe-Streifen von iOS beginnen */
 body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top);background:var(--bg);z-index:6;pointer-events:none} /* Leiste oben deckt beim Scrollen ab */
 @media (min-width:900px) and (orientation:landscape){main{max-width:860px;padding-left:24px;padding-right:24px}}
 h1{font-size:1.9rem;font-weight:800;margin:6px 0 12px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
@@ -109,7 +109,7 @@ body:has(.padwrap) .toast{bottom:auto;top:max(12px,env(safe-area-inset-top))} /*
 .head{display:flex;align-items:center;gap:10px;margin:2px 0 4px}.head .kl{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 /* App-Sperre */
 #lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;padding:24px;overflow:auto}
-#lock{padding-top:max(24px,calc(env(safe-area-inset-top) + 12px))}
+#lock{padding-top:max(24px,calc(env(safe-area-inset-top) + 40px))}
 #lock .box{max-width:340px;width:100%;text-align:center}
 #lock h1{justify-content:center}#lock h1::before{display:none}
 #lock .pins{display:flex;justify-content:center;gap:14px;margin:18px 0 8px}
@@ -130,7 +130,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.3.1",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.3.2",SOMI_STAND="05.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
