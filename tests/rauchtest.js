@@ -191,9 +191,24 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.locator(".tbl tbody tr",{hasText:"DEMO-01"}).click();ok(await p.locator(".card b",{hasText:"Verhalten in DEMO Mathe"}).count()===1&&await p.locator(".obsl li",{hasText:"hilft anderen"}).filter({hasText:"+2 · ○0 · −0"}).count()===1&&await p.locator(".obsl li",{hasText:"eher +"}).count()>0,"Kürzel-Seite zeigt Verhalten je Merkmal");
   await p.click("button:has-text('Noten verbergen')");
   ok(await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe"),x={id:"zzasv1",gid:g.id,sid:g.members[0],m:"reg",v:"+",d:today(),t:"",upd:Date.now()};
-    IMP={d:{groups:[],sus:[],obs:[],att:[],ka:[],asv:[x,{...x,id:"zzasv2",m:"böse"}].filter(okAsv),del:[]},settings:false};applyImport();return db.asv.some(a=>a.id==="zzasv1")&&!db.asv.some(a=>a.id==="zzasv2")}),"Sicherung laden übernimmt Verhalten, prüft es vorher");
+    IMP={d:{groups:[],sus:[],obs:[],att:[],ka:[],asv:[x,{...x,id:"zzasv2",m:"böse"}].filter(okAsv),rl:[],del:[]},settings:false};applyImport();return db.asv.some(a=>a.id==="zzasv1")&&!db.asv.some(a=>a.id==="zzasv2")}),"Sicherung laden übernimmt Verhalten, prüft es vorher");
   await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Sport"}).click();await p.click("button:has-text('Verhalten erfassen')");
   ok(await p.locator("button:has-text('Material fehlt')").count()===0,"Sport: kein Knopf „Material fehlt“ (steht im Stundenstatus)");
+  // 0.4.1 Rücklauf-Listen: anlegen, abhaken, Teilbetrag, Summe, Heute-Hinweis, abschließen
+  await p.click("nav >> text=Heute");ok(await p.locator(".card b",{hasText:"Offene Rückläufe"}).count()===1&&await p.locator(".card.tap",{hasText:"Wandertag (fiktiv)"}).count()===1,"Heute zeigt offene Rückläufe");
+  await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();await p.click("button:has-text('Rückläufe')");
+  await p.click("button:has-text('+ Rücklauf-Liste')");await p.fill("#rdt","Elternbrief Ausflug");await p.click(".pick button:text-is('Geld')");await p.click("button:has-text('Anlegen')");
+  ok(await p.locator(".toast",{hasText:"Betrag"}).count()===1,"Geld ohne Betrag wird abgelehnt");
+  await p.fill("#rdb","12,50");await p.click("button:has-text('Anlegen')");
+  ok(await p.locator("h1",{hasText:"Elternbrief Ausflug"}).count()===1&&await p.evaluate(()=>db.rl.some(a=>a.t==="Elternbrief Ausflug"&&a.ct===1250&&a.art==="g")),"Geld-Liste mit 12,50 € angelegt");
+  ok(await p.locator("text=Fehlt noch: 8 von 8").count()===1&&await p.locator("text=0,00 €").count()>0,"anfangs fehlen alle");
+  await p.locator(".obsl li",{hasText:"DEMO-01"}).locator("button",{hasText:"erledigt"}).click();
+  await p.locator(".obsl li",{hasText:"DEMO-02"}).locator("button",{hasText:"Teilbetrag"}).click();await dlgIn("5");
+  ok(await p.locator("text=Fehlt noch: 7 von 8").count()===1&&await p.locator("text=Eingesammelt: 17,50 €").count()===1,"abhaken und Teilbetrag, Summe stimmt");
+  await p.locator(".obsl li",{hasText:"DEMO-01"}).locator("button",{hasText:"erledigt"}).click();ok(await p.locator("text=Fehlt noch: 8 von 8").count()===1,"nochmal tippen macht es wieder offen");
+  ok(await p.evaluate(()=>!okRl({id:"r1",gid:"g1",t:"x",art:"u",aus:"2026-11-05",ct:100,r:{},upd:1})&&!okRl({id:"r1",gid:"g1",t:"x",art:"g",aus:"2026-11-05",ct:100,r:{s1:{st:"teil",pc:100}},upd:1})&&okRl({id:"r1",gid:"g1",t:"x",art:"g",aus:"2026-11-05",ct:100,r:{s1:{st:"teil",pc:50}},upd:1})&&parseEur("12,5")===1250&&isNaN(parseEur("abc"))),"okRl und parseEur prüfen Fremddaten");
+  await p.click("button:has-text('Liste abschließen')");await dlgBtn("Abschließen");
+  ok(await p.evaluate(()=>!!db.rl.find(a=>a.t==="Elternbrief Ausflug").arch)&&await p.locator("button",{hasText:"Teilbetrag"}).count()===0,"Liste abgeschlossen und nur lesbar");
   // Namen: getrennt, verschlüsselt, nicht in der Sicherung
   await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("button:has-text('Namen eintragen')");await p.locator("input[aria-label='Name zu DEMO-01']").fill("Fiktiv Testname");
