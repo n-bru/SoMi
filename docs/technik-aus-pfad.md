@@ -2,7 +2,7 @@
 
 SoMi teilt sich die Technik mit Pfad (hbg-pfad/pfad). Es gibt keine gemeinsame Bibliothek: Die Bausteine sind aus `quelle/pfad.html` kopiert und angepasst. Wird ein Baustein in Pfad korrigiert, hier prüfen und nachziehen.
 
-Stand der Kopie: Pfad 1.1.3 (26.10.2026).
+Stand der Kopie: Pfad 1.1.3 (26.10.2026), Technik-Korrekturen nachgezogen bis Pfad 1.2.6 (05.11.2026): Offline zuerst mit Knopf „Aktualisieren“ (1.2.0/1.2.1), Abstand oben in der Home-Bildschirm-App ohne festen Streifen (1.1.8/1.2.6), kein Nachfedern (1.2.5). Nicht übernommen: Team-Passwort (1.1.5), Sicherungs-Zeile auf „Heute“ (1.1.6), Upload-Paket (1.2.0).
 
 | Baustein in Pfad | In SoMi | Anpassung |
 |---|---|---|
@@ -13,7 +13,7 @@ Stand der Kopie: Pfad 1.1.3 (26.10.2026).
 | `go`, `back`, `navTo`, `renderNav` | gleich | eigene Bereiche |
 | `applyTheme`, Hell/Dunkel, Schriftgröße | gleich | – |
 | Design B (Formen, Abstände, Bausteine) | angepasst | eigene Farben „Tafelgrün“ und eigenes Logo, nicht Sopäd-Team-Design |
-| `envHint`, Service Worker, `navigator.storage.persist` | vereinfacht | Einrichtungsseite mit Bildern noch nicht übernommen |
+| `envHint`, Service Worker (offline zuerst, `quelle/sw.js`, Knopf „Aktualisieren“), `navigator.storage.persist` | vereinfacht | Einrichtungsseite mit Bildern noch nicht übernommen |
 | Einrichtungsschritte (`SETUP`, `markFor`, `mk`, `mtip`) | angepasst | Schritte: App-Sperre, Beispielklasse, Sicherung |
 | `pwKey`, `gcm`, `ungcm`, `idb*`, `askNewPw`, `backupKey`, `forgetBackupPw` | gleich | IndexedDB `somi` |
 | `sealFile`, `openFile`, `exportJSON`, `backupTip`, `giveFile`, `download` | angepasst | Format `{somi:1}`, keine alten unverschlüsselten Formate |

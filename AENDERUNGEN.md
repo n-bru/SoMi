@@ -4,6 +4,7 @@ Neueste oben.
 
 | Datum | Version | Was | Beta/Haupt |
 |---|---|---|---|
+| 05.11.2026 | 0.3.4 | Technik aus Pfad 1.2.6 nachgezogen: startet immer aus dem Gerät (auch ohne WLAN sofort), neue Version zeigt Knopf „Tippe hier zum Aktualisieren“, kein Nachfedern am Seitenende, kein fester Streifen oben (Inhalt verschwand dahinter), großer Abstand oben nur in der Home-Bildschirm-App. Offline-Datei kommt jetzt aus `quelle/sw.js` | Beta |
 | 05.11.2026 | 0.3.3 | Schriftliche Überprüfungen auch in Sport (gleiche Eingabe wie Klassenarbeiten, Schlüssel ohne Kurs vorbelegt). Anteil schriftlich am Gesamtvorschlag je Fach einstellbar (Mathe 60 %, Sport 20 %; Einstellungen → Schriftliche Leistungen). Hinweis: Ins Zeugnis kommt eine ganze Note | Beta |
 | 05.11.2026 | 0.3.2 | iPhone: Inhalt und BETA-Schild noch tiefer, damit nichts im Unschärfe-Streifen von iOS oben liegt. Freigabe als Hauptversion (Nicks Kommando 05.11.) | Beta + Haupt |
 | 05.11.2026 | 0.3.1 | Stufenknopf „teilweise erfüllt“ heißt jetzt kurz „teilweise“, Stufenknöpfe dadurch niedriger. Freigabe als Hauptversion (Nicks Kommando 05.11.) | Beta + Haupt |
