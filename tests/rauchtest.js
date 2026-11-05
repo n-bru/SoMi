@@ -168,6 +168,12 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.locator(".tbl thead th",{hasText:"Gesamt"}).count()===1&&await p.locator(".tbl thead th",{hasText:"KA"}).count()===1,"Übersicht mit Klassenarbeiten und Gesamt");
   await p.click("nav >> text=Einstellungen");await p.locator("label.swr:has-text('Noten mit + und −') input").uncheck();
   ok(await p.evaluate(()=>kaNoteP("-",40,40)==="1"&&kaNoteP("-",40,26)==="3"),"Tendenz abschaltbar");await p.locator("label.swr:has-text('Noten mit + und −') input").check();
+  await p.locator('[aria-label="Anteil schriftlich Mathe"] button',{hasText:"50 %"}).click();
+  ok(await p.evaluate(()=>db.kaw.Mathe===50&&Math.abs(gesamt(2,3,"Mathe")-2.5)<1e-9&&!okKaw({Mathe:55})&&!okKaw({Kunst:50})),"Anteil schriftlich je Fach einstellbar");
+  await p.locator('[aria-label="Anteil schriftlich Mathe"] button',{hasText:"60 %"}).click();ok(await p.evaluate(()=>!db.kaw),"Mathe zurück auf 60 %");
+  await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Sport"}).click();await p.click("button:has-text('Schriftliche Überprüfungen')");
+  await p.click("button:has-text('+ Schriftliche Überprüfung')");await p.fill("#kdt","Test Regeln");await p.fill("#kdm","20");await p.click("button:has-text('Anlegen')");
+  await p.fill("#kp","18");await p.press("#kp","Enter");ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Test Regeln");return a&&groupById(a.gid).fach==="Sport"&&Object.keys(a.r).length===1}),"Schriftliche Überprüfung in Sport");
   // Namen: getrennt, verschlüsselt, nicht in der Sicherung
   await p.click("nav >> text=Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("button:has-text('Namen eintragen')");await p.locator("input[aria-label='Name zu DEMO-01']").fill("Fiktiv Testname");

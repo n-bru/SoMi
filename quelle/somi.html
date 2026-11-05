@@ -130,7 +130,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.3.2",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.3.3",SOMI_STAND="05.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -171,7 +171,7 @@ const okStr=(s,n=4000)=>s==null||typeof s==="string"&&s.length<=n,okNum=v=>v==nu
 const okSY=s=>typeof s==="string"&&/^\d{4}\/\d{2}$/.test(s);
 function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&okNum(s.upd)}catch(e){return false}}
 function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&(g.lastK==null||Object.hasOwn(KMAP,g.lastK))&&(g.lastKs==null||Array.isArray(g.lastKs)&&g.lastKs.length<=12&&g.lastKs.every(k=>Object.hasOwn(KMAP,k)))&&okNum(g.upd)}catch(e){return false}}
-const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f),hausa:v=>typeof v==="boolean",stw:v=>okStw(v),kgw:v=>okKgw(v),kaTend:v=>typeof v==="boolean"};
+const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f),hausa:v=>typeof v==="boolean",stw:v=>okStw(v),kgw:v=>okKgw(v),kaTend:v=>typeof v==="boolean",kaw:v=>okKaw(v)};
 const susById=id=>db.sus.find(s=>s.id===id);
 const groupById=id=>db.groups.find(g=>g.id===id);
 const gName=g=>`${g.cls} ${g.fach}${g.kurs&&g.kurs!=="-"?" "+g.kurs:""}`;
@@ -397,26 +397,28 @@ function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.o
   const rows=ms.map(s=>{const os=all.filter(o=>o.sid===s.id).sort((a,b)=>a.d.localeCompare(b.d)||a.upd-b.upd),z=os.filter(o=>!o.fb);
     const last=os.length?os[os.length-1].d:null,old=!os.some(o=>o.d>=lim);
     return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span>${(s.profil||"r")!=="r"?` <span class="tag ${s.profil}">${s.profil==="zd"?"LE":"NA"}</span>`:""}${nm(s)}</th>
-    <td class="num">${z.length}${os.length>z.length?`<span class="muted small"> +${os.length-z.length}</span>`:""}</td><td class="num">${genug(z)?hid(vorschlag(z)):"–"}</td>${hasKa?(()=>{const k=kaMean(g.id,s.id,from),t=gesamt(genug(z)?noteMean(z):null,k);return `<td class="num">${k==null?"–":hid(noteTxt(k))}</td><td class="num"><b>${t==null?"–":hid(noteTxt(t))}</b></td>`})():""}
+    <td class="num">${z.length}${os.length>z.length?`<span class="muted small"> +${os.length-z.length}</span>`:""}</td><td class="num">${genug(z)?hid(vorschlag(z)):"–"}</td>${hasKa?(()=>{const k=kaMean(g.id,s.id,from),t=gesamt(genug(z)?noteMean(z):null,k,g.fach);return `<td class="num">${k==null?"–":hid(noteTxt(k))}</td><td class="num"><b>${t==null?"–":hid(noteTxt(t))}</b></td>`})():""}
     <td class="verl">${z.slice(-6).map(o=>hid(oTxt(o))).join(" ")||"–"}</td><td class="small${old?" old":""}">${last?dDEy(last).slice(0,6):"–"}</td></tr>`}).join("");
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
   <div class="between"><h1 style="margin-bottom:4px">Übersicht</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · ${hasKa?"Sonstige Mitarbeit und Klassenarbeiten":"Sonstige Mitarbeit"}</p>
   <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
   ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">Einträge</th><th class="num">${hasKa?"SoMi":"Note"}</th>${hasKa?`<th class="num">KA</th><th class="num">Gesamt</th>`:""}<th>Verlauf</th><th>zuletzt</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
-  <p class="muted small">Verlauf: neueste Stufe rechts (++ + o −). „+2“ heißt: 2 weitere Einträge als „nur Rückmeldung“, die nicht zählen. Rot: seit 2 Wochen kein Eintrag. „Note“ ist ein rechnerischer Vorschlag aus den Stufen (Umrechnung unter Einstellungen). ${hasKa?" „KA“: Schnitt der Klassenarbeitsnoten. „Gesamt“: Sonstige Mitarbeit 40 %, Klassenarbeiten 60 % (SILP), nur wenn beides da ist.":""} Laut SILP zählt die Gesamtentwicklung: Du entscheidest die Note.</p>
+  <p class="muted small">Verlauf: neueste Stufe rechts (++ + o −). „+2“ heißt: 2 weitere Einträge als „nur Rückmeldung“, die nicht zählen. Rot: seit 2 Wochen kein Eintrag. „Note“ ist ein rechnerischer Vorschlag aus den Stufen (Umrechnung unter Einstellungen). ${hasKa?" „KA“: Schnitt der Klassenarbeitsnoten. „Gesamt“: ${wTxt(g)}, nur wenn beides da ist. Ins Zeugnis kommt eine ganze Note.":""} Laut SILP zählt die Gesamtentwicklung: Du entscheidest die Note.</p>
   ${g.arch?"":`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="erStart(${ja(g.id)})">Erfassen</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Klassenarbeiten</button></p>`}`}
 
 // Auf der Seite einer Schülerin, eines Schülers: Einträge dieser Lerngruppe
-function susObsV(s,g){if(g.fach!=="Mathe")return "";const os=obsOf(g.id,s.id).sort((a,b)=>b.d.localeCompare(a.d)||b.upd-a.upd),z=os.filter(o=>!o.fb),ro=!!g.arch;
+function susObsV(s,g){if(g.fach!=="Mathe")return kaSusCard(s,g,null);const os=obsOf(g.id,s.id).sort((a,b)=>b.d.localeCompare(a.d)||b.upd-a.upd),z=os.filter(o=>!o.fb),ro=!!g.arch;
   const per=kritList().map(K=>{const a=z.filter(o=>o.k===K.k);return a.length?`<span class="tag">${esc(K.t)}: ${hid(noteTxt(mean(a)))} (${a.length})</span>`:""}).join(" ");
   return `<div class="card"><div class="between"><b>Sonstige Mitarbeit in ${esc(gName(g))}</b>${ssBtn()}</div>
   <p class="small muted" style="margin:6px 0">${z.length} zählende ${z.length===1?"Beobachtung":"Beobachtungen"}${os.length>z.length?`, ${os.length-z.length} nur Rückmeldung`:""} · ${genug(z)?`Notenvorschlag ${hid(vorschlag(z))}`:"Notenvorschlag ab 3 Beobachtungen in 2 Kriterien"}</p>${per?`<p style="display:flex;flex-wrap:wrap;gap:6px">${per}</p>`:""}
   ${os.length?`<ul class="obsl">${os.map(o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(KMAP[o.k].t)}</span><br><b>${o.fb?`<span class="muted">Rückmeldung</span> ${hid(oTxt(o))}`:hid(oTxt(o))}</b>${o.t?` <span class="small">${esc(o.t)}</span>`:""}</div>
   ${ro?"":`<button class="btn ghost small" aria-label="${o.fb?"Zählt nicht. Tippen: zählt":"Zählt. Tippen: nur Rückmeldung"}" onclick="obsFb(${ja(o.id)})">${o.fb?"zählt nicht":"zählt ✓"}</button><button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="obsDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul>`:`<p class="muted small">Noch keine Einträge.</p>`}
   ${ro?"":`<p style="margin-bottom:0"><button class="btn" onclick="ER={...erNeu(${ja(g.id)},'e'),sel:[${ja(s.id)}]};go({tab:view.tab,group:${ja(g.id)},erf:${ja(g.id)}})">Für ${esc(s.code)} erfassen</button></p>`}</div>
-  ${kaOf(g.id).length?(()=>{const k=kaMean(g.id,s.id),t=gesamt(genug(z)?noteMean(z):null,k);return `<div class="card"><b>Klassenarbeiten in ${esc(gName(g))}</b>${kaSusV(s,g)}
-  <p class="small" style="margin:8px 0 0">Schnitt Klassenarbeiten: ${k==null?"–":hid(noteTxt(k))} · <b>Gesamtvorschlag: ${t==null?"–":hid(noteTxt(t))}</b></p>
-  <p class="small muted" style="margin:4px 0 0">Gesamt: Sonstige Mitarbeit 40 %, Klassenarbeiten 60 % (SILP). Laut SILP zählt die Gesamtentwicklung, nicht nur der Mittelwert.</p></div>`})():""}`}
+  ${kaSusCard(s,g,genug(z)?noteMean(z):null)}`}
+function kaSusCard(s,g,somi){if(!kaOf(g.id).length)return "";const k=kaMean(g.id,s.id),t=g.fach==="Mathe"?gesamt(somi,k,g.fach):null;
+  return `<div class="card"><div class="between"><b>${kaL(g)[1]} in ${esc(gName(g))}</b>${g.fach==="Mathe"?"":ssBtn()}</div>${kaSusV(s,g)}
+  <p class="small" style="margin:8px 0 0">Schnitt: ${k==null?"–":hid(noteTxt(k))}${g.fach==="Mathe"?` · <b>Gesamtvorschlag: ${t==null?"–":hid(noteTxt(t))}</b>`:""}</p>
+  <p class="small muted" style="margin:4px 0 0">${g.fach==="Mathe"?`Gesamt: ${wTxt(g)}. Ins Zeugnis kommt eine ganze Note. Laut SILP zählt die Gesamtentwicklung, nicht nur der Mittelwert.`:"Den Gesamtvorschlag für Sport gibt es mit den Sport-Noten (Version 0.5)."}</p></div>`}
 function setKgw(k,n){if(!Object.hasOwn(KMAP,k)||![1,2,3].includes(n))return;const o={...(db.kgw||{})};if(n===1)delete o[k];else o[k]=n;if(Object.keys(o).length)db.kgw=o;else delete db.kgw;save();render()}
 function setStw(v,t){const x=parseFloat(String(t).replace(",","."));if(!(x>=1&&x<=6))return render(),toast("Bitte einen Wert von 1 bis 6.");db.stw={...(db.stw||{}),[v]:Math.round(x*10)/10};save();render();toast("Umrechnung gespeichert")}
 function obsFb(id){const o=db.obs.find(x=>x.id===id);if(!o)return;o.fb=!o.fb;touch(o);save();render();toast(o.fb?"Zählt jetzt nicht für die Note":"Zählt jetzt für die Note")}
@@ -451,27 +453,33 @@ function kaNoteP(sk,max,p){if(p==null)return null;const gr=kaGr(sk,max);let n=6;
   const lo=gr[n-1],hi=n===1?max:gr[n-2],t=hi>lo?(p-lo)/(hi-lo):.5;return t>=2/3?n+"+":t<1/3?n+"-":String(n)}
 const kaNote=(a,sid)=>{const x=a.r[sid];return !x||x.st||x.p==null?null:kaNoteP(a.sk,x.mx||a.max,x.p)};
 function kaMean(gid,sid,from){const n=kaOf(gid,from).map(a=>kaNote(a,sid)).filter(Boolean);return n.length?n.reduce((s,x)=>s+nWert(x),0)/n.length:null}
-// Gesamtvorschlag Mathe nach SILP: Sonstige Mitarbeit 40 %, Klassenarbeiten 60 %
-const gesamt=(somi,ka)=>somi==null||ka==null?null:.4*somi+.6*ka;
+// Gesamtvorschlag: Anteil der schriftlichen Leistungen je Fach einstellbar (db.kaw), Mathe nach SILP 60 %
+const KAW0={Mathe:60,Sport:20};
+const kaw=fach=>(db.kaw&&db.kaw[fach]!=null?db.kaw[fach]:KAW0[fach]??50);
+const okKaw=v=>!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).every(k=>FAECHER.includes(k)&&Number.isInteger(v[k])&&v[k]>=10&&v[k]<=90&&v[k]%10===0);
+const gesamt=(somi,ka,fach="Mathe")=>somi==null||ka==null?null:(1-kaw(fach)/100)*somi+kaw(fach)/100*ka;
+const kaL=g=>g.fach==="Mathe"?["Klassenarbeit","Klassenarbeiten"]:["Schriftliche Überprüfung","Schriftliche Überprüfungen"];
+const wTxt=g=>`${kaL(g)[1]} ${kaw(g.fach)} %, Sonstige Mitarbeit ${100-kaw(g.fach)} %`;
+function setKaw(fach,n){if(!FAECHER.includes(fach)||!okKaw({[fach]:n}))return;const o={...(db.kaw||{}),[fach]:n};if(n===KAW0[fach])delete o[fach];if(Object.keys(o).length)db.kaw=o;else delete db.kaw;save();render()}
 const kaSt=a=>{const v=Object.values(a.r);return {p:v.filter(x=>x.p!=null&&!x.st).length,fehlt:v.filter(x=>x.st==="fehlt").length,nach:v.filter(x=>x.st==="nach").length}};
 
 let KD=null,KE={kid:null,i:0};
 function kaListV(){const g=groupById(view.ka);if(!g){view={tab:view.tab,group:view.ka};return groupV()}
   const ro=!!g.arch,list=kaOf(g.id).reverse(),n=g.members.length;
   return `<button class="btn ghost" onclick="KD=null;back()">‹ Zurück</button>
-  <div class="between"><h1 style="margin-bottom:4px">Klassenarbeiten</h1>${ssBtn()}</div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>
-  ${ro?"":KD?`<div class="card"><b>Neue Klassenarbeit</b>
-    <label for="kdt">Titel</label><input id="kdt" maxlength="80" value="${esc(KD.t)}" oninput="KD.t=this.value" placeholder="z. B. KA 2 Brüche">
+  <div class="between"><h1 style="margin-bottom:4px">${kaL(g)[1]}</h1>${ssBtn()}</div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>
+  ${ro?"":KD?`<div class="card"><b>Neue ${kaL(g)[0]}</b>
+    <label for="kdt">Titel</label><input id="kdt" maxlength="80" value="${esc(KD.t)}" oninput="KD.t=this.value" placeholder="${g.fach==="Mathe"?"z. B. KA 2 Brüche":"z. B. Test Regelkunde Basketball"}">
     <div class="two"><div><label for="kdd">Datum</label><input id="kdd" type="date" value="${esc(KD.d)}" onchange="KD.d=this.value"></div>
     <div><label for="kdm">Höchstpunktzahl</label><input id="kdm" inputmode="decimal" value="${esc(KD.max)}" oninput="KD.max=this.value" placeholder="z. B. 40"></div></div>
     <label>Notenschlüssel (SILP 4.3)</label><div class="pick">${[["-","ohne Kurs"],["E","E-Kurs"],["G","G-Kurs"]].map(([k,t])=>`<button class="${KD.sk===k?"on":""}" aria-pressed="${KD.sk===k}" onclick="KD.sk='${k}';render()">${t}</button>`).join("")}</div>
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="KD=null;render()">Abbrechen</button><button class="btn pri" onclick="addKa(${ja(g.id)})">Anlegen</button></div></div>`
-  :`<p><button class="btn pri" onclick="KD={t:'',d:today(),max:'',sk:${ja(g.kurs||"-")}};render();$('#kdt')?.focus()">+ Klassenarbeit</button></p>`}
+  :`<p><button class="btn pri" onclick="KD={t:'',d:today(),max:'',sk:${ja(g.kurs||"-")}};render();$('#kdt')?.focus()">+ ${kaL(g)[0]}</button></p>`}
   ${list.length?list.map(a=>{const c=kaSt(a),z=Object.keys(a.r).filter(id=>kaNote(a,id)),m=z.length?z.reduce((s,id)=>s+Math.round(nWert(kaNote(a,id))),0)/z.length:null;
     return `<button class="card tap row" onclick="KE={kid:${ja(a.id)},i:0};go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)},kad:${ja(a.id)}})"><div class="grow"><div class="code">${esc(a.t)}${a.demo?' <span class="tag">Beispiel</span>':""}</div>
     <div class="muted small">${dDEy(a.d)} · ${fmtP(a.max)} Punkte · ${c.p} von ${n} eingetragen${c.nach?` · ${c.nach} ${c.nach===1?"schreibt":"schreiben"} nach`:""}${m!=null?` · Schnitt ${hid(fmt1(m))}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`}).join("")
-  :`<p class="muted">Noch keine Klassenarbeit.</p>`}
-  <p class="muted small">Du trägst Punkte ein, SoMi rechnet die Note nach dem Schlüssel aus SILP Mathe 4.3. Im Notenvorschlag zählen die Klassenarbeiten 60 %, die Sonstige Mitarbeit 40 %.</p>`}
+  :`<p class="muted">Noch keine ${kaL(g)[0]}.</p>`}
+  <p class="muted small">Du trägst Punkte ein, SoMi rechnet die Note nach dem Prozentschlüssel aus SILP Mathe 4.3${g.fach==="Mathe"?"":" (Sport hat keinen eigenen Schlüssel)"}. Im Gesamtvorschlag: ${wTxt(g)} (Einstellungen).</p>`}
 function addKa(gid){const g=groupById(gid);if(!g||g.arch)return;const t=KD.t.trim(),max=parseP(KD.max);
   if(!t)return toast("Bitte einen Titel eintragen.");if(looksLikeName(t))toast("Bitte keine Namen in den Titel schreiben.");
   if(!(max>0&&max<=1000))return toast("Bitte die Höchstpunktzahl eintragen, z. B. 40.");if(!okDate(KD.d))return toast("Bitte ein Datum wählen.");
@@ -495,12 +503,12 @@ function kaV(){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g){view={t
   ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">Punkte</th><th class="num">Note</th><th>Vermerk</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   <div class="card"><b>Notenschlüssel</b><p class="small muted" style="margin:4px 0 8px">SILP Mathe 4.3, ${KASN[a.sk]}. Mindestpunkte auf halbe Punkte gerundet.${kaTend()?" Tendenz: Jede Note ist in drei gleich große Bereiche geteilt (oberes Drittel +, unteres Drittel −).":""}</p>
   <table class="tbl" style="cursor:default"><thead><tr><th>Note</th><th class="num">ab Punkte</th><th class="num">ab %</th></tr></thead><tbody>${gr.map((p,i)=>`<tr style="cursor:default"><td>${i+1}</td><td class="num">${fmtP(p)}</td><td class="num">${KASCHL[a.sk][i]} %</td></tr>`).join("")}<tr style="cursor:default"><td>6</td><td class="num">darunter</td><td class="num"></td></tr></tbody></table></div>
-  ${ro?"":`<details class="card"><summary style="font-weight:800">Klassenarbeit bearbeiten</summary>
+  ${ro?"":`<details class="card"><summary style="font-weight:800">${kaL(g)[0]} bearbeiten</summary>
     <label for="ket">Titel</label><input id="ket" maxlength="80" value="${esc(a.t)}" onchange="kaEdit('t',this.value)">
     <div class="two"><div><label for="ked">Datum</label><input id="ked" type="date" value="${esc(a.d)}" onchange="kaEdit('d',this.value)"></div>
     <div><label for="kem">Höchstpunktzahl</label><input id="kem" inputmode="decimal" value="${fmtP(a.max)}" onchange="kaEdit('max',this.value)"></div></div>
     <label>Notenschlüssel</label><div class="pick">${[["-","ohne Kurs"],["E","E-Kurs"],["G","G-Kurs"]].map(([k,t])=>`<button class="${a.sk===k?"on":""}" aria-pressed="${a.sk===k}" onclick="kaEdit('sk','${k}')">${t}</button>`).join("")}</div>
-    <p style="margin:14px 0 0"><button class="btn ghost danger" onclick="kaDel(${ja(a.id)})">Klassenarbeit löschen</button></p></details>`}`}
+    <p style="margin:14px 0 0"><button class="btn ghost danger" onclick="kaDel(${ja(a.id)})">${kaL(g)[0]} löschen</button></p></details>`}`}
 
 function kaCard(a,ms){if(KE.i>=ms.length)return `<div class="card seqdone"><b style="font-size:1.2rem">Alle durch</b><p>${kaSt(a).p} von ${ms.length} mit Punkten.</p>
   <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="KE.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="KE.i=0;render()">Von vorn</button></p></div>`;
@@ -540,12 +548,12 @@ function kaEdit(f,v){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g||g
   else if(f==="sk"&&Object.hasOwn(KASCHL,v))a.sk=v;else return;
   touch(a);save();render();toast("Gespeichert")}
 async function kaDel(id){const a=kaById(id);if(!a)return;
-  if(!await ask(`„${a.t}“ löschen?`,{ok:"Löschen",danger:true,sub:"Alle Punkte dieser Klassenarbeit gehen verloren."}))return;
+  if(!await ask(`„${a.t}“ löschen?`,{ok:"Löschen",danger:true,sub:"Alle Punkte gehen verloren."}))return;
   db.ka=db.ka.filter(x=>x.id!==id);db.del.push(id);save();back();
-  undoToast("Klassenarbeit gelöscht",()=>{db.del=db.del.filter(x=>x!==id);db.ka.push(touch(a));save();render()})}
+  undoToast("Gelöscht",()=>{db.del=db.del.filter(x=>x!==id);db.ka.push(touch(a));save();render()})}
 function kaSusV(s,g){const list=kaOf(g.id);if(!list.length)return "";
   return `<ul class="obsl">${list.map(a=>{const x=a.r[s.id]||{},n=kaNote(a,s.id);
-    return `<li><div class="grow"><span class="small muted">${dDEy(a.d)} · Klassenarbeit</span><br><b>${esc(a.t)}</b>: ${x.st?`<span class="muted">${KAST[x.st]}</span>`:x.p!=null?`${hid(fmtP(x.p))} von ${fmtP(x.mx||a.max)} Punkten · Note ${hid(nTxt(n))}`:`<span class="muted">nichts eingetragen</span>`}${x.na?` <span class="tag na">NA gewährt</span>`:""}${x.nat?` <span class="small">${esc(x.nat)}</span>`:""}</div></li>`}).join("")}</ul>`}
+    return `<li><div class="grow"><span class="small muted">${dDEy(a.d)} · ${kaL(g)[0]}</span><br><b>${esc(a.t)}</b>: ${x.st?`<span class="muted">${KAST[x.st]}</span>`:x.p!=null?`${hid(fmtP(x.p))} von ${fmtP(x.mx||a.max)} Punkten · Note ${hid(nTxt(n))}`:`<span class="muted">nichts eingetragen</span>`}${x.na?` <span class="tag na">NA gewährt</span>`:""}${x.nat?` <span class="small">${esc(x.nat)}</span>`:""}</div></li>`}).join("")}</ul>`}
 function demoKa(g){const p=[34,28,22.5,17,14,null,12,30.5],a={id:uid(),gid:g.id,t:"KA 1 (fiktiv)",d:daysAgo(9),max:40,sk:"-",r:{},upd:Date.now(),demo:true};
   g.members.forEach((sid,i)=>{a.r[sid]=i===5?{st:"nach"}:{p:p[i]};if(i===4)a.r[sid].mx=20;if(i===2)a.r[sid]={...a.r[sid],na:true,nat:"Fiktiv: 10 Minuten mehr Zeit."}});return a}
 
@@ -634,7 +642,7 @@ function heuteV(){
   if(!act.length)return h+`<div class="card"><p>Noch keine Lerngruppen.</p><p class="muted">Lege unter „Lerngruppen“ eine Gruppe an oder lade unter „Einstellungen“ die fiktive Beispielklasse.</p><p><button class="btn pri" onclick="go({tab:'gruppen',adding:true})">Lerngruppe anlegen</button></p></div>`;
   if(act.length)h+=`<div class="card"><b>Schnell erfassen</b><p class="row" style="flex-wrap:wrap;margin:8px 0 0">${act.map(g=>g.fach==="Mathe"?`<span class="row" style="gap:6px"><button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: ganze Klasse</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln</button></span>`:`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: Stundenstatus</button>`).join("")}</p></div>`;
   h+=`<h2>Deine Lerngruppen</h2>`+act.map(groupCard).join("");
-  return h+`<p class="muted small">Version 0.3: Sonstige Mitarbeit und Klassenarbeiten in Mathe, Stundenstatus in Sport. Arbeits- und Sozialverhalten, Rücklauf-Listen und Sport-Noten folgen in den nächsten Versionen.</p>`}
+  return h+`<p class="muted small">Version 0.3: Sonstige Mitarbeit und Klassenarbeiten in Mathe, Stundenstatus und schriftliche Überprüfungen in Sport. Arbeits- und Sozialverhalten, Rücklauf-Listen und Sport-Noten folgen in den nächsten Versionen.</p>`}
 const groupCard=g=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)}})"><div class="grow"><div class="code">${esc(gName(g))}${g.demo?' <span class="tag">Beispiel</span>':""}</div><div class="muted small">${esc(g.sy)} · ${g.members.length} Schüler:innen${g.arch?` · archiviert am ${dDEy(g.arch)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`;
 
 /* ===== Lerngruppen ===== */
@@ -678,7 +686,7 @@ function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};retu
     <label for="scode">Kürzel</label><input id="scode" value="${esc(SD.code)}" maxlength="40" oninput="SD.code=this.value">
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="SD=null;render()">Abbrechen</button><button class="btn pri" onclick="addSus(${ja(g.id)})">Hinzufügen</button></div></div>`
     :`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="SD={code:nextCode(${ja(g.cls)})};render();$('#scode')?.focus()">+ Schüler:in</button>${others.length?`<button class="btn" onclick="addExisting(${ja(g.id)})">Aus Klasse ${esc(g.cls)} übernehmen</button>`:""}${ms.length?`<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},names:${ja(g.id)}})">Namen eintragen</button>`:""}</p>`}
-  ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Klassenarbeiten${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`:`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Stundenstatus erfassen</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Stundenstatus</button></p><p class="muted small">Noten für Sport kommen in Version 0.5.</p>`}
+  ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Klassenarbeiten${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`:`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Stundenstatus erfassen</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Stundenstatus</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Schriftliche Überprüfungen${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p><p class="muted small">Die übrigen Noten für Sport kommen in Version 0.5.</p>`}
   ${ms.length?ms.map(s=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)},sus:${ja(s.id)}})">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${nm(s)}${(s.profil||"r")!=="r"?`<span class="tag ${s.profil}">${esc(PROFILE[s.profil])}${s.profil==="zd"?(s.zdNote?" · mit Note":" · Bericht"):""}</span>`:`<span class="muted small">Regel</span>`}</div><span aria-hidden="true" class="muted">›</span></button>`).join(""):`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   ${ro?"":`<div class="card"><b>Schuljahresende</b><p class="small muted" style="margin:6px 0 10px">Archivieren macht die Gruppe nur noch lesbar. Die Daten bleiben ${FRIST_JAHRE} Jahre erhalten (VO-DV I § 9). Gelöscht wird erst nach deiner Bestätigung.</p><button class="btn" onclick="archive(${ja(g.id)})">Lerngruppe archivieren</button></div>`}`}
 function addSus(gid){const g=groupById(gid),code=SD.code.trim();if(!code)return toast("Bitte ein Kürzel eintragen.");
@@ -740,7 +748,9 @@ function profilV(){
   <div class="card"><h2 style="margin-top:0">Umrechnung Stufen → Note</h2><p class="small muted" style="margin:0 0 8px">Jede Stufe zählt mit diesem Notenwert. SoMi mittelt erst je Kriterium, dann über die Kriterien (mit Gewicht). Das Ergebnis wird auf Drittel gerundet: 2,33 → 2−, 2,67 → 3+. Das Ergebnis ist ein Vorschlag.</p>
   ${Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<div class="row" style="margin:6px 0"><label for="stw${v}" class="grow" style="margin:0"><b>${x.t}</b> ${x.l}</label><input id="stw${v}" inputmode="decimal" style="width:6em;text-align:right" value="${String(stw()[v]).replace(".",",")}" onchange="setStw('${v}',this.value)"></div>`).join("")}
   <p class="small muted" style="margin:6px 0 0">Der Notenwert steht klein auf jedem Knopf. Einen Notenvorschlag gibt es ab 3 Beobachtungen in mindestens 2 Kriterien. Bezug zum SILP: „erfüllt“ heißt Anker „gut“ erreicht, „kaum erfüllt“ heißt Anker „ausreichend“ nicht erreicht.${db.stw?` <button class="btn ghost small" onclick="delete db.stw;save();render()">Zurücksetzen</button>`:""}</p></div>
-  <div class="card"><h2 style="margin-top:0">Klassenarbeiten</h2><p class="small muted" style="margin:0">Notenschlüssel nach SILP Mathe 4.3 (Mindestprozent für 1 bis 5): ohne Kursdifferenzierung 85/70/55/40/20, E- und G-Kurs 87/73/59/45/18. Den Schlüssel wählst du pro Klassenarbeit.</p>
+  <div class="card"><h2 style="margin-top:0">Schriftliche Leistungen</h2><p class="small muted" style="margin:0">Klassenarbeiten in Mathe, schriftliche Überprüfungen in Sport. Notenschlüssel nach SILP Mathe 4.3 (Mindestprozent für 1 bis 5): ohne Kursdifferenzierung 85/70/55/40/20, E- und G-Kurs 87/73/59/45/18. Den Schlüssel wählst du pro Arbeit.</p>
+  <div class="sub" style="margin:14px 0 4px;font-weight:700">Anteil am Gesamtvorschlag</div><p class="small muted" style="margin:0 0 6px">Der Rest ist die Sonstige Mitarbeit. Mathe laut SILP: 60 %. Sport zählt erst ab Version 0.5.</p>
+  ${FAECHER.map(f=>`<div style="margin:8px 0"><div class="small" style="font-weight:700;margin-bottom:4px">${f}</div><div class="pick" style="grid-template-columns:repeat(6,1fr)" role="group" aria-label="Anteil schriftlich ${f}">${[20,30,40,50,60,70].map(n=>`<button class="${kaw(f)===n?"on":""}" aria-pressed="${kaw(f)===n}" onclick="setKaw('${f}',${n})">${n} %</button>`).join("")}</div></div>`).join("")}
   <label class="swr"><span class="grow">Noten mit + und −<span class="sub">Jede Note wird in drei gleich große Punktbereiche geteilt. Das steht nicht im SILP, es ist deine Festlegung.</span></span><input type="checkbox" class="sw" ${kaTend()?"checked":""} onchange="db.kaTend=this.checked;save();render()"></label></div>
   <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length} Einträge · ${db.ka.length} Klassenarbeiten auf diesem Gerät</p>
   ${mtip("backup")}<p class="row" style="flex-wrap:wrap"><button class="btn pri${mk("backup")}" onclick="exportJSON()">Sicherung speichern</button><button class="btn" onclick="$('#imp').click()">Sicherung laden</button></p>
@@ -832,7 +842,7 @@ function importV(){if(!IMP){view={tab:"profil"};return profilV()}const {o,d}=IMP
 function applyImport(){const d=IMP.d,dels=new Set([...db.del,...d.del]);
   const a=mergeList(db.groups,d.groups,dels),b=mergeList(db.sus,d.sus,dels),c=mergeList(db.obs,d.obs,dels),e=mergeList(db.att,d.att,dels),f=mergeList(db.ka,d.ka,dels);db.groups=a.list;db.sus=b.list;db.del=[...dels];
   const gids=new Set(db.groups.map(g=>g.id)),sids=new Set(db.sus.map(x=>x.id));db.obs=c.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.att=e.list.filter(o=>gids.has(o.gid)&&sids.has(o.sid));db.ka=f.list.filter(a=>gids.has(a.gid));
-  if(IMP.settings)for(const k of ["theme","fs","hausa","stw","kgw","kaTend"])if(d[k]!=null&&okSetting[k](d[k]))db[k]=d[k];
+  if(IMP.settings)for(const k of ["theme","fs","hausa","stw","kgw","kaTend","kaw"])if(d[k]!=null&&okSetting[k](d[k]))db[k]=d[k];
   IMP=null;save();applyTheme();toast(`Übernommen: ${a.n} Lerngruppen, ${b.n} Schüler:innen, ${c.n+e.n+f.n} Einträge neu oder aktualisiert`);go({tab:"gruppen"})}
 async function wipe(){if(!await ask("Wirklich alle Daten auf diesem Gerät löschen?",{ok:"Alles löschen",danger:true,sub:"Speichere vorher eine Sicherung. Die Aufbewahrungsfrist gilt auch hier."}))return;
   const keep={theme:db.theme,fs:db.fs,bsalt:db.bsalt,lock:db.lock,setupDone:db.setupDone};db={...leer(),...keep};dropNames();save();go({tab:"heute"})}
