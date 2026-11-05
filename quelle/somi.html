@@ -25,8 +25,10 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.45 ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
-main{padding-top:max(16px,calc(env(safe-area-inset-top) + 40px))} /* iPhone: Inhalt unter Uhrzeit/Akku-Leiste und dem Unschärfe-Streifen von iOS beginnen */
-body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top);background:var(--bg);z-index:6;pointer-events:none} /* Leiste oben deckt beim Scrollen ab */
+/* Home-Bildschirm-App: Inhalt beginnt unter Uhrzeit-Leiste und iOS-Unschärfe. Kein fester Streifen oben, sonst verschwindet Inhalt dahinter (wie Pfad 1.2.6) */
+@media (display-mode:standalone){main{padding-top:calc(env(safe-area-inset-top,0px) + 40px)}#lock{padding-top:calc(env(safe-area-inset-top,0px) + 40px)}}
+/* iPad/iPhone: kein Nachfedern am Seitenende, sonst zieht iOS die Menüleiste unten mit (wie Pfad 1.2.5) */
+html,body{overscroll-behavior-y:none}
 @media (min-width:900px) and (orientation:landscape){main{max-width:860px;padding-left:24px;padding-right:24px}}
 h1{font-size:1.9rem;font-weight:800;margin:6px 0 12px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
 h1::before{content:"";width:14px;height:14px;border-radius:5px;background:var(--acc);transform:rotate(45deg);flex:none}
@@ -107,9 +109,9 @@ body:has(.padwrap) .toast{bottom:auto;top:max(12px,env(safe-area-inset-top))} /*
 .tbl .old{color:var(--down);font-weight:700}
 .obsl{list-style:none;padding:0;margin:8px 0}.obsl li{display:flex;align-items:center;gap:4px;padding:8px 0;border-top:1px solid var(--line)}
 .head{display:flex;align-items:center;gap:10px;margin:2px 0 4px}.head .kl{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.updbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 84px);z-index:60;max-width:min(92vw,520px);min-height:44px;padding:10px 16px;border:0;border-radius:14px;background:var(--sig);color:var(--sig-ink);font:600 1rem/1.3 system-ui,sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.18)}@media print{.updbar{display:none}}
 /* App-Sperre */
 #lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;padding:24px;overflow:auto}
-#lock{padding-top:max(24px,calc(env(safe-area-inset-top) + 40px))}
 #lock .box{max-width:340px;width:100%;text-align:center}
 #lock h1{justify-content:center}#lock h1::before{display:none}
 #lock .pins{display:flex;justify-content:center;gap:14px;margin:18px 0 8px}
@@ -130,7 +132,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.3.3",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.3.4",SOMI_STAND="05.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -599,7 +601,11 @@ async function askText(msg,ph,type){return dlg(`<p style="font-weight:700;margin
 const isWeb=/^https?:$/.test(location.protocol),standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
 const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
 try{navigator.storage?.persist?.()}catch(e){}
-if(isWeb&&"serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+if(isWeb&&"serviceWorker" in navigator){const hadSW=!!navigator.serviceWorker.controller;navigator.serviceWorker.register("sw.js").catch(()=>{});
+  /* Neue Fassung geladen: nicht von selbst neu laden (sonst gehen halb ausgefüllte Eingaben verloren), sondern Knopf anbieten (wie Pfad 1.2.0) */
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!hadSW||document.querySelector(".updbar"))return;
+    const b=document.createElement("button");b.className="updbar";b.type="button";b.textContent="Neue Version von SoMi geladen. Tippe hier zum Aktualisieren.";
+    b.addEventListener("click",()=>location.reload());document.body.appendChild(b)})}
 function envHint(){if(sessionStorage.getItem("hideEnv"))return "";
   const x=`<button class="btn ghost small" onclick="sessionStorage.setItem('hideEnv',1);render()">Ausblenden</button>`;
   if(!isWeb)return `<div class="card" style="border:2px solid var(--new)"><b>Achtung: Vorschau-Modus</b><p class="small" style="margin:6px 0">Die App läuft gerade als Datei. Dort kann das Gerät die Daten jederzeit löschen. Öffne sie über ihre Internetadresse und speichere regelmäßig eine Sicherung.</p>${x}</div>`;
