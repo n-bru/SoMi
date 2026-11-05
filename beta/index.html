@@ -25,7 +25,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.45 ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
-main{padding-top:max(16px,calc(env(safe-area-inset-top) + 12px))} /* iPhone: Inhalt unter Uhrzeit/Akku-Leiste beginnen */
+main{padding-top:max(16px,calc(env(safe-area-inset-top) + 40px))} /* iPhone: Inhalt unter Uhrzeit/Akku-Leiste und dem Unschärfe-Streifen von iOS beginnen */
 body::before{content:"";position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top);background:var(--bg);z-index:6;pointer-events:none} /* Leiste oben deckt beim Scrollen ab */
 @media (min-width:900px) and (orientation:landscape){main{max-width:860px;padding-left:24px;padding-right:24px}}
 h1{font-size:1.9rem;font-weight:800;margin:6px 0 12px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
@@ -109,7 +109,7 @@ body:has(.padwrap) .toast{bottom:auto;top:max(12px,env(safe-area-inset-top))} /*
 .head{display:flex;align-items:center;gap:10px;margin:2px 0 4px}.head .kl{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 /* App-Sperre */
 #lock{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;padding:24px;overflow:auto}
-#lock{padding-top:max(24px,calc(env(safe-area-inset-top) + 12px))}
+#lock{padding-top:max(24px,calc(env(safe-area-inset-top) + 40px))}
 #lock .box{max-width:340px;width:100%;text-align:center}
 #lock h1{justify-content:center}#lock h1::before{display:none}
 #lock .pins{display:flex;justify-content:center;gap:14px;margin:18px 0 8px}
@@ -121,7 +121,7 @@ body:has(.padwrap) .toast{bottom:auto;top:max(12px,env(safe-area-inset-top))} /*
 body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .toast{visibility:hidden}
 @media (prefers-reduced-motion:reduce){#lock .pins.bad{animation:none}}
 @media print{nav,.noprint,body::before{display:none!important}main{padding:0}#lock{display:none!important}}
-.betab{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:10px;z-index:50;background:var(--sig,#e3a008);color:#2b2420;font:700 .7rem/1 system-ui,sans-serif;letter-spacing:.06em;padding:5px 8px;border-radius:8px;pointer-events:none}@media print{.betab{display:none}}
+.betab{position:fixed;top:calc(env(safe-area-inset-top) + 34px);right:10px;z-index:50;background:var(--sig,#e3a008);color:#2b2420;font:700 .7rem/1 system-ui,sans-serif;letter-spacing:.06em;padding:5px 8px;border-radius:8px;pointer-events:none}@media print{.betab{display:none}}
 </style>
 </head>
 <body><div class="betab" aria-label="Beta-Version">BETA</div>
@@ -131,7 +131,7 @@ body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .t
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.3.1 Beta",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.3.2 Beta",SOMI_STAND="05.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
