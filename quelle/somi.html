@@ -150,7 +150,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.4.6",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.4.7",SOMI_STAND="05.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -233,7 +233,7 @@ function noteOf(m){if(m==null)return null;const n=Math.min(6,Math.max(1,Math.cei
   if(b>=6)return "6";return d<-.01?b+"+":d>.01?b+"-":String(b)}
 const noteTxt=m=>m==null?"–":nTxt(noteOf(m));
 const KRIT=[
- {k:"qual",t:"Qualität der Beiträge",kz:"Qualität",hint:"Dazu gehört auch die Fachsprache. Fehler in Erarbeitungs- und Übungsphasen nicht abwerten (Kernlehrplan Mathe). Im Zweifel „nur Rückmeldung“.",
+ {k:"qual",t:"Qualität der Beiträge",kz:"Qualität",hint:"Dazu gehört auch die Fachsprache. Fehler in Erarbeitungs- und Übungsphasen nicht abwerten (Kernlehrplan Mathe). Im Zweifel nicht eintragen.",
   gut:["nennt richtige Lösungen und begründet sie nachvollziehbar","geht selbstständig auf andere Lösungen ein, findet Argumente und Begründungen","stellt Ergebnisse auf unterschiedliche Art und mit verschiedenen Medien dar","verwendet Fachbegriffe sicher und korrekt"],
   aus:["nennt teilweise richtige Lösungen, meist ohne nachvollziehbare Begründung","geht selten auf andere Lösungen ein, nennt Argumente, kann sie aber nicht begründen","stellt Ergebnisse nur auf eine Art dar","verwendet Fachbegriffe selten oder ungenau"]},
  {k:"kont",t:"Beteiligung",hint:"Beteiligung am Unterrichtsgespräch (SILP: Kontinuität). Nur bewerten, wenn du einen klaren Eindruck hast.",
@@ -349,7 +349,6 @@ const erPick=g=>{const m=fOf(g)==="Sport"?[["s","Status"],["k","Ganze Klasse"],[
 const erHd=(g,h,eye)=>`<h1 class="sr">${h}</h1><div class="erhd"><button class="btn ghost" onclick="back()" aria-label="Zurück">‹</button><b>${esc(gName(g))}${g.demo?" (fiktiv)":""}</b>${hasNames()?`<button class="btn ss${NSHOW?"":" on"}" onclick="NSHOW=!NSHOW;render()" aria-pressed="${!NSHOW}">${NSHOW?"Namen aus":"Namen an"}</button>`:""}${eye?`<button class="btn ss ic${SHOW?" on":""}" onclick="SHOW=!SHOW;render()" aria-pressed="${SHOW}" aria-label="${SHOW?"Noten verbergen":"Noten zeigen"}">${EYE}</button>`:""}</div>`;
 const padH=()=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" onclick="addObs('${v}')" aria-label="${x.l}, Notenwert ${fmtW(stw()[v])}"><b>${x.t}</b><span>${x.l}</span><span class="nt">= ${fmtW(stw()[v])}</span></button>`).join("");
 const erExtras=()=>`<label for="erT">Stichwort <span class="muted small">(freiwillig)</span></label><input id="erT" maxlength="300" value="${esc(ER.t)}" oninput="ER.t=this.value" placeholder="${fOf(groupById(ER.gid))==="Sport"?"z. B. Handstand sicher gehalten":"z. B. Lösungsweg an der Tafel erklärt"}">
-  <label class="swr"><span class="grow">Nur Rückmeldung<span class="sub">Zählt nicht für die Note, z. B. in Übungsphasen.</span></span><input type="checkbox" class="sw" ${ER.fb?"checked":""} onchange="ER.fb=this.checked"></label>
   <div class="row"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${ER.d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();render()"></div>`;
 const ancBox=K=>`${K.hint?`<p class="small" style="margin:6px 0 0;color:var(--sigt);font-weight:700;text-align:center">${esc(K.hint)}</p>`:""}
   <details style="margin-top:6px"><summary class="small" style="font-weight:700;cursor:pointer">Ankertexte aus dem SILP</summary>
@@ -380,7 +379,7 @@ function seqSet(k,v){const g=groupById(ER.gid),s=seqCur();if(!g||!s||!Object.has
   const r=seqRun(s.id),old=r[k]?db.obs.find(o=>o.id===r[k]):null;
   if(old){db.obs=db.obs.filter(o=>o.id!==old.id);delete r[k];if(old.s===v){save();return render()}}
   const t=ER.t.trim().slice(0,300);if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
-  const o=touch({id:uid(),gid:g.id,sid:s.id,k,s:v,fb:!!ER.fb,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});db.obs.push(o);r[k]=o.id;g.lastK=k;save();render()}
+  const o=touch({id:uid(),gid:g.id,sid:s.id,k,s:v,fb:false,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});db.obs.push(o);r[k]=o.id;g.lastK=k;save();render()}
 function seqStoer(sid){const g=groupById(ER.gid);if(!g||g.arch||!g.members.includes(sid))return;
   const r=seqRun(sid),old=r["@st"]?db.asv.find(a=>a.id===r["@st"]):null;
   if(old){db.asv=db.asv.filter(a=>a.id!==old.id);delete r["@st"];save();return render()}
@@ -402,10 +401,10 @@ function addObs(v){const g=groupById(ER.gid);if(!g||!Object.hasOwn(STUF,v))retur
   if(!ER.sel.length)return toast("Tippe zuerst ein oder mehrere Kürzel an.");
   const ks=kritList(fOf(g)),k=ks.some(x=>x.k===(ER.k||g.lastK))?(ER.k||g.lastK):ks[0].k,t=ER.t.trim().slice(0,300);
   if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
-  const neu=ER.sel.filter(id=>g.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,k,s:v,fb:!!ER.fb,d:ER.d||today(),t,...(g.demo?{demo:true}:{})}));
+  const neu=ER.sel.filter(id=>g.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,k,s:v,fb:false,d:ER.d||today(),t,...(g.demo?{demo:true}:{})}));
   db.obs.push(...neu);g.lastK=k;ER.k=k;ER.sel=[];ER.t="";save();render();
   const ids=new Set(neu.map(o=>o.id));
-  undoToast(`${neu.length} ${neu.length===1?"Eintrag":"Einträge"} gespeichert${SHOW?": "+st:""}${ER.fb?" (nur Rückmeldung)":""}`,()=>{db.obs=db.obs.filter(o=>!ids.has(o.id));save();render()})}
+  undoToast(`${neu.length} ${neu.length===1?"Eintrag":"Einträge"} gespeichert${SHOW?": "+st:""}`,()=>{db.obs=db.obs.filter(o=>!ids.has(o.id));save();render()})}
 
 function sportV(g){const ms=msOf(g),d=ER.d||today(),day=new Map(db.att.filter(a=>a.gid===g.id&&a.d===d).map(a=>[a.sid,a]));
   const cnt=Object.keys(ST).map(k=>[k,ms.filter(s=>day.get(s.id)?.st===k).length]).filter(x=>x[1]);
@@ -461,7 +460,7 @@ function susObsV(s,g){const os=[...obsOf(g.id,s.id),...plObs(g.id,s.id)].sort((a
   return `<div class="card"><div class="between"><b>Sonstige Mitarbeit in ${esc(gName(g))}</b>${ssBtn()}</div>
   <p class="small muted" style="margin:6px 0">${z.length} zählende ${z.length===1?"Beobachtung":"Beobachtungen"}${os.length>z.length?`, ${os.length-z.length} nur Rückmeldung`:""} · ${genug(z)?`Notenvorschlag ${hid(vorschlag(z))}`:"Notenvorschlag ab 3 Beobachtungen in 2 Kriterien"}</p>${per?`<p style="display:flex;flex-wrap:wrap;gap:6px">${per}</p>`:""}
   ${os.length?`<ul class="obsl">${os.map(o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(KMAP[o.k].t)}</span><br><b>${o.fb?`<span class="muted">Rückmeldung</span> ${hid(oTxt(o))}`:hid(oTxt(o))}</b>${o.t?` <span class="small">${esc(o.t)}</span>`:""}</div>
-  ${ro?"":o.pl?`<span class="small muted">gesondert</span>`:`<button class="btn ghost small" aria-label="${o.fb?"Zählt nicht. Tippen: zählt":"Zählt. Tippen: nur Rückmeldung"}" onclick="obsFb(${ja(o.id)})">${o.fb?"zählt nicht":"zählt ✓"}</button><button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="obsDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul>`:`<p class="muted small">Noch keine Einträge.</p>`}
+  ${ro?"":o.pl?`<span class="small muted">gesondert</span>`:`${o.fb?`<button class="btn ghost small" aria-label="Alter Eintrag als Rückmeldung, zählt nicht. Tippen: zählt" onclick="obsFb(${ja(o.id)})">zählt nicht</button>`:""}<button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="obsDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul>`:`<p class="muted small">Noch keine Einträge.</p>`}
   ${ro?"":`<p style="margin-bottom:0"><button class="btn" onclick="ER={...erNeu(${ja(g.id)},'e'),sel:[${ja(s.id)}]};go({tab:view.tab,group:${ja(g.id)},erf:${ja(g.id)}})">Für ${esc(s.code)} erfassen</button></p>`}</div>
   ${kaSusCard(s,g,genug(z)?noteMean(z):null)}`}
 function kaSusCard(s,g,somi){if(!kaOf(g.id).length)return "";const k=kaMean(g.id,s.id),t=gesamt(somi,k,g.fach);
@@ -475,7 +474,7 @@ function obsDel(id){const o=db.obs.find(x=>x.id===id);if(!o)return;db.obs=db.obs
   undoToast("Eintrag gelöscht",()=>{db.del=db.del.filter(x=>x!==id);db.obs.push(touch(o));save();render()})}
 function demoObs(g){const d=[[0,"2","qual"],[0,"3+","qual"],[1,"1-","selbst"],[2,"4","qual"],[3,"2+","kont"],[4,"3","koop"],[5,"3","koop"],[6,"2-","qual"],[7,"5+","selbst"],[0,"2","kont"],[2,"3-","kont"],[4,"2","selbst"],[6,"3","koop"],[1,"2","qual"]];
   const st=n=>({"1":"4","2":"3","3":"2"})[n[0]]||"1";
-  return d.map(([i,n,k],j)=>({id:uid(),gid:g.id,sid:g.members[i],k,s:st(n),fb:j===3,d:daysAgo(2+j*2),t:j===0?"Fiktiv: Lösungsweg an der Tafel erklärt.":"",upd:Date.now(),demo:true}))}
+  return d.map(([i,n,k],j)=>({id:uid(),gid:g.id,sid:g.members[i],k,s:st(n),fb:false,d:daysAgo(2+j*2),t:j===0?"Fiktiv: Lösungsweg an der Tafel erklärt.":"",upd:Date.now(),demo:true}))}
 
 /* ===== Klassenarbeiten (ab 0.3) =====
    Gespeichert als db.ka=[{id,gid,t,d,max,sk,r:{sid:{p,st,mx,na,nat}},upd}]. p = Punkte, st = Status ohne Punkte, mx = eigene Höchstpunktzahl (zieldifferent),

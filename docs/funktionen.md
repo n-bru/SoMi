@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.4.6, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.7, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -53,7 +53,7 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 ## Erfassen auf dem iPhone (ab 0.4.5, Matrix ab 0.4.6)
 - Runde als Matrix: oben einmal die Stufen, links die Kriterien, Knöpfe zeigen den Notenwert. Fragezeichen am Kriterium öffnet Hinweis und Ankertexte.
 - Runde und Stundenstatus passen ohne Scrollen auf ein iPhone (Safari, 390 × 664). Kopf in einer Zeile, Menüleiste unten beim Erfassen aus (zurück über ‹).
-- In der Runde keine Hinweise und Ankertexte. Die stehen weiter bei „Einzeln bewerten“. Stichwort, „Nur Rückmeldung“ und Datum stehen unter den Knöpfen.
+- In der Runde keine Hinweise und Ankertexte. Die stehen weiter bei „Einzeln bewerten“. Stichwort und Datum stehen unter den Knöpfen. „Nur Rückmeldung“ gibt es ab 0.4.7 nicht mehr: Jeder neue Eintrag zählt.
 
 ## Kriterien und Runde (ab 0.4.3)
 - Runde „Ganze Klasse nacheinander“ ohne Kriterienwahl: pro Kürzel immer Qualität der Beiträge, Beteiligung (SILP: Kontinuität), Selbstständigkeit, Kooperation; dazu Werkzeuge und Hausaufgaben, wenn unter Einstellungen eingeschaltet (`db.werkz`, `db.hausa`). Darunter der Knopf „massive Unterrichtsstörung“. Dann „Weiter ›“.

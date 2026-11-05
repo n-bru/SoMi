@@ -112,8 +112,10 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.locator(".toast",{hasText:": +"}).count()===0,"Sichtschutz: Stufe nicht im Hinweis");
   let o=await p.evaluate(()=>db.obs.slice(-2));ok(o.length===2&&o.every(x=>x.s==="3"&&!x.n&&x.k==="koop"&&x.t==="Gruppenarbeit Station 3"&&!x.fb),"zwei Einträge mit Kriterium, Note und Stichwort");
   ok(await p.locator(".tile.on").count()===0&&await p.locator(".tile:has-text('DEMO-01') .done").count()===1,"Auswahl zurückgesetzt, Haken für heute");
-  await p.locator("label.swr:has-text('Nur Rückmeldung') input").check();await p.click(".tile:has-text('DEMO-03')");await p.click(".pad button[data-s='1']");
-  o=await p.evaluate(()=>db.obs.at(-1));ok(o.fb===true&&o.s==="1","nur Rückmeldung gespeichert");
+  ok(await p.locator("label.swr:has-text('Nur Rückmeldung')").count()===0,"kein Schalter „Nur Rückmeldung“ mehr (0.4.7)");
+  await p.click(".tile:has-text('DEMO-03')");await p.click(".pad button[data-s='1']");
+  o=await p.evaluate(()=>db.obs.at(-1));ok(o.fb===false&&o.s==="1","neuer Eintrag zählt immer");
+  await p.evaluate(()=>{const x=db.obs.at(-1);x.fb=true;save()});// alter Eintrag als Rückmeldung bleibt gültig
   await p.click(".pad button[data-s='2']");// ohne Auswahl
   await p.click("button:has-text('Übersicht DEMO Mathe')");ok(await p.locator("h1",{hasText:"Übersicht"}).count()===1,"Übersicht geöffnet");
   ok(await p.evaluate(()=>[...document.querySelectorAll(".tbl tbody tr")].every(tr=>{const c=tr.cells;return !/[+−o]|\d/.test(c[2].innerText)&&!/[+−]/.test(c[3].innerText)})),"Sichtschutz: keine Noten in der Übersicht");
