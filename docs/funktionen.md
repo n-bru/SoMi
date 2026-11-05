@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.4.4, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.5, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -44,6 +44,10 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Ab 0.3.3 auch in Sport als „Schriftliche Überprüfungen“ (ohne Gesamtvorschlag bis Version 0.5).
 - Gesamtvorschlag: Anteil schriftlich je Fach einstellbar (`db.kaw`, 20 bis 70 %, Standard Mathe 60 % nach SILP, Sport 20 %), Rest Sonstige Mitarbeit. Mit + und −, ins Zeugnis kommt eine ganze Note. Erscheint in der Übersicht (Spalten SoMi, KA, Gesamt, sobald es im Zeitraum eine Arbeit gibt) und auf der Kürzel-Seite. Nur wenn beides vorliegt.
 - Daten: `db.ka = [{id,gid,t,d,max,sk,r:{sid:{p,st,mx,na,nat}},upd}]`, geprüft mit `okKa`, in Sicherung und Import enthalten. Die Beispielklasse hat eine fiktive Arbeit.
+
+## Erfassen auf dem iPhone (ab 0.4.5)
+- Runde und Stundenstatus passen ohne Scrollen auf ein iPhone (Safari, 390 × 664). Kopf in einer Zeile, Menüleiste unten beim Erfassen aus (zurück über ‹).
+- In der Runde keine Hinweise und Ankertexte. Die stehen weiter bei „Einzeln bewerten“. Stichwort, „Nur Rückmeldung“ und Datum stehen unter den Knöpfen.
 
 ## Kriterien und Runde (ab 0.4.3)
 - Runde „Ganze Klasse nacheinander“ ohne Kriterienwahl: pro Kürzel immer Qualität der Beiträge, Beteiligung (SILP: Kontinuität), Selbstständigkeit, Kooperation; dazu Werkzeuge und Hausaufgaben, wenn unter Einstellungen eingeschaltet (`db.werkz`, `db.hausa`). Darunter der Knopf „massive Unterrichtsstörung“. Dann „Weiter ›“.
