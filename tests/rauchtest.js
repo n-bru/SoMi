@@ -119,7 +119,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>[...document.querySelectorAll(".tbl tbody tr")].every(tr=>{const c=tr.cells;return !/[+−o]|\d/.test(c[2].innerText)&&!/[+−]/.test(c[3].innerText)})),"Sichtschutz: keine Noten in der Übersicht");
   await p.click("button:has-text('Noten zeigen')");ok(await p.locator(".tbl tr:has-text('DEMO-01')").innerText().then(t=>t.includes("+")),"Noten zeigen");
   ok(await p.evaluate(()=>noteOf(2)==="2"&&noteOf(2.34)==="2-"&&noteOf(2.66)==="3+"&&noteOf(1)==="1"&&noteOf(5.9)==="6"&&mean([{s:"4"},{s:"3"}])===1.5),"Umrechnung Stufen in Note mit + und −");
-  ok(await p.evaluate(()=>{const z=[{k:"qual",s:"3"},{k:"qual",s:"3"},{k:"qual",s:"3"},{k:"port",s:"1"}];db.kgw={qual:1};const a=noteMean(z)===3.5;db.kgw={qual:3};const b=noteMean(z)===2.75;const c=!okKgw({qual:4})&&!okKgw({xyz:2})&&okKgw({qual:2});delete db.kgw;return a&&b&&c}),"Notenvorschlag: erst je Kriterium, dann gewichtet");
+  ok(await p.evaluate(()=>{const z=[{k:"qual",s:"3"},{k:"qual",s:"3"},{k:"qual",s:"3"},{k:"port",s:"1"}];db.kgw={qual:1};const a=noteMean(z)===3.5;db.kgw={qual:3};const b=noteMean(z)===2.75;const c=!okKgw({qual:4})&&!okKgw({xyz:2})&&okKgw({qual:2})&&okKgw({mot:5})&&!okKgw({mot:6});delete db.kgw;return a&&b&&c}),"Notenvorschlag: erst je Kriterium, dann gewichtet");
   ok(await p.evaluate(()=>!genug([{k:"qual"},{k:"qual"},{k:"qual"}])&&!genug([{k:"qual"},{k:"port"}])&&genug([{k:"qual"},{k:"qual"},{k:"port"}])),"Notenvorschlag erst ab 3 Beobachtungen in 2 Kriterien");
   ok(await p.evaluate(()=>okObs({id:"a",gid:"b",sid:"c",k:"qual",s:"3",d:"2026-01-01",upd:1})&&!okObs({id:"a",gid:"b",sid:"c",k:"qual",s:"5",d:"2026-01-01",upd:1})&&okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"2+",d:"2026-01-01",upd:1})),"Prüfhelfer: Stufe neu, Note alt gültig");
   ok(await p.locator(".tbl tr:has-text('DEMO-03')").innerText().then(t=>/ \+[12]/.test(t)),"Rückmeldung zählt nicht mit");
@@ -135,7 +135,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>!db.kgw),"Gewichte zurückgesetzt");
   await p.screenshot({path:process.env.SHOT||"/dev/null",fullPage:true}).catch(()=>{});
   await nav("Heute");await p.click(".card >> button:has-text('DEMO Mathe')");
-  ok(await p.locator(".seqk:has-text('Hausaufgaben')").count()===1,"Kriterium Hausaufgaben zuschaltbar");
+  ok(await p.locator(".pad button[data-k='hausa']").count()===4,"Kriterium Hausaufgaben zuschaltbar");
   ok(await p.evaluate(()=>!okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"7",d:"2026-01-01"})&&!okObs({id:"a",gid:"b",sid:"c",k:"x",n:"2",d:"2026-01-01"})&&okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"2+",d:"2026-01-01"})),"Prüfhelfer okObs");
   // Sport: Stundenstatus
   await nav("Heute");await p.click("button:has-text('DEMO Sport: Stundenstatus')");
@@ -150,6 +150,14 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>db.att.length===6&&db.att.filter(a=>a.st==="abw").length===1),"Sport: Status ersetzt, nicht doppelt");
   await p.click("button:has-text('Zur Übersicht')");ok(await p.locator(".tbl tr:has-text('DEMO-02') td").nth(1).innerText().then(t=>t==="1"),"Sport-Übersicht zählt ohne Sachen");
   ok(await p.evaluate(()=>!okAtt({id:"a",gid:"b",sid:"c",st:"x",d:"2026-01-01",upd:1})),"Prüfhelfer okAtt");
+  // 0.4.6 Sport: Kriterien nach SILP Sport, Runde als Matrix, Fragezeichen zeigt Ankertexte
+  await nav("Heute");await p.locator(".card button:has-text('Bewerten')").first().click();
+  ok(await p.evaluate(()=>JSON.stringify(ER.ks)==='["mot","kog","soz","arb"]')&&await p.locator(".mxh").count()===1,"Sport-Runde: Motorik, Wissen, Sozial- und Arbeitsverhalten als Matrix");
+  const so0=await p.evaluate(()=>db.obs.length);await p.click(".pad button[data-k='mot'][data-s='3']");
+  ok(await p.evaluate(n=>db.obs.length===n+1&&db.obs.at(-1).k==="mot"&&groupById(db.obs.at(-1).gid).fach==="Sport",so0),"Sport: Motorik gespeichert");
+  await p.click(".seqk:has-text('Motorik')");ok(await p.locator(".cele:has-text('Kondition')").count()===1,"Fragezeichen zeigt Hinweis und Ankertexte");await dlgBtn("Schließen");
+  ok(await p.evaluate(()=>{const z=[{k:"mot",s:"4"},{k:"kog",s:"1"}];return Math.abs(noteMean(z)-(5*1+1*5)/6)<1e-9}),"Sport: Gewicht Motorik 5, Wissen 1");
+  await p.click(".pick.sm button:has-text('Status')");ok(await p.locator("h1",{hasText:"Stundenstatus"}).count()===1,"Sport: Umschalten auf Stundenstatus");
   // 0.3 Klassenarbeiten: anlegen, Punkte eintragen, Notenschlüssel, Notenspiegel, Gesamtvorschlag
   await p.evaluate(()=>{SHOW=false});await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("button:has-text('Klassenarbeiten')");ok(await p.locator("h1",{hasText:"Klassenarbeiten"}).count()===1&&await p.locator(".card.tap",{hasText:"KA 1 (fiktiv)"}).count()===1,"Klassenarbeiten mit fiktiver Beispielarbeit");

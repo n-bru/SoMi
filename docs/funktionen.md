@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.4.5, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.6, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -45,7 +45,13 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Gesamtvorschlag: Anteil schriftlich je Fach einstellbar (`db.kaw`, 20 bis 70 %, Standard Mathe 60 % nach SILP, Sport 20 %), Rest Sonstige Mitarbeit. Mit + und −, ins Zeugnis kommt eine ganze Note. Erscheint in der Übersicht (Spalten SoMi, KA, Gesamt, sobald es im Zeitraum eine Arbeit gibt) und auf der Kürzel-Seite. Nur wenn beides vorliegt.
 - Daten: `db.ka = [{id,gid,t,d,max,sk,r:{sid:{p,st,mx,na,nat}},upd}]`, geprüft mit `okKa`, in Sicherung und Import enthalten. Die Beispielklasse hat eine fiktive Arbeit.
 
-## Erfassen auf dem iPhone (ab 0.4.5)
+## Sport: Sonstige Leistungen (ab 0.4.6)
+- Kriterien nach SILP Sport Kap. 3 (Stand 03/2021): Motorik, Wissen, Sozialverhalten, Arbeitsverhalten. Ankertexte angelehnt, nicht wörtlich.
+- Gewicht-Vorschlag 5 : 1 : 2 : 2 (= 50/10/20/20 %), in Einstellungen 1× bis 5× änderbar.
+- Erfassen mit Umschalter Status / Ganze Klasse / Einzeln. Übersicht Sonstige Leistungen und Übersicht Stundenstatus getrennt.
+
+## Erfassen auf dem iPhone (ab 0.4.5, Matrix ab 0.4.6)
+- Runde als Matrix: oben einmal die Stufen, links die Kriterien, Knöpfe zeigen den Notenwert. Fragezeichen am Kriterium öffnet Hinweis und Ankertexte.
 - Runde und Stundenstatus passen ohne Scrollen auf ein iPhone (Safari, 390 × 664). Kopf in einer Zeile, Menüleiste unten beim Erfassen aus (zurück über ‹).
 - In der Runde keine Hinweise und Ankertexte. Die stehen weiter bei „Einzeln bewerten“. Stichwort, „Nur Rückmeldung“ und Datum stehen unter den Knöpfen.
 
