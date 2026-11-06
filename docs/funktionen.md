@@ -54,6 +54,7 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - In der Sport-Gruppe „Punktuelle Überprüfungen“. Anlegen mit Titel, Datum, Art (Demonstration, Motorischer Test, Aufwärmen gestalten, Sportabzeichen, Bundesjugendspiele, Sonstiges) und Bereich (Motorik, Wissen, Sozialverhalten, Arbeitsverhalten; Standard Motorik).
 - Je Kürzel direkt eine Note 1+ bis 6, oder „fehlt“ / „holt nach“. Die Note zählt als Eintrag im gewählten Bereich der Sonstigen Leistungen (kein eigenes Gewicht).
 - Gruppen (Riegen): „Einteilen“ ordnet jedem Kürzel Gruppe 1 bis 6 zu. Oben „Alle / Gr. 1 / Gr. 2 …“ wählt, wer beim Eintragen drankommt; am Ende „Weiter mit Gruppe …“. Eine neue Überprüfung übernimmt die Gruppen der letzten.
+- Eintragen (ab 0.5.1) ist ein Vollbild-Schritt ohne Menüleiste und passt ohne Scrollen auf alle iPhones (gilt auch für Präsentation und Heft). Die Übersichtsseite zeigt Gruppen, „Einteilen“, Notenspiegel und Tabelle.
 - Gespeichert in db.ka mit k:"pue", b (Bereich), art, rg {Kürzel-ID: Gruppe}. Geprüft in okKa/okRg.
 
 ## Erfassen auf dem iPhone (ab 0.4.5, Matrix ab 0.4.6, volle Höhe ab 0.4.8)

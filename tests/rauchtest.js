@@ -204,10 +204,14 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.fill("#kdt","Cooper-Test Probe");await p.click("button:has-text('Anlegen')");
   ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Cooper-Test Probe");return a&&a.k==="pue"&&a.b==="mot"&&a.art==="Motorischer Test"&&a.rg&&Object.keys(a.rg).length===6&&okKa(a)}),"Überprüfung angelegt, Gruppen übernommen");
   await p.click(".rgbar button:has-text('Gr. 2')");ok(await p.locator(".card b",{hasText:"Gruppe 2: 1 von 3"}).count()===1,"nur Gruppe 2");
+  {const vp=p.viewportSize();for(const [w,h] of [[375,548],[390,664],[430,740]]){await p.setViewportSize({width:w,height:h});
+  ok(await p.evaluate(()=>{const b=[...document.querySelectorAll(".kan .four button,.kan .padn button")].map(x=>x.getBoundingClientRect());return document.documentElement.scrollHeight<=innerHeight&&b.every(r=>r.bottom<=innerHeight&&r.height>=30)}),`${w}×${h}: Noten eintragen passt ohne Scrollen`)}
+  await p.setViewportSize(vp)}
   await p.click(".pad button[data-n='2']");
   ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Cooper-Test Probe"),m=groupById(a.gid).members;return a.r[m[1]]?.n==="2"&&!a.r[m[0]]&&plObs(a.gid,m[1]).some(o=>o.k==="mot"&&o.n==="2")}),"Note in Gruppe 2 gespeichert, zählt bei Motorik");
   await p.click(".pad button[data-n='3']");await p.click(".pad button[data-n='4']");ok(await p.locator("button:has-text('Weiter mit Gruppe')").count()===0&&await p.locator("text=Gruppe 2 fertig").count()===1,"Gruppe 2 fertig");
-  await p.click(".rgbar button:has-text('Gr. 1')");await p.click("button:text-is('Einteilen')");
+  ok(await p.evaluate(()=>document.body.classList.contains("erf")),"Noten eintragen als Vollbild");
+  await p.click(".erhd button[aria-label='Zurück']");await p.click(".rgbar button:has-text('Gr. 1')");await p.click("button:text-is('Einteilen')");
   await p.locator("[aria-label='Gruppe für DEMO-01'] button",{hasText:"3"}).click();
   ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Cooper-Test Probe");return a.rg[groupById(a.gid).members[0]]===3}),"Gruppe umgeteilt");
   await p.locator("[aria-label='Gruppe für DEMO-01'] button",{hasText:"3"}).click();
@@ -227,7 +231,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Heftkontrolle Test"),m=groupById(a.gid).members;return a.k==="port"&&a.max==null&&a.r[m[0]].n==="2+"&&a.r[m[1]].st==="fehlt"&&okKa(a)}),"Note direkt und „fehlt“ gespeichert");
   ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Heftkontrolle Test");return plObs(a.gid,groupById(a.gid).members[0]).some(o=>o.k==="port"&&o.n==="2+")&&!kaOf(a.gid).some(x=>x.k)}),"zählt zur Sonstigen Mitarbeit, nicht zu den Klassenarbeiten");
   ok(await p.evaluate(()=>!okKa({id:"x1",gid:"g1",t:"x",d:"2026-11-05",k:"port",max:10,sk:"-",r:{},upd:1})&&!okKa({id:"x1",gid:"g1",t:"x",d:"2026-11-05",k:"qual",r:{},upd:1})&&!okKa({id:"x1",gid:"g1",t:"x",d:"2026-11-05",k:"port",r:{s1:{n:"7"}},upd:1})),"okKa prüft gesonderte Leistungen");
-  await p.click("text=‹ Zurück");await p.click("button:has-text('+ Präsentation, Heft oder Übung')");await p.click(".pick button:text-is('Schriftliche Übung')");
+  await p.click(".erhd button[aria-label='Zurück']");await p.click("text=‹ Zurück");await p.click("button:has-text('+ Präsentation, Heft oder Übung')");await p.click(".pick button:text-is('Schriftliche Übung')");
   ok(await p.locator("#kdm").count()===1,"Schriftliche Übung mit Punkten");await p.fill("#kdm","20");await p.click("button:has-text('Anlegen')");
   await p.fill("#kp","15");await p.press("#kp","Enter");ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.k==="sue"&&a.max===20);return a&&kaNote(a,groupById(a.gid).members[0])!=null}),"Übung: Punkte ergeben Note");
   await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();await p.click("button:has-text('Übersicht Sonstige Mitarbeit')");
