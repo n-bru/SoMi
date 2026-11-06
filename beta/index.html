@@ -149,6 +149,7 @@ body.erf .stgrid{flex:1 1 auto!important;min-height:0;grid-template-rows:repeat(
 .rgbar{gap:6px;margin:0 0 10px}.rgbar .pick button{padding:6px 2px}.rgr{gap:8px;margin:5px 0}.rgr .code{min-width:88px;flex:none;white-space:nowrap}
 body.erf .kan .padn{flex:1 1 auto!important;min-height:0;grid-template-rows:repeat(3,minmax(0,64px));align-content:start}body.erf .kan .padn button{min-height:0;height:100%}
 body.erf .rgbar{margin:0 0 6px}body.erf .kan .seqsus{margin:4px 0}body.erf .kan .bar{margin:4px 0}
+.mxz .seqk b{font-size:.72rem;font-weight:700;line-height:1.15;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;hyphens:auto;text-align:left}
 .four{display:grid;grid-template-columns:.6fr 1fr 1fr 1fr;gap:6px}.four .btn{padding-left:4px;padding-right:4px}
 .kan .seqsus{margin:8px 0 6px}.kan .seqsus .code{font-size:1.5rem}.kan .kic.big{width:44px;height:44px;font-size:1.5rem}.kan .pad button{min-height:44px}.rgr .pick button{min-height:40px;padding:4px 0}
 .tilew{flex:1 1 auto!important;min-height:0;overflow-y:auto;margin-top:6px}
@@ -171,7 +172,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.2 Beta",SOMI_STAND="06.11.2026";
+const SOMI_VERSION="0.5.3 Beta",SOMI_STAND="06.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -210,7 +211,7 @@ const byNum=(a,b)=>a.localeCompare(b,"de",{numeric:true});
 const okId=s=>typeof s==="string"&&/^[A-Za-z0-9_-]{1,40}$/.test(s),okDate=s=>typeof s==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(s);
 const okStr=(s,n=4000)=>s==null||typeof s==="string"&&s.length<=n,okNum=v=>v==null||typeof v==="number"&&isFinite(v);
 const okSY=s=>typeof s==="string"&&/^\d{4}\/\d{2}$/.test(s);
-function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&(s.kl==null||typeof s.kl==="boolean")&&okNum(s.upd)}catch(e){return false}}
+function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&(s.kl==null||typeof s.kl==="boolean")&&okLez(s.lez)&&okNum(s.upd)}catch(e){return false}}
 function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&(g.lastK==null||Object.hasOwn(KMAP,g.lastK))&&(g.lastKs==null||Array.isArray(g.lastKs)&&g.lastKs.length<=12&&g.lastKs.every(k=>Object.hasOwn(KMAP,k)))&&(g.lastM==null||Object.hasOwn(AMAP,g.lastM))&&okNum(g.upd)}catch(e){return false}}
 const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f),hausa:v=>typeof v==="boolean",werkz:v=>typeof v==="boolean",stw:v=>okStw(v),kgw:v=>okKgw(v),kaTend:v=>typeof v==="boolean",kaw:v=>okKaw(v)};
 const susById=id=>db.sus.find(s=>s.id===id);
@@ -286,6 +287,8 @@ const KRIT=[
  {k:"arb",f:"Sport",t:"Arbeitsverhalten",kz:"Arbeits­verhalten",hint:"Lern-, Leistungs- und Anstrengungsbereitschaft, Zuverlässigkeit, Selbstständigkeit. Zählt laut SILP Sport zur Note.",
   gut:["ist leistungs- und anstrengungsbereit","ist zuverlässig, z. B. beim Auf- und Abbau","übt selbstständig an Aufgaben"],
   aus:["strengt sich nur teilweise an","ist nicht immer zuverlässig","übt nur mit Aufforderung"]},
+ /* 0.5.3: Förderplanziel (zieldifferent, LE). Eintrag mit o.z = Ziel-ID, nur in der Runde. */
+ {k:"lez",t:"Förderplanziel",alt:true,nogw:true,gut:[],aus:[]},
  /* 0.5.0: punktuelle Überprüfung im Sport (Nicks Wahl 06.11.). Note direkt, zählt im gewählten Bereich (a.b), kein eigenes Gewicht. */
  {k:"pue",f:"Sport",t:"Punktuelle Überprüfung",pl:"n",nogw:true,gut:[],aus:[]}];
 const KMAP=Object.fromEntries(KRIT.map(x=>[x.k,x]));
@@ -296,11 +299,23 @@ const kF=x=>x.f||"Mathe",fOf=g=>g&&g.fach==="Sport"?"Sport":"Mathe";
 const kritList=(f="Mathe")=>KRIT.filter(x=>kF(x)===f&&!x.alt&&!x.pl&&optOn(x));
 const kritGew=(f="Mathe")=>KRIT.filter(x=>kF(x)===f&&!x.alt&&!x.nogw&&optOn(x));
 const plk=g=>KRIT.filter(x=>x.pl&&kF(x)===fOf(g));
+/* 0.5.3: Förderplanziele für zieldifferent Lernende (LE). s.lez={Mathe:[{id,t}],Sport:[…]}, höchstens 4 je Fach.
+   Hat ein LE-Kürzel Ziele, bewertest du in der Runde die Ziele statt der Kriterien; nur sie zählen dann.
+   „Note im Zeugnis“ aus: kein Notenvorschlag, stattdessen Textbausteine je Ziel. */
+const okLez=v=>v==null||!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).every(f=>FAECHER.includes(f)&&Array.isArray(v[f])&&v[f].length<=4&&v[f].every(z=>!!z&&okId(z.id)&&typeof z.t==="string"&&z.t.trim().length>0&&z.t.length<=120));
+const lezOf=(s,f)=>(s&&(s.profil||"r")==="zd"&&s.lez?.[f])||[];
+const zdBer=(s,g)=>lezOf(s,fOf(g)).length>0&&!s.zdNote;
+const zaehl=(s,g,os)=>{const lz=lezOf(s,fOf(g));if(!lz.length)return os.filter(o=>o.k!=="lez");const ids=new Set(lz.map(z=>z.id));return os.filter(o=>o.k==="lez"&&ids.has(o.z))};
+const okey=o=>o.k==="lez"?"z:"+o.z:o.k;
+const LEZB=[[3.5,"sicher erreicht"],[2.75,"erreicht"],[1.75,"teilweise erreicht"],[0,"noch nicht erreicht"]];
+const lezStand=a=>{const v=a.filter(o=>o.s).map(o=>+o.s);if(!v.length)return null;const m=v.reduce((x,y)=>x+y,0)/v.length;return LEZB.find(([x])=>m>=x)[1]};
+const lezSatz=(z,a)=>{const st=lezStand(a);return st?`Ziel „${z.t}“: ${st}.`:null};
+const zLab=(o,s)=>o.k==="lez"?`Ziel: ${(s?.lez&&Object.values(s.lez).flat().find(z=>z.id===o.z)?.t)||"gelöscht"}`:KMAP[o.k].t;
 // Punktuelle Überprüfungen (Sport): Art, Bereich, Gruppen (Riegen 1 bis 6)
 const PUEART=["Demonstration","Motorischer Test","Aufwärmen gestalten","Sportabzeichen","Bundesjugendspiele","Sonstiges"];
 const PUEB=["mot","kog","soz","arb"];
 const okRg=v=>v==null||!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).length<=60&&Object.entries(v).every(([k,n])=>okId(k)&&Number.isInteger(n)&&n>=1&&n<=6);
-function okObs(o){try{return !!o&&okId(o.id)&&okId(o.gid)&&okId(o.sid)&&Object.hasOwn(KMAP,o.k)&&(o.s==null?NOTEN.includes(o.n):Object.hasOwn(STUF,o.s)&&o.n==null)&&(o.fb==null||typeof o.fb==="boolean")&&okDate(o.d)&&okStr(o.t,300)&&okNum(o.upd)}catch(e){return false}}
+function okObs(o){try{return !!o&&okId(o.id)&&okId(o.gid)&&okId(o.sid)&&Object.hasOwn(KMAP,o.k)&&(o.k==="lez"?okId(o.z):o.z==null)&&(o.s==null?NOTEN.includes(o.n):Object.hasOwn(STUF,o.s)&&o.n==null)&&(o.fb==null||typeof o.fb==="boolean")&&okDate(o.d)&&okStr(o.t,300)&&okNum(o.upd)}catch(e){return false}}
 const obsOf=(gid,sid)=>db.obs.filter(o=>o.gid===gid&&(!sid||o.sid===sid));
 /* Sport: Stundenstatus. db.att = [{id,gid,sid,d,st,upd}], höchstens einer pro Gruppe, Kürzel und Tag */
 const ST={akt:"aktiv",ohne:"ohne Sportsachen",unf:"sportunfähig",abw:"nicht anwesend"};
@@ -332,9 +347,9 @@ const GWS=f=>f==="Sport"?[1,2,3,4,5]:[1,2,3];
 const kgw=k=>(db.kgw&&db.kgw[k])||KGW0[k]||1;
 const fmtW=x=>String(x).replace(".",",");
 /* Notenvorschlag erst ab 3 zählenden Beobachtungen in mind. 2 Kriterien (Nicks Entscheidung 04.11.2026) */
-const genug=a=>a.length>=3&&new Set(a.map(o=>o.k)).size>=2;
+const genug=a=>a.length>=3&&new Set(a.map(okey)).size>=2;
 const vorschlag=a=>genug(a)?noteTxt(noteMean(a)):"–";
-function noteMean(a){let s=0,w=0;for(const k of new Set(a.map(o=>o.k))){const g=kgw(k);s+=g*mean(a.filter(o=>o.k===k));w+=g}return w?s/w:null}
+function noteMean(a){let s=0,w=0;for(const k of new Set(a.map(okey))){const g=kgw(k);s+=g*mean(a.filter(o=>okey(o)===k));w+=g}return w?s/w:null}
 const fmt1=x=>x==null?"–":x.toFixed(1).replace(".",",");
 // Sichtschutz: Noten sind nach jedem Start verborgen, bis du sie zeigst
 let SHOW=false;
@@ -383,26 +398,30 @@ function seqCard(g,ms){if(!ms.length)return `<div class="card"><p class="muted">
   const sum=`${nB} bewertet${nA?` · ${nA} nicht anwesend`:""}`;
   if(ER.i>=ms.length)return `<div class="card seqdone fill"><b style="font-size:1.2rem">Fertig</b><p>${nB} bewertet${nA?`, ${nA} nicht anwesend`:""}.</p>
     <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="ER.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.run={};ER.ks=null;render()">Neue Runde</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
-  const s=ms[ER.i],r=ER.run[s.id],abw=r==="abw";
-  const rows=ks.map(k=>{const K=KMAP[k],id=r&&!abw?r[k]:null,o=id?db.obs.find(x=>x.id===id):null;
+  const s=ms[ER.i],r=ER.run[s.id],abw=r==="abw",lz=lezOf(s,fOf(g)),rk=lz.length?lz.map(z=>"z:"+z.id):ks;
+  const rows=rk.map(k=>{const z=lz.find(x=>"z:"+x.id===k),K=KMAP[k],id=r&&!abw?r[k]:null,o=id?db.obs.find(x=>x.id===id):null;
+    if(z)return `<div class="pad mx mxz" role="group" aria-label="Förderplanziel: ${esc(z.t)}"><button class="seqk" onclick="lezInfo(${ja(z.t)})" aria-label="Förderplanziel: ${esc(z.t)}"><b>${esc(z.t)}</b></button>${padRow(k,o?.s,"Ziel "+z.t)}</div>`;
     return `<div class="pad mx" role="group" aria-label="${esc(K.t)}"><button class="seqk" onclick="krInfo('${k}')" aria-label="${esc(K.t)}: Hinweis und Ankertexte"><b>${esc(K.kz||K.t)}</b><span class="q" aria-hidden="true">?</span></button>${padRow(k,o?.s)}</div>`}).join("");
   const mxh=`<div class="mx mxh" aria-hidden="true"><span></span>${Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<span>${x.l.replace("über","über\u00ad")}</span>`).join("")}</div>`;
   return `<div class="card seqc fill"><div class="seqhd">${bigSus(s)}<span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
   ${abw?`<p class="small" style="margin:4px 0 0">Nicht anwesend. Stufe tippen hebt das auf.</p>`:""}
-  <div class="mxw" style="grid-template-rows:auto repeat(${ks.length},minmax(0,64px))">${mxh}${rows}</div>${stRow(s.id)}
+  ${lz.length?`<p class="small" style="margin:2px 0 0"><b>Förderplanziele</b> statt Kriterien</p>`:""}<div class="mxw" style="grid-template-rows:auto repeat(${rk.length},minmax(0,64px))">${mxh}${rows}</div>${stRow(s.id)}
   <div class="padwrap"><div class="three"><button class="btn" ${ER.i?"":"disabled"} onclick="seqPrev()">‹ Zurück</button><button class="btn abw" onclick="seqAbw()" aria-label="nicht anwesend">abwesend</button><button class="btn pri" onclick="seqNext()">Weiter ›</button></div></div>
   ${erExtras()}</div>`}
-const padRow=(k,cur)=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" data-k="${k}" class="${cur===v?"cur":""}" aria-pressed="${cur===v}" onclick="seqSet('${k}','${v}')" aria-label="${esc(KMAP[k].t)}: ${x.l}, Notenwert ${fmtW(stw()[v])}">${fmtW(stw()[v])}</button>`).join("");
+const padRow=(k,cur,lab)=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" data-k="${esc(k)}" class="${cur===v?"cur":""}" aria-pressed="${cur===v}" onclick="seqSet(${ja(k)},'${v}')" aria-label="${esc(lab||KMAP[k].t)}: ${x.l}, Notenwert ${fmtW(stw()[v])}">${fmtW(stw()[v])}</button>`).join("");
 // Massive Unterrichtsstörung in der Runde (Mathe) und im Stundenstatus (Sport); gespeichert sofort, in ER.run unter "@st"
 function stRow(sid){const r=ER.run[sid],id=r&&r!=="abw"?r["@st"]:null,on=!!(id&&db.asv.some(a=>a.id===id));
   return `<div class="seqrow"><button class="btn block abw stb${on?" cur":""}" aria-pressed="${on}" onclick="seqStoer(${ja(sid)})">${on?"⚠ Störung vermerkt":"⚠ Massive Störung"}</button></div>`}
 function seqRun(sid){let r=ER.run[sid];if(!r||r==="abw")r=ER.run[sid]={};return r}
-function seqSet(k,v){const g=groupById(ER.gid),s=seqCur();if(!g||!s||!Object.hasOwn(KMAP,k)||!Object.hasOwn(STUF,v))return;
+function lezInfo(t){dlg(`<p style="font-weight:700;font-size:1.05rem;margin:0 0 6px">Förderplanziel</p><p style="margin:0 0 8px">${esc(t)}</p>
+  <p class="small muted" style="margin:0 0 12px">Bewerte, wie sicher das Ziel heute erreicht ist: übertroffen, erfüllt, teilweise, kaum. Daraus entstehen der Notenvorschlag (wenn „Note im Zeugnis“ an ist) und die Textbausteine fürs Zeugnis.</p><button class="btn pri block" data-a="1">Schließen</button>`,(el,done)=>{el.querySelector('[data-a="1"]').onclick=()=>done(null)})}
+function seqSet(k,v){const g=groupById(ER.gid),s=seqCur();if(!g||!s||!Object.hasOwn(STUF,v))return;
+  const lz=String(k).startsWith("z:")?lezOf(s,fOf(g)).find(z=>"z:"+z.id===k):null;if(!lz&&(!Object.hasOwn(KMAP,k)||k==="lez"))return;
   const r=seqRun(s.id),old=r[k]?db.obs.find(o=>o.id===r[k]):null;
   if(old){db.obs=db.obs.filter(o=>o.id!==old.id);delete r[k];if(old.s===v){save();return render()}}
   const t=ER.t.trim().slice(0,300);if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
-  const o=touch({id:uid(),gid:g.id,sid:s.id,k,s:v,fb:false,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});db.obs.push(o);r[k]=o.id;g.lastK=k;save();render()}
+  const o=touch({id:uid(),gid:g.id,sid:s.id,k:lz?"lez":k,...(lz?{z:lz.id}:{}),s:v,fb:false,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});db.obs.push(o);r[k]=o.id;if(!lz)g.lastK=k;save();render()}
 function seqStoer(sid){const g=groupById(ER.gid);if(!g||g.arch||!g.members.includes(sid))return;
   const r=seqRun(sid),old=r["@st"]?db.asv.find(a=>a.id===r["@st"]):null;
   if(old){db.asv=db.asv.filter(a=>a.id!==old.id);delete r["@st"];save();return render()}
@@ -465,10 +484,10 @@ function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.o
   const from=OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00";
   const all=[...obsOf(g.id).filter(o=>o.d>=from),...plObs(g.id,null,from)];
   const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code)),lim=daysAgo(14),hasKa=kaOf(g.id,from).length>0;
-  const rows=ms.map(s=>{const os=all.filter(o=>o.sid===s.id).sort((a,b)=>a.d.localeCompare(b.d)||a.upd-b.upd),z=os.filter(o=>!o.fb);
+  const rows=ms.map(s=>{const os=all.filter(o=>o.sid===s.id).sort((a,b)=>a.d.localeCompare(b.d)||a.upd-b.upd),z=zaehl(s,g,os.filter(o=>!o.fb)),zb=zdBer(s,g);
     const last=os.length?os[os.length-1].d:null,old=!os.some(o=>o.d>=lim);
     return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span>${(s.profil||"r")!=="r"?` <span class="tag ${s.profil}">${s.profil==="zd"?"LE":"NA"}</span>`:""}${nm(s)}</th>
-    <td class="num">${z.length}${os.length>z.length?`<span class="muted small"> +${os.length-z.length}</span>`:""}</td><td class="num">${genug(z)?hid(vorschlag(z)):"–"}</td>${hasKa?(()=>{const k=kaMean(g.id,s.id,from),t=gesamt(genug(z)?noteMean(z):null,k,g.fach);return `<td class="num">${k==null?"–":hid(noteTxt(k))}</td><td class="num"><b>${t==null?"–":hid(noteTxt(t))}</b></td>`})():""}
+    <td class="num">${z.length}${os.length>z.length?`<span class="muted small"> +${os.length-z.length}</span>`:""}</td><td class="num">${zb?'<span class="small muted">Bericht</span>':genug(z)?hid(vorschlag(z)):"–"}</td>${hasKa?(()=>{const k=kaMean(g.id,s.id,from),t=gesamt(!zb&&genug(z)?noteMean(z):null,k,g.fach);return `<td class="num">${k==null?"–":hid(noteTxt(k))}</td><td class="num"><b>${t==null?"–":hid(noteTxt(t))}</b></td>`})():""}
     <td class="num">${(n=>n?hid(String(n)):"–")(stOf(g.id,s.id,from).length)}</td><td class="verl">${z.slice(-6).map(o=>hid(oTxt(o))).join(" ")||"–"}</td><td class="small${old?" old":""}">${last?dDEy(last).slice(0,6):"–"}</td></tr>`}).join("");
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
   <div class="between"><h1 style="margin-bottom:4px">Übersicht</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · ${hasKa?"Sonstige Mitarbeit und Klassenarbeiten":"Sonstige Mitarbeit"}</p>
@@ -478,14 +497,17 @@ function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.o
   ${g.arch?"":`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="erStart(${ja(g.id)})">Erfassen</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">${kaL(g)[1]}</button>${g.fach==="Sport"?`<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)},att:true})">Stundenstatus</button>`:""}</p>`}`}
 
 // Auf der Seite einer Schülerin, eines Schülers: Einträge dieser Lerngruppe
-function susObsV(s,g){const os=[...obsOf(g.id,s.id),...plObs(g.id,s.id)].sort((a,b)=>b.d.localeCompare(a.d)||b.upd-a.upd),z=os.filter(o=>!o.fb),ro=!!g.arch;
-  const per=KRIT.map(K=>{const a=z.filter(o=>o.k===K.k);return a.length?`<span class="tag">${esc(K.t)}: ${hid(noteTxt(mean(a)))} (${a.length})</span>`:""}).join(" ");
+function susObsV(s,g){const os=[...obsOf(g.id,s.id),...plObs(g.id,s.id)].sort((a,b)=>b.d.localeCompare(a.d)||b.upd-a.upd),z=zaehl(s,g,os.filter(o=>!o.fb)),ro=!!g.arch,lz=lezOf(s,fOf(g)),zb=zdBer(s,g);
+  const per=lz.length?"":KRIT.map(K=>{const a=z.filter(o=>o.k===K.k);return a.length?`<span class="tag">${esc(K.t)}: ${hid(noteTxt(mean(a)))} (${a.length})</span>`:""}).join(" ");
+  const sz=lz.map(q=>[q,z.filter(o=>o.z===q.id)]),tb=sz.map(([q,a])=>lezSatz(q,a)).filter(Boolean);
+  const lzBox=lz.length?`<div style="margin:6px 0 10px"><b class="small">Förderplanziele</b>${sz.map(([q,a])=>`<div class="small" style="margin:4px 0">${esc(q.t)} <span class="muted">(${a.length} ${a.length===1?"Eintrag":"Einträge"}${a.length?`, ${hid(lezStand(a))}`:""})</span></div>`).join("")}
+    ${tb.length?`<div class="small" style="margin-top:8px"><b>Textbausteine fürs Zeugnis</b>${tb.map(t=>`<div style="margin:3px 0">${hid(esc(t))}</div>`).join("")}</div>`:""}</div>`:"";
   return `<div class="card"><div class="between"><b>Sonstige Mitarbeit in ${esc(gName(g))}</b>${ssBtn()}</div>
-  <p class="small muted" style="margin:6px 0">${z.length} zählende ${z.length===1?"Beobachtung":"Beobachtungen"}${os.length>z.length?`, ${os.length-z.length} nur Rückmeldung`:""} · ${genug(z)?`Notenvorschlag ${hid(vorschlag(z))}`:"Notenvorschlag ab 3 Beobachtungen in 2 Kriterien"}</p>${per?`<p style="display:flex;flex-wrap:wrap;gap:6px">${per}</p>`:""}
-  ${os.length?`<ul class="obsl">${os.map(o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(KMAP[o.k].t)}</span><br><b>${o.fb?`<span class="muted">Rückmeldung</span> ${hid(oTxt(o))}`:hid(oTxt(o))}</b>${o.t?` <span class="small">${esc(o.t)}</span>`:""}</div>
+  <p class="small muted" style="margin:6px 0">${z.length} zählende ${z.length===1?"Beobachtung":"Beobachtungen"}${lz.length?" zu den Förderplanzielen":os.length>z.length?`, ${os.length-z.length} nur Rückmeldung`:""} · ${zb?"Zeugnis: Bericht statt Note":genug(z)?`Notenvorschlag ${hid(vorschlag(z))}`:`Notenvorschlag ab 3 Beobachtungen in 2 ${lz.length?"Zielen":"Kriterien"}`}</p>${per?`<p style="display:flex;flex-wrap:wrap;gap:6px">${per}</p>`:""}${lzBox}
+  ${os.length?`<ul class="obsl">${os.map(o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(zLab(o,s))}</span><br><b>${o.fb?`<span class="muted">Rückmeldung</span> ${hid(oTxt(o))}`:hid(oTxt(o))}</b>${o.t?` <span class="small">${esc(o.t)}</span>`:""}</div>
   ${ro?"":o.pl?`<span class="small muted">gesondert</span>`:`${o.fb?`<button class="btn ghost small" aria-label="Alter Eintrag als Rückmeldung, zählt nicht. Tippen: zählt" onclick="obsFb(${ja(o.id)})">zählt nicht</button>`:""}<button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="obsDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul>`:`<p class="muted small">Noch keine Einträge.</p>`}
-  ${ro?"":`<p style="margin-bottom:0"><button class="btn" onclick="ER={...erNeu(${ja(g.id)},'e'),sel:[${ja(s.id)}]};go({tab:view.tab,group:${ja(g.id)},erf:${ja(g.id)}})">Für ${esc(s.code)} erfassen</button></p>`}</div>
-  ${kaSusCard(s,g,genug(z)?noteMean(z):null)}`}
+  ${ro?"":lz.length?`<p style="margin-bottom:0"><button class="btn" onclick="ER={...erNeu(${ja(g.id)},'k'),i:${Math.max(0,msOf(g).findIndex(x=>x.id===s.id))}};go({tab:view.tab,group:${ja(g.id)},erf:${ja(g.id)}})">Ziele für ${esc(s.code)} bewerten</button></p>`:`<p style="margin-bottom:0"><button class="btn" onclick="ER={...erNeu(${ja(g.id)},'e'),sel:[${ja(s.id)}]};go({tab:view.tab,group:${ja(g.id)},erf:${ja(g.id)}})">Für ${esc(s.code)} erfassen</button></p>`}</div>
+  ${kaSusCard(s,g,!zb&&genug(z)?noteMean(z):null)}`}
 function kaSusCard(s,g,somi){if(!kaOf(g.id).length)return "";const k=kaMean(g.id,s.id),t=gesamt(somi,k,g.fach);
   return `<div class="card"><div class="between"><b>${kaL(g)[1]} in ${esc(gName(g))}</b>${g.fach==="Mathe"?"":ssBtn()}</div>${kaSusV(s,g)}
   <p class="small" style="margin:8px 0 0">Schnitt: ${k==null?"–":hid(noteTxt(k))} · <b>Gesamtvorschlag: ${t==null?"–":hid(noteTxt(t))}</b></p>
@@ -1041,7 +1063,7 @@ function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){vie
   <div class="card"><b>Profil</b><div class="sub" style="margin-top:6px">Gilt in allen Lerngruppen. Der Förderschwerpunkt wird bewusst nicht gespeichert.</div>
   <div class="pick" style="margin-top:8px">${Object.entries(PROFILE).map(([k,t])=>`<button class="${p===k?"on":""}" ${dis} onclick="setProfil(${ja(s.id)},'${k}')">${t}</button>`).join("")}</div>
   ${p==="na"?`<label for="na">Nachteilsausgleich</label><div class="sub">Z. B. mehr Zeit, mündlich statt schriftlich, Ersatzaufgabe im Sport. Keine Diagnosen eintragen.</div><textarea id="na" ${dis} maxlength="2000" onchange="setNA(${ja(s.id)},this.value)">${esc(s.na)}</textarea>`:""}
-  ${p==="zd"?`<label class="swr"><span class="grow">Note im Zeugnis<span class="sub">Aus: Leistungsbeschreibung als Bericht. An: Note auf Grundlage der Förderplanziele.</span></span><input type="checkbox" class="sw" ${s.zdNote?"checked":""} ${dis} onchange="setZd(${ja(s.id)},this.checked)"></label><p class="muted small">Die Förderplanziele als Bewertungskriterien kommen in einer späteren Version.</p>`:""}</div>
+  ${p==="zd"?`<label class="swr"><span class="grow">Note im Zeugnis<span class="sub">Aus: Leistungsbeschreibung als Bericht. An: Note auf Grundlage der Förderplanziele.</span></span><input type="checkbox" class="sw" ${s.zdNote?"checked":""} ${dis} onchange="setZd(${ja(s.id)},this.checked)"></label>${lezEd(s,g,dis)}`:""}</div>
   ${susObsV(s,g)}
   ${stSusCard(s,g)}
   ${pdfCard(s,g)}
@@ -1049,6 +1071,19 @@ function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){vie
 async function setIcon(id){const s=susById(id),i=await pickIcon(s.icon,s.cls);if(!i)return;s.icon=i;touch(s);save();render()}
 function setProfil(id,p){const s=susById(id);s.profil=p;touch(s);save();render()}
 function setNA(id,v){const s=susById(id);if(looksLikeName(v.split(/\s+/)[0]||""))toast("Bitte keine Namen eintragen.");s.na=v.trim();touch(s);save();toast("Gespeichert")}
+function lezEd(s,g,dis){const f=fOf(g),lz=lezOf(s,f);
+  return `<label style="margin-top:12px">Förderplanziele ${f}</label><div class="sub">2 bis 4 Ziele aus dem Förderplan, kurz formuliert, ohne Diagnosen. In der Runde bewertest du für ${esc(s.code)} dann diese Ziele statt der Kriterien.</div>
+  ${lz.map((z,i)=>`<div class="row" style="margin:6px 0;gap:6px"><input class="grow" maxlength="120" value="${esc(z.t)}" aria-label="Förderplanziel ${i+1}" ${dis} onchange="lezEdit(${ja(s.id)},${ja(f)},${ja(z.id)},this.value)"><button class="btn ghost danger small" ${dis} aria-label="Ziel ${i+1} löschen" onclick="lezDel(${ja(s.id)},${ja(f)},${ja(z.id)})">✕</button></div>`).join("")}
+  ${lz.length<4&&!dis?`<div class="row" style="margin:6px 0;gap:6px"><input id="lezNeu" class="grow" maxlength="120" placeholder="z. B. Zahlen bis 100 ordnen" aria-label="Neues Förderplanziel"><button class="btn small" onclick="lezAdd(${ja(s.id)},${ja(f)})">Hinzufügen</button></div>`:""}`}
+function lezSet(s,f,list){const o={...(s.lez||{})};if(list.length)o[f]=list;else delete o[f];if(Object.keys(o).length)s.lez=o;else delete s.lez;touch(s);save();render()}
+function lezAdd(id,f){const s=susById(id);if(!s||!FAECHER.includes(f))return;const t=String($("#lezNeu")?.value||"").trim().slice(0,120),l=s.lez?.[f]||[];
+  if(!t)return toast("Bitte ein Ziel eintragen.");if(l.length>=4)return toast("Höchstens 4 Ziele.");if(looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen eintragen.");
+  lezSet(s,f,[...l,{id:uid(),t}]);requestAnimationFrame(()=>$("#lezNeu")?.focus())}
+function lezEdit(id,f,zid,v){const s=susById(id);if(!s||!FAECHER.includes(f))return;const t=String(v).trim().slice(0,120);if(!t)return render(),toast("Das Ziel darf nicht leer sein. Zum Entfernen ✕ tippen.");
+  lezSet(s,f,(s.lez?.[f]||[]).map(z=>z.id===zid?{...z,t}:z));toast("Gespeichert")}
+async function lezDel(id,f,zid){const s=susById(id);if(!s||!FAECHER.includes(f))return;const n=db.obs.filter(o=>o.sid===id&&o.k==="lez"&&o.z===zid).length;
+  if(n&&!await ask("Ziel entfernen?",{ok:"Entfernen",sub:`${n} ${n===1?"Eintrag bleibt":"Einträge bleiben"} gespeichert, ${n===1?"zählt":"zählen"} aber nicht mehr.`}))return;
+  lezSet(s,f,(s.lez?.[f]||[]).filter(z=>z.id!==zid))}
 function setZd(id,v){const s=susById(id);s.zdNote=v;touch(s);save();render()}
 async function removeFromGroup(gid,sid){const g=groupById(gid),s=susById(sid);
   if(!await ask(`${s.code} aus ${gName(g)} entfernen?`,{ok:"Entfernen",sub:"Die Einträge bleiben gespeichert und sind wieder da, wenn du das Kürzel erneut hinzufügst."}))return;
@@ -1100,18 +1135,21 @@ async function susPdf(sid,gid){const s=susById(sid),g=groupById(gid);if(!s||!g||
   // Sonstige Mitarbeit / Sonstige Leistungen
   const os=[...obsOf(g.id,s.id),...plObs(g.id,s.id)].filter(o=>o.d>=from&&!o.fb).sort((a,b)=>a.d.localeCompare(b.d)||a.upd-b.upd);
   sec(SP?"Sonstige Leistungen":"Sonstige Mitarbeit");
-  const ks=KRIT.filter(K=>!K.nogw&&os.some(o=>o.k===K.k));
+  const lz=lezOf(s,fOf(g)),zs=zaehl(s,g,os),zb=zdBer(s,g),ks=KRIT.filter(K=>!K.nogw&&!K.alt&&zs.some(o=>o.k===K.k));
   if(!os.length)d.wrap("Keine Einträge in diesem Zeitraum.",L,W,{size:10,color:"muted"});
-  else{row([[0,200,"Kriterium"],[210,70,"Einträge"],[290,90,"Schnitt"],[390,80,"Gewicht"]],{bold:1,color:"muted"});
-    ks.forEach(K=>{const a=os.filter(o=>o.k===K.k);row([[0,200,K.t],[210,70,String(a.length)],[290,90,noteTxt(mean(a))],[390,80,kgw(K.k)+"x"]])});
-    d.y+=4;d.wrap(genug(os)?`Rechnerischer Notenvorschlag: ${pTxt(vorschlag(os))}`:"Noch kein Notenvorschlag (ab 3 Einträgen in 2 Kriterien).",L,W,{size:10.5,bold:1});
+  else{if(lz.length){row([[0,280,"Förderplanziel"],[290,60,"Einträge"],[360,W-360,"Stand"]],{bold:1,color:"muted"});
+      lz.forEach(q=>{const a=zs.filter(o=>o.z===q.id);row([[0,280,q.t],[290,60,String(a.length)],[360,W-360,lezStand(a)||"–"]])});
+      const tb=lz.map(q=>lezSatz(q,zs.filter(o=>o.z===q.id))).filter(Boolean);if(tb.length){d.y+=4;d.wrap("Textbausteine fürs Zeugnis",L,W,{size:10,bold:1});tb.forEach(t=>d.wrap(t,L,W,{size:9.5}))}}
+    else{row([[0,200,"Kriterium"],[210,70,"Einträge"],[290,90,"Schnitt"],[390,80,"Gewicht"]],{bold:1,color:"muted"});
+    ks.forEach(K=>{const a=zs.filter(o=>o.k===K.k);row([[0,200,K.t],[210,70,String(a.length)],[290,90,noteTxt(mean(a))],[390,80,kgw(K.k)+"x"]])})}
+    d.y+=4;d.wrap(zb?"Zeugnis: Bericht statt Note (zieldifferent).":genug(zs)?`Rechnerischer Notenvorschlag: ${pTxt(vorschlag(zs))}${lz.length?" (auf Grundlage der Förderplanziele)":""}`:`Noch kein Notenvorschlag (ab 3 Einträgen in 2 ${lz.length?"Zielen":"Kriterien"}).`,L,W,{size:10.5,bold:1});
     d.y+=6;d.wrap("Einzelne Einträge",L,W,{size:10,bold:1});
-    os.forEach(o=>row([[0,62,dDEy(o.d)],[66,120,KMAP[o.k].t],[190,100,o.s?`${STUF[o.s].l} (${STUF[o.s].t})`:`Note ${o.n}`],[294,W-294,(o.pl?"gesondert: ":"")+(o.t||"")]]))}
+    os.forEach(o=>row([[0,62,dDEy(o.d)],[66,120,zLab(o,s)],[190,100,o.s?`${STUF[o.s].l} (${STUF[o.s].t})`:`Note ${o.n}`],[294,W-294,(o.pl?"gesondert: ":"")+(o.t||"")]]))}
   // Klassenarbeiten / schriftliche Überprüfungen
   const ka=kaOf(g.id,from);
   if(ka.length){sec(kaL(g)[1]);row([[0,62,"Datum"],[66,190,"Titel"],[260,110,"Punkte"],[374,W-374,"Note"]],{bold:1,color:"muted"});
     ka.forEach(a=>{const x=a.r[s.id]||{},n=kaNote(a,s.id);row([[0,62,dDEy(a.d)],[66,190,a.t],[260,110,x.st?KAST[x.st]:x.p!=null?`${fmtP(x.p)} von ${fmtP(x.mx||a.max)}`:"–"],[374,W-374,(n?n:"–")+(x.na?" (NA gewährt)":"")]])});
-    const k=kaMean(g.id,s.id,from),t=gesamt(genug(os)?noteMean(os):null,k,g.fach);
+    const k=kaMean(g.id,s.id,from),t=gesamt(!zb&&genug(zs)?noteMean(zs):null,k,g.fach);
     d.y+=4;d.wrap(`Schnitt: ${pTxt(noteTxt(k))} · Gesamtvorschlag: ${pTxt(t==null?"–":noteTxt(t))}`,L,W,{size:10.5,bold:1});d.wrap(`Gewichtung: ${wTxt(g)}.`,L,W,{size:9,color:"muted"})}
   // Sport: Stundenstatus
   if(SP){const at=db.att.filter(a=>a.gid===g.id&&a.sid===s.id&&a.d>=from);sec("Stundenstatus");
@@ -1246,9 +1284,10 @@ async function delDemo(){if(!await ask("Die fiktive Beispielklasse entfernen? De
   db.groups=db.groups.filter(g=>!g.demo);db.sus=db.sus.filter(s=>!s.demo);db.obs=db.obs.filter(o=>!o.demo);db.att=db.att.filter(a=>!a.demo);db.ka=db.ka.filter(a=>!a.demo);db.asv=db.asv.filter(a=>!a.demo);db.rl=db.rl.filter(a=>!a.demo);save();render();toast("Beispielklasse entfernt")}
 function demo(){if(db.groups.some(g=>g.demo))return toast("Beispielklasse ist schon da");
   const prof=["r","r","na","r","zd","r","r","na"],sus=prof.map((p,i)=>touch({id:uid(),code:`DEMO-${String(i+1).padStart(2,"0")}`,cls:"DEMO",icon:ICONS[i*5%ICONS.length],profil:p,
-    na:p==="na"?(i===2?"Fiktiv: 10 Minuten mehr Zeit bei Klassenarbeiten.":"Fiktiv: Ersatzaufgabe im Sport (Schiedsrichter, Helfen)."):"",zdNote:p==="zd",demo:true}));
+    na:p==="na"?(i===2?"Fiktiv: 10 Minuten mehr Zeit bei Klassenarbeiten.":"Fiktiv: Ersatzaufgabe im Sport (Schiedsrichter, Helfen)."):"",zdNote:p==="zd",
+    ...(p==="zd"?{lez:{Mathe:[{id:uid(),t:"Zahlen bis 1000 ordnen und vergleichen (fiktiv)"},{id:uid(),t:"Einfache Sachaufgaben mit Plus und Minus lösen (fiktiv)"}]}}:{}),demo:true}));
   db.sus.push(...sus);
-  const gm=touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true});db.obs.push(...demoObs(gm));db.ka.push(demoKa(gm),demoPl(gm));db.asv.push(...demoStoer(gm));db.rl.push(demoRl(gm));
+  const gm=touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true});db.obs.push(...demoObs(gm));{const z=sus[4].lez.Mathe;db.obs.push(...[[0,"3"],[1,"2"],[0,"4"],[1,"3"]].map(([j,v],i)=>({id:uid(),gid:gm.id,sid:sus[4].id,k:"lez",z:z[j].id,s:v,fb:false,d:daysAgo(4+i*3),t:"",upd:Date.now(),demo:true})))}db.ka.push(demoKa(gm),demoPl(gm));db.asv.push(...demoStoer(gm));db.rl.push(demoRl(gm));
   const gs=touch({id:uid(),fach:"Sport",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.slice(0,6).map(s=>s.id),arch:null,demo:true});
   db.obs.push(...[[0,"4","mot"],[0,"3","soz"],[1,"3","mot"],[1,"2","arb"],[2,"3","kog"],[3,"2","mot"],[4,"3","soz"],[5,"4","arb"],[0,"3","kog"]].map(([i,v,k],j)=>({id:uid(),gid:gs.id,sid:gs.members[i],k,s:v,fb:false,d:daysAgo(3+j*2),t:j===0?"Fiktiv: Handstand sicher gehalten.":"",upd:Date.now(),demo:true})));
   db.ka.push(demoPue(gs));db.groups.push(gm,gs);
