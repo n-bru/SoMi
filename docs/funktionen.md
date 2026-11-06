@@ -50,6 +50,12 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Gewicht-Vorschlag 5 : 1 : 2 : 2 (= 50/10/20/20 %), in Einstellungen 1× bis 5× änderbar.
 - Erfassen mit Umschalter Status / Ganze Klasse / Einzeln. Übersicht Sonstige Leistungen und Übersicht Stundenstatus getrennt.
 
+## Sport: Punktuelle Überprüfungen (ab 0.5.0)
+- In der Sport-Gruppe „Punktuelle Überprüfungen“. Anlegen mit Titel, Datum, Art (Demonstration, Motorischer Test, Aufwärmen gestalten, Sportabzeichen, Bundesjugendspiele, Sonstiges) und Bereich (Motorik, Wissen, Sozialverhalten, Arbeitsverhalten; Standard Motorik).
+- Je Kürzel direkt eine Note 1+ bis 6, oder „fehlt“ / „holt nach“. Die Note zählt als Eintrag im gewählten Bereich der Sonstigen Leistungen (kein eigenes Gewicht).
+- Gruppen (Riegen): „Einteilen“ ordnet jedem Kürzel Gruppe 1 bis 6 zu. Oben „Alle / Gr. 1 / Gr. 2 …“ wählt, wer beim Eintragen drankommt; am Ende „Weiter mit Gruppe …“. Eine neue Überprüfung übernimmt die Gruppen der letzten.
+- Gespeichert in db.ka mit k:"pue", b (Bereich), art, rg {Kürzel-ID: Gruppe}. Geprüft in okKa/okRg.
+
 ## Erfassen auf dem iPhone (ab 0.4.5, Matrix ab 0.4.6, volle Höhe ab 0.4.8)
 - Die Erfassen-Seiten füllen genau den Bildschirm und scrollen nie. Getestet bei 375 × 548 (iPhone SE im Safari-Tab), 390 × 664 und 430 × 740. Bei „Einzeln“ mit großer Klasse scrollt nur die Kürzel-Liste.
 - Runde als Matrix: oben einmal die Stufen, links die Kriterien, Knöpfe zeigen den Notenwert. Fragezeichen am Kriterium öffnet Hinweis und Ankertexte.
