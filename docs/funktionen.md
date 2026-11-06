@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.4.7, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.8, Stand 05.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -50,7 +50,8 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Gewicht-Vorschlag 5 : 1 : 2 : 2 (= 50/10/20/20 %), in Einstellungen 1× bis 5× änderbar.
 - Erfassen mit Umschalter Status / Ganze Klasse / Einzeln. Übersicht Sonstige Leistungen und Übersicht Stundenstatus getrennt.
 
-## Erfassen auf dem iPhone (ab 0.4.5, Matrix ab 0.4.6)
+## Erfassen auf dem iPhone (ab 0.4.5, Matrix ab 0.4.6, volle Höhe ab 0.4.8)
+- Die Erfassen-Seiten füllen genau den Bildschirm und scrollen nie. Getestet bei 375 × 548 (iPhone SE im Safari-Tab), 390 × 664 und 430 × 740. Bei „Einzeln“ mit großer Klasse scrollt nur die Kürzel-Liste.
 - Runde als Matrix: oben einmal die Stufen, links die Kriterien, Knöpfe zeigen den Notenwert. Fragezeichen am Kriterium öffnet Hinweis und Ankertexte.
 - Runde und Stundenstatus passen ohne Scrollen auf ein iPhone (Safari, 390 × 664). Kopf in einer Zeile, Menüleiste unten beim Erfassen aus (zurück über ‹).
 - In der Runde keine Hinweise und Ankertexte. Die stehen weiter bei „Einzeln bewerten“. Stichwort und Datum stehen unter den Knöpfen. „Nur Rückmeldung“ gibt es ab 0.4.7 nicht mehr: Jeder neue Eintrag zählt.

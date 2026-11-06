@@ -135,8 +135,23 @@ body.erf nav{display:none}body.erf main{padding-bottom:24px}
 .seqc .pad.st span:first-child{color:var(--ink);font-size:.74rem;white-space:nowrap}.seqc .pad button.cur span{color:var(--acc-ink)}.mx{display:grid;grid-template-columns:minmax(0,2fr) repeat(4,minmax(0,1fr));gap:5px;margin-top:5px;align-items:stretch}
 .mxh{margin-top:8px}.mxh span{font-size:.66rem;font-weight:700;color:var(--muted);text-align:center;line-height:1.15;align-self:end;hyphens:manual}
 .mx .seqk{display:flex;align-items:center;justify-content:space-between;gap:4px;text-align:left;margin:0;min-height:44px;padding:4px 2px;border:none;background:none;color:var(--ink);font:inherit;font-size:.78rem;line-height:1.15;hyphens:manual}
-.mx .seqk b{min-width:0;overflow-wrap:anywhere}.q{display:inline-grid;place-items:center;flex:none;width:18px;height:18px;border-radius:50%;background:var(--soft);border:1.5px solid var(--line);font-size:.75rem;font-weight:800;color:var(--muted)}
+.mx .seqk b{min-width:0}.q{display:inline-grid;place-items:center;flex:none;width:18px;height:18px;border-radius:50%;background:var(--soft);border:1.5px solid var(--line);font-size:.75rem;font-weight:800;color:var(--muted)}
 .mx button[data-s]{min-height:44px;font-size:.95rem;padding:0 2px}
+/* 0.4.8: Erfassen füllt genau den Bildschirm, nie scrollen. Die Knopfzeilen teilen sich die freie Höhe. */
+body.erf{height:100dvh;overflow:hidden}
+body.erf main{height:100dvh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+body.erf main>*{flex:none}body.erf main>.fill{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;margin-bottom:0}
+body.erf .fill>*{flex:none}body.erf .padwrap{position:static;box-shadow:none;margin:6px 0 0;padding:0}
+.mxw{flex:1 1 auto!important;min-height:0;display:grid;gap:5px;align-content:start}
+.mxw .mx{margin:0}.mxw .mx>*{min-height:0!important;height:100%}.mxw .mxh{margin:4px 0 0}
+.erx{display:flex;gap:6px;margin-top:6px}.erx #erT{flex:1;min-width:0}.erx #erD{flex:none;width:auto;max-width:44%}
+body.erf .stgrid{flex:1 1 auto!important;min-height:0;grid-template-rows:repeat(2,minmax(0,96px));align-content:start}body.erf .stgrid .btn{min-height:0;height:100%}
+.tilew{flex:1 1 auto!important;min-height:0;overflow-y:auto;margin-top:6px}
+.chips.one{flex:1;min-width:0;gap:5px}.chips.one button{padding:6px 10px;font-size:.84rem}
+.ein{padding:10px 12px}.ein .tiles{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;margin:0}.ein .tiles:has(.nm){grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.ein .tile{min-height:44px;padding:4px;gap:4px}.ein .tile .kic{width:24px;height:24px;font-size:.9rem}.ein .tile .code{font-size:.8rem}
+.ein .pad.st button{min-height:46px;padding:3px 2px;grid-template-rows:auto auto;gap:0;align-content:center}.ein .pad.st b{display:none}.ein .pad.st span:first-of-type{color:var(--ink);font-size:.74rem;white-space:nowrap}
+.ein .stb{min-height:40px;padding:6px 10px;font-size:.95rem}.ein .btn.ic{width:40px;height:40px;padding:0;display:grid;place-items:center;flex:none}
 .seqc .stb{min-height:40px;padding:6px 10px;font-size:.95rem}
 body.erf .padwrap{bottom:env(safe-area-inset-bottom);margin-top:8px;padding:6px 8px}body.erf .padwrap .btn{min-height:44px}
 body.erf .stgrid .btn{min-height:52px}
@@ -151,7 +166,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.4.7 Beta",SOMI_STAND="05.11.2026";
+const SOMI_VERSION="0.4.8 Beta",SOMI_STAND="05.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -237,7 +252,7 @@ const KRIT=[
  {k:"qual",t:"Qualität der Beiträge",kz:"Qualität",hint:"Dazu gehört auch die Fachsprache. Fehler in Erarbeitungs- und Übungsphasen nicht abwerten (Kernlehrplan Mathe). Im Zweifel nicht eintragen.",
   gut:["nennt richtige Lösungen und begründet sie nachvollziehbar","geht selbstständig auf andere Lösungen ein, findet Argumente und Begründungen","stellt Ergebnisse auf unterschiedliche Art und mit verschiedenen Medien dar","verwendet Fachbegriffe sicher und korrekt"],
   aus:["nennt teilweise richtige Lösungen, meist ohne nachvollziehbare Begründung","geht selten auf andere Lösungen ein, nennt Argumente, kann sie aber nicht begründen","stellt Ergebnisse nur auf eine Art dar","verwendet Fachbegriffe selten oder ungenau"]},
- {k:"kont",t:"Beteiligung",hint:"Beteiligung am Unterrichtsgespräch (SILP: Kontinuität). Nur bewerten, wenn du einen klaren Eindruck hast.",
+ {k:"kont",t:"Beteiligung",kz:"Betei­ligung",hint:"Beteiligung am Unterrichtsgespräch (SILP: Kontinuität). Nur bewerten, wenn du einen klaren Eindruck hast.",
   gut:["beteiligt sich regelmäßig am Unterrichtsgespräch"],aus:["nimmt eher selten am Unterrichtsgespräch teil"]},
  {k:"selbst",t:"Selbstständigkeit",kz:"Selbst­ständig­keit",
   gut:["bringt sich von sich aus ein","ist ausdauernd bei der Sache, erledigt Aufgaben gründlich und zuverlässig","erarbeitet neue Inhalte weitgehend selbstständig, fragt selbst nach","erarbeitet bereitgestellte Materialien selbstständig"],
@@ -245,7 +260,7 @@ const KRIT=[
  {k:"hausa",t:"Hausaufgaben (LZ)",kz:"Haus­aufgaben",opt:"hausa",
   gut:["erledigt LZ-Aufgaben sorgfältig und vollständig","trägt sie mit nachvollziehbaren Erläuterungen vor"],
   aus:["erledigt LZ-Aufgaben weitgehend vollständig, teils oberflächlich","nennt Ergebnisse, erläutert erst auf Nachfrage und oft unvollständig"]},
- {k:"koop",t:"Kooperation",hint:"Mehrere Kürzel antippen, dann gilt die Note für die ganze Gruppe.",
+ {k:"koop",t:"Kooperation",kz:"Koope­ration",hint:"Mehrere Kürzel antippen, dann gilt die Note für die ganze Gruppe.",
   gut:["bringt sich ergebnisorientiert in Gruppen- und Teamarbeit ein","arbeitet kooperativ und respektiert Beiträge anderer"],
   aus:["bringt sich nur wenig in die Gruppen- und Teamarbeit ein","unterstützt die Gruppenarbeit wenig, stört aber nicht"]},
  {k:"fach",t:"Fachsprache",alt:true,gut:["wendet Fachbegriffe sachangemessen an und kann ihre Bedeutung erklären"],aus:["versteht Fachbegriffe nicht immer, wendet sie teils nicht sachangemessen an"]},
@@ -329,17 +344,13 @@ function erfV(){const g=groupById(view.erf);if(!g||g.arch){view={tab:view.tab,gr
   const ks=kritList(fOf(g));let k=ER.k||g.lastK||ks[0].k;if(!ks.some(x=>x.k===k))k=ks[0].k;const K=KMAP[k];
   const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code));
   const todayK=new Set(db.obs.filter(o=>o.gid===g.id&&o.d===ER.d&&o.k===k).map(o=>o.sid));
-  const st=stale(g);
   return `${erHd(g,"Erfassen",true)}${erPick(g)}
-  ${ER.mode==="k"?"":`<div class="card"><div class="chips" role="group" aria-label="Kriterium">${ks.map(x=>`<button class="${x.k===k?"on":""}" aria-pressed="${x.k===k}" onclick="ER.k='${x.k}';render()">${esc(x.t)}</button>`).join("")}</div>
-  <p style="margin:8px 0 0"><button class="btn ghost small" onclick="krInfo('${k}')" aria-label="Hinweis und Ankertexte zu ${esc(K.t)}"><span class="q">?</span> Ankertexte</button></p></div>`}
-  ${ER.mode==="k"?seqCard(g,ms):`<div class="card">
-  <div class="between" style="flex-wrap:wrap"><b>${ER.sel.length?`${ER.sel.length} ausgewählt`:"Kürzel antippen"}</b>${ER.sel.length?`<button class="btn ghost small" onclick="ER.sel=[];render()">Auswahl aufheben</button>`:""}</div>
-  <div class="tiles">${ms.map(s=>`<button class="tile${ER.sel.includes(s.id)?" on":""}" aria-pressed="${ER.sel.includes(s.id)}" onclick="erSel(${ja(s.id)})">${susIcon(s)}<span style="min-width:0"><span class="code" style="display:block">${esc(s.code)}</span>${nm(s)}</span>${todayK.has(s.id)?'<span class="done" aria-label="heute schon erfasst">✓</span>':""}${(s.profil||"r")==="zd"?'<span class="tag zd">LE</span>':(s.profil==="na"?'<span class="tag na">NA</span>':"")}</button>`).join("")||`<p class="muted">Noch niemand in dieser Gruppe.</p>`}</div>
-  <div class="padwrap"><div class="pad st" role="group" aria-label="Stufe">${padH()}</div><button class="btn block abw stb" style="margin-top:6px" onclick="addStoer()">${stBtnTxt(false)}</button></div>
-  ${erExtras()}</div>`}
-  ${st.length?`<div class="card"><b>Seit 2 Wochen ohne Eintrag</b><p class="small" style="margin:6px 0 0">${st.map(s=>esc(s.code)).join(", ")}</p></div>`:""}
-  <p><button class="btn block" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht ${esc(gName(g))}</button></p>`}
+  ${ER.mode==="k"?seqCard(g,ms):`<div class="card fill ein">
+  <div class="row" style="gap:6px"><div class="chips one" role="group" aria-label="Kriterium">${ks.map(x=>`<button class="${x.k===k?"on":""}" aria-pressed="${x.k===k}" onclick="ER.k='${x.k}';render()">${esc((x.kz||x.t).replace(/\u00ad/g,""))}</button>`).join("")}</div><button class="btn ghost ic" onclick="krInfo('${k}')" aria-label="Hinweis und Ankertexte zu ${esc(K.t)}"><span class="q">?</span></button></div>
+  <div class="between" style="margin-top:6px;min-height:28px"><b class="small">${ER.sel.length?`${ER.sel.length} ausgewählt`:"Kürzel antippen"}</b>${ER.sel.length?`<button class="btn ghost small" style="min-height:28px;padding:2px 8px" onclick="ER.sel=[];render()">Auswahl aufheben</button>`:""}</div>
+  <div class="tilew"><div class="tiles">${ms.map(s=>`<button class="tile${ER.sel.includes(s.id)?" on":""}" aria-pressed="${ER.sel.includes(s.id)}" onclick="erSel(${ja(s.id)})">${susIcon(s)}<span style="min-width:0"><span class="code" style="display:block">${esc(s.code)}</span>${nm(s)}</span>${todayK.has(s.id)?'<span class="done" aria-label="heute schon erfasst">✓</span>':""}${(s.profil||"r")==="zd"?'<span class="tag zd">LE</span>':(s.profil==="na"?'<span class="tag na">NA</span>':"")}</button>`).join("")||`<p class="muted">Noch niemand in dieser Gruppe.</p>`}</div></div>
+  <div class="padwrap"><div class="pad st" role="group" aria-label="Stufe">${padH()}</div><button class="btn block abw stb" style="margin-top:6px" onclick="addStoer()">⚠ Massive Störung</button></div>
+  ${erExtras()}</div>`}`}
 // Fragezeichen: Hinweis und Ankertexte eines Kriteriums im Dialog
 function krInfo(k){const K=KMAP[k];if(!K)return;dlg(`<p style="font-weight:700;font-size:1.05rem;margin:0 0 6px">${esc(K.t)}</p>${K.hint?`<p class="small" style="margin:0 0 8px;color:var(--sigt);font-weight:700">${esc(K.hint)}</p>`:""}
   <p class="small" style="margin:0"><b>gut</b></p><ul class="anc small">${K.gut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul><p class="small" style="margin:6px 0 0"><b>ausreichend</b></p><ul class="anc small">${K.aus.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
@@ -349,8 +360,8 @@ const erPick=g=>{const m=fOf(g)==="Sport"?[["s","Status"],["k","Ganze Klasse"],[
 // Kopfzeile beim Erfassen: eine Zeile statt Überschrift, Untertitel und großer Knöpfe
 const erHd=(g,h,eye)=>`<h1 class="sr">${h}</h1><div class="erhd"><button class="btn ghost" onclick="back()" aria-label="Zurück">‹</button><b>${esc(gName(g))}${g.demo?" (fiktiv)":""}</b>${hasNames()?`<button class="btn ss${NSHOW?"":" on"}" onclick="NSHOW=!NSHOW;render()" aria-pressed="${!NSHOW}">${NSHOW?"Namen aus":"Namen an"}</button>`:""}${eye?`<button class="btn ss ic${SHOW?" on":""}" onclick="SHOW=!SHOW;render()" aria-pressed="${SHOW}" aria-label="${SHOW?"Noten verbergen":"Noten zeigen"}">${EYE}</button>`:""}</div>`;
 const padH=()=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" onclick="addObs('${v}')" aria-label="${x.l}, Notenwert ${fmtW(stw()[v])}"><b>${x.t}</b><span>${x.l}</span><span class="nt">= ${fmtW(stw()[v])}</span></button>`).join("");
-const erExtras=()=>`<label for="erT">Stichwort <span class="muted small">(freiwillig)</span></label><input id="erT" maxlength="300" value="${esc(ER.t)}" oninput="ER.t=this.value" placeholder="${fOf(groupById(ER.gid))==="Sport"?"z. B. Handstand sicher gehalten":"z. B. Lösungsweg an der Tafel erklärt"}">
-  <div class="row"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${ER.d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();render()"></div>`;
+const erDate=(oc)=>`<input id="erD" type="date" aria-label="Datum" max="${today()}" value="${ER.d||today()}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();${oc||""}render()">`;
+const erExtras=()=>`<div class="erx"><input id="erT" maxlength="300" aria-label="Stichwort (freiwillig)" value="${esc(ER.t)}" oninput="ER.t=this.value" placeholder="Stichwort (freiwillig)">${erDate()}</div>`;
 const ancBox=K=>`${K.hint?`<p class="small" style="margin:6px 0 0;color:var(--sigt);font-weight:700;text-align:center">${esc(K.hint)}</p>`:""}
   <details style="margin-top:6px"><summary class="small" style="font-weight:700;cursor:pointer">Ankertexte aus dem SILP</summary>
   <div class="two small" style="margin-top:6px"><div><b>gut</b><ul class="anc">${K.gut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div><b>ausreichend</b><ul class="anc">${K.aus.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div></details>`;
@@ -359,16 +370,16 @@ function seqCard(g,ms){if(!ms.length)return `<div class="card"><p class="muted">
   if(!ER.ks)ER.ks=kritList(fOf(g)).map(x=>x.k);
   const ks=ER.ks,runs=Object.values(ER.run),nA=runs.filter(v=>v==="abw").length,nB=runs.filter(v=>v!=="abw"&&Object.keys(v).length).length;
   const sum=`${nB} bewertet${nA?` · ${nA} nicht anwesend`:""}`;
-  if(ER.i>=ms.length)return `<div class="card seqdone"><b style="font-size:1.2rem">Fertig</b><p>${nB} bewertet${nA?`, ${nA} nicht anwesend`:""}.</p>
+  if(ER.i>=ms.length)return `<div class="card seqdone fill"><b style="font-size:1.2rem">Fertig</b><p>${nB} bewertet${nA?`, ${nA} nicht anwesend`:""}.</p>
     <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="ER.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.run={};ER.ks=null;render()">Neue Runde</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
   const s=ms[ER.i],r=ER.run[s.id],abw=r==="abw";
   const rows=ks.map(k=>{const K=KMAP[k],id=r&&!abw?r[k]:null,o=id?db.obs.find(x=>x.id===id):null;
     return `<div class="pad mx" role="group" aria-label="${esc(K.t)}"><button class="seqk" onclick="krInfo('${k}')" aria-label="${esc(K.t)}: Hinweis und Ankertexte"><b>${esc(K.kz||K.t)}</b><span class="q" aria-hidden="true">?</span></button>${padRow(k,o?.s)}</div>`}).join("");
   const mxh=`<div class="mx mxh" aria-hidden="true"><span></span>${Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<span>${x.l.replace("über","über\u00ad")}</span>`).join("")}</div>`;
-  return `<div class="card seqc"><div class="seqhd">${bigSus(s)}<span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
+  return `<div class="card seqc fill"><div class="seqhd">${bigSus(s)}<span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
   ${abw?`<p class="small" style="margin:4px 0 0">Nicht anwesend. Stufe tippen hebt das auf.</p>`:""}
-  ${mxh}${rows}${stRow(s.id)}
+  <div class="mxw" style="grid-template-rows:auto repeat(${ks.length},minmax(0,64px))">${mxh}${rows}</div>${stRow(s.id)}
   <div class="padwrap"><div class="three"><button class="btn" ${ER.i?"":"disabled"} onclick="seqPrev()">‹ Zurück</button><button class="btn abw" onclick="seqAbw()" aria-label="nicht anwesend">abwesend</button><button class="btn pri" onclick="seqNext()">Weiter ›</button></div></div>
   ${erExtras()}</div>`}
 const padRow=(k,cur)=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" data-k="${k}" class="${cur===v?"cur":""}" aria-pressed="${cur===v}" onclick="seqSet('${k}','${v}')" aria-label="${esc(KMAP[k].t)}: ${x.l}, Notenwert ${fmtW(stw()[v])}">${fmtW(stw()[v])}</button>`).join("");
@@ -410,13 +421,13 @@ function addObs(v){const g=groupById(ER.gid);if(!g||!Object.hasOwn(STUF,v))retur
 function sportV(g){const ms=msOf(g),d=ER.d||today(),day=new Map(db.att.filter(a=>a.gid===g.id&&a.d===d).map(a=>[a.sid,a]));
   const cnt=Object.keys(ST).map(k=>[k,ms.filter(s=>day.get(s.id)?.st===k).length]).filter(x=>x[1]);
   const head=erHd(g,"Stundenstatus",false)+erPick(g);
-  const dat=`<div class="row" style="margin-top:12px"><label for="erD" style="margin:0" class="grow">Datum</label><input id="erD" type="date" style="width:auto" max="${today()}" value="${d}" onchange="ER.d=okDate(this.value)&&this.value<=today()?this.value:today();ER.i=0;ER.run={};render()"></div>`;
+  const dat=`<div class="erx" style="justify-content:flex-end">${erDate("ER.i=0;ER.run={};")}</div>`;
   const sum=cnt.map(([k,n])=>`${n} ${ST[k]}`).join(" · ")||"noch nichts erfasst";
   if(!ms.length)return head+`<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
-  if(ER.i>=ms.length)return head+`<div class="card seqdone"><b style="font-size:1.2rem">Fertig</b><p>${esc(sum)}.</p>
+  if(ER.i>=ms.length)return head+`<div class="card seqdone fill"><b style="font-size:1.2rem">Fertig</b><p>${esc(sum)}.</p>
     <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="ER.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;render()">Von vorn</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)},att:true})">Zur Übersicht</button></p>${dat}</div>`;
   const s=ms[ER.i],a=day.get(s.id),rest=ms.slice(ER.i).filter(x=>!day.has(x.id)).length;
-  return head+`<div class="card seqc"><div class="seqhd">${bigSus(s)}<span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
+  return head+`<div class="card seqc fill"><div class="seqhd">${bigSus(s)}<span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
   ${stRow(s.id)}
   <div class="stgrid" style="margin-top:8px">${Object.entries(ST).map(([k,t])=>`<button class="btn${k==="akt"?" pri":k==="abw"?" abw":""}${a?.st===k?" cur":""}" onclick="setAtt('${k}')">${t}</button>`).join("")}</div>
@@ -865,6 +876,7 @@ function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};retu
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="SD=null;render()">Abbrechen</button><button class="btn pri" onclick="addSus(${ja(g.id)})">Hinzufügen</button></div></div>`
     :`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="SD={code:nextCode(${ja(g.cls)})};render();$('#scode')?.focus()">+ Schüler:in</button>${others.length?`<button class="btn" onclick="addExisting(${ja(g.id)})">Aus Klasse ${esc(g.cls)} übernehmen</button>`:""}${ms.length?`<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},names:${ja(g.id)}})">Namen eintragen</button>`:""}</p>`}
   ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)},plm:true})">Präsentation, Heft, Übung${plOf(g.id).length?` (${plOf(g.id).length})`:""}</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Klassenarbeiten${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`:`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'s')">Stundenstatus erfassen</button><button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse bewerten</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Leistungen</button><button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)},att:true})">Übersicht Stundenstatus</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Schriftliche Überprüfungen${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`}
+  ${!ro&&ms.length&&stale(g).length?`<p class="small" style="margin:0 0 10px"><b>Seit 2 Wochen ohne Eintrag:</b> ${stale(g).map(x=>esc(x.code)).join(", ")}</p>`:""}
   <p class="row" style="flex-wrap:wrap"><button class="btn" onclick="RD=null;go({tab:view.tab,group:${ja(g.id)},rl:${ja(g.id)}})">Rückläufe${rlOf(g.id).filter(a=>!a.arch).length?` (${rlOf(g.id).filter(a=>!a.arch).length})`:""}</button></p>
   ${ms.length?ms.map(s=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)},sus:${ja(s.id)}})">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${nm(s)}${(s.profil||"r")!=="r"?`<span class="tag ${s.profil}">${esc(PROFILE[s.profil])}${s.profil==="zd"?(s.zdNote?" · mit Note":" · Bericht"):""}</span>`:`<span class="muted small">Regel</span>`}</div><span aria-hidden="true" class="muted">›</span></button>`).join(""):`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   ${ro?"":`<div class="card"><b>Schuljahresende</b><p class="small muted" style="margin:6px 0 10px">Archivieren macht die Gruppe nur noch lesbar. Die Daten bleiben ${FRIST_JAHRE} Jahre erhalten (VO-DV I § 9). Gelöscht wird erst nach deiner Bestätigung.</p><button class="btn" onclick="archive(${ja(g.id)})">Lerngruppe archivieren</button></div>`}`}

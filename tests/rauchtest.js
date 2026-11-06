@@ -77,7 +77,9 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   // 0.4.3 Ganze Klasse: feste Kriterien und Störungs-Knopf pro Kind auf einem Bildschirm
   await p.click(".card >> button:has-text('DEMO Mathe: ganze Klasse')");ok(await p.locator("h1",{hasText:"Erfassen"}).count()===1,"Erfassen geöffnet");
   ok(await p.locator(".seqsus:has-text('DEMO-01')").count()===1&&await p.locator("text=Was hast du heute beobachtet?").count()===0,"Runde startet ohne Kriterienwahl");
-  {const vp=p.viewportSize();await p.setViewportSize({width:390,height:664});
+  {const vp=p.viewportSize();for(const [w,h] of [[375,548],[390,664],[430,740]]){await p.setViewportSize({width:w,height:h});
+  ok(await p.evaluate(()=>document.documentElement.scrollHeight<=innerHeight&&document.querySelector("#erT").getBoundingClientRect().bottom<=innerHeight),`${w}×${h}: Runde passt ohne Scrollen, Stichwort sichtbar`)}
+  await p.setViewportSize({width:390,height:664});
   ok(await p.evaluate(()=>{const s=document.querySelector(".stb").getBoundingClientRect(),w=document.querySelector(".padwrap").getBoundingClientRect();return s.bottom<=w.top+1&&w.bottom<=innerHeight&&scrollY===0&&!document.querySelector("nav").offsetParent}),"iPhone: alle Knöpfe der Runde ohne Scrollen, Menüleiste ausgeblendet");
   await p.setViewportSize(vp)}
   ok(await p.evaluate(()=>JSON.stringify(ER.ks)===JSON.stringify(["qual","kont","selbst","koop"])),"immer Qualität, Beteiligung, Selbstständigkeit, Kooperation");
@@ -117,7 +119,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   o=await p.evaluate(()=>db.obs.at(-1));ok(o.fb===false&&o.s==="1","neuer Eintrag zählt immer");
   await p.evaluate(()=>{const x=db.obs.at(-1);x.fb=true;save()});// alter Eintrag als Rückmeldung bleibt gültig
   await p.click(".pad button[data-s='2']");// ohne Auswahl
-  await p.click("button:has-text('Übersicht DEMO Mathe')");ok(await p.locator("h1",{hasText:"Übersicht"}).count()===1,"Übersicht geöffnet");
+  await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();await p.click("button:has-text('Übersicht Sonstige Mitarbeit')");ok(await p.locator("h1",{hasText:"Übersicht"}).count()===1,"Übersicht geöffnet");
   ok(await p.evaluate(()=>[...document.querySelectorAll(".tbl tbody tr")].every(tr=>{const c=tr.cells;return !/[+−o]|\d/.test(c[2].innerText)&&!/[+−]/.test(c[3].innerText)})),"Sichtschutz: keine Noten in der Übersicht");
   await p.click("button:has-text('Noten zeigen')");ok(await p.locator(".tbl tr:has-text('DEMO-01')").innerText().then(t=>t.includes("+")),"Noten zeigen");
   ok(await p.evaluate(()=>noteOf(2)==="2"&&noteOf(2.34)==="2-"&&noteOf(2.66)==="3+"&&noteOf(1)==="1"&&noteOf(5.9)==="6"&&mean([{s:"4"},{s:"3"}])===1.5),"Umrechnung Stufen in Note mit + und −");
