@@ -1,4 +1,4 @@
-# Übergabe SoMi (Stand 05.11.2026)
+# Übergabe SoMi (Stand 06.11.2026)
 
 ## Wo was liegt
 
@@ -15,7 +15,7 @@
 
 ## Stand
 
-- Hauptversion 0.3.3 (Freigabe durch Nick am 05.11.2026). Beta 0.4.8 (06.11.2026): Erfassen füllt genau den Bildschirm, nie scrollen. Davor 0.4.7: „Nur Rückmeldung“ entfernt. Davor 0.4.6: Runde als Matrix, Ankertexte per Fragezeichen, Sport-Kriterien nach SILP Sport (Motorik, Wissen, Sozial-, Arbeitsverhalten; 5:1:2:2). Davor 0.4.5: Erfassen kompakt, auf dem iPhone alles ohne Scrollen. Davor 0.4.4: Störung nur mit Pflicht-Notiz, Fachsprache unter Qualität. Davor 0.4.3: Runde pro Kind auf einem Bildschirm mit festen Kriterien (Qualität 2×, Beteiligung, Selbstständigkeit, Kooperation), Knopf massive Unterrichtsstörung, Präsentation/Heft/Übung gesondert, Rücklauf-Listen. Arbeits- und Sozialverhalten wieder entfernt (Nick 05.11.). Beta 0.3.4 (Technik aus Pfad 1.2.6) steckt darin und ist noch ungetestet. Verlauf in `AENDERUNGEN.md`.
+- Hauptversion 0.3.3 (Freigabe durch Nick am 05.11.2026). Beta 0.4.9 (06.11.2026): Klassenlisten per Einfügen, Kurse daraus wählen (Nicks Wunsch). Echte Klassenlisten nie ins Repo, nur auf dem iPad einfügen. Offen: Klassen wechseln zum neuen Schuljahr (75 → 85) gibt es noch nicht. Davor 0.4.8: Erfassen füllt genau den Bildschirm, nie scrollen. Davor 0.4.7: „Nur Rückmeldung“ entfernt. Davor 0.4.6: Runde als Matrix, Ankertexte per Fragezeichen, Sport-Kriterien nach SILP Sport (Motorik, Wissen, Sozial-, Arbeitsverhalten; 5:1:2:2). Davor 0.4.5: Erfassen kompakt, auf dem iPhone alles ohne Scrollen. Davor 0.4.4: Störung nur mit Pflicht-Notiz, Fachsprache unter Qualität. Davor 0.4.3: Runde pro Kind auf einem Bildschirm mit festen Kriterien (Qualität 2×, Beteiligung, Selbstständigkeit, Kooperation), Knopf massive Unterrichtsstörung, Präsentation/Heft/Übung gesondert, Rücklauf-Listen. Arbeits- und Sozialverhalten wieder entfernt (Nick 05.11.). Beta 0.3.4 (Technik aus Pfad 1.2.6) steckt darin und ist noch ungetestet. Verlauf in `AENDERUNGEN.md`.
 - Entscheidungen (03.11.2026): nur für Nick; eigene Adresse n-bru.github.io/SoMi; App-Sperre standardmäßig an; Klassenarbeiten gehören dazu; Hausaufgaben als abschaltbares Kriterium; Notenskala 1 bis 6 mit + und −; Aufbewahrung 5 Jahre, Löschen nur nach Rückfrage; LE kann Noten bekommen.
 - Kriterien: Mathe nach SILP Mathe 4.2/4.3 (Stand 09/2026), Sport nach SILP Sport Kap. 3 (Stand 03/2021, veraltet).
 
