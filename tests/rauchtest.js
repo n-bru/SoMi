@@ -248,6 +248,22 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   const [dn]=await Promise.all([p.waitForEvent("download"),p.click("button:has-text('Namensliste sichern')")]);
   const nf=path.join(require("os").tmpdir(),"somi-namen-test.json");await dn.saveAs(nf);
   ok(JSON.parse(fs.readFileSync(nf,"utf8")).art==="namen"&&!fs.readFileSync(nf,"utf8").includes("Testname"),"Namensliste als verschlüsselte Datei");
+  // Klassenlisten (ab 0.4.9): Liste einfügen, Namen landen verschlüsselt in der Namensliste, Kurs aus Klassenlisten wählen
+  await nav("Lerngruppen");await p.click("button:has-text('+ Klassenliste')");await p.fill("#klcls","9z");
+  await p.fill("#kltxt","Fiktiv Eins\nFiv\n9Z-07\n\nFiktiv Eins\n");await p.click("button:has-text('Anlegen')");
+  ok(await p.locator("h1",{hasText:"Klasse 9Z"}).count()===1&&await p.evaluate(()=>{const k=db.sus.filter(s=>s.cls==="9Z").map(s=>s.code).sort().join();return k==="9Z-01,9Z-02,9Z-07"&&db.sus.filter(s=>s.cls==="9Z").every(s=>s.kl)}),"Klassenliste 9Z mit 3 Kürzeln (doppelte Zeile übersprungen)");
+  ok(await p.evaluate(()=>NAMES[db.sus.find(s=>s.code==="9Z-01").id]==="Fiktiv Eins"&&!JSON.stringify(db).includes("Fiktiv Eins")),"Namen aus der Liste nur in der Namensliste");
+  await p.click("button:has-text('+ Weitere Kinder einfügen')");await p.fill("#kltxt","Fiktiv Drei");await p.click("button:has-text('Hinzufügen')");
+  ok(await p.locator(".nm",{hasText:"Fiktiv Drei"}).count()===1&&await p.evaluate(()=>NAMES[db.sus.find(s=>s.code==="9Z-03").id]==="Fiktiv Drei"),"weitere Kinder einfügen");
+  await nav("Lerngruppen");await p.click("text=+ Lerngruppe");await p.fill("#gcls","9");await p.click("button:has-text('G-Kurs')");await p.click("button:has-text('Anlegen')");
+  await p.click("button:has-text('Aus Klassenlisten wählen')");
+  ok(await p.locator(".cele b",{hasText:"Klasse 9Z"}).count()===1&&await p.locator(".cele b",{hasText:"Klasse DEMO"}).count()===0&&await p.locator(".cele input:checked").count()===0,"Auswahl nach Klassen, nichts vorausgewählt, keine Beispielkinder");
+  await p.locator(".cele label",{hasText:"9Z-01"}).click();await p.locator(".cele label",{hasText:"9Z-07"}).click();await dlgBtn("Übernehmen");
+  ok(await p.locator(".card.tap .code").count()===2,"zwei Kinder in den Kurs übernommen");
+  await p.click("text=Lerngruppe archivieren");await dlgBtn("Archivieren");await p.click("button:text-is('Löschen')");await dlgBtn("Endgültig löschen");await dlgBtn("Ja, löschen");
+  ok(await p.evaluate(()=>db.sus.filter(s=>s.cls==="9Z").length===4),"Kurs gelöscht, Klassenliste bleibt");
+  await p.locator(".card.tap",{hasText:"Klasse 9Z"}).click();await p.click("button:has-text('Kürzel ohne Lerngruppe löschen')");await dlgBtn("Löschen");
+  ok(await p.evaluate(()=>!db.sus.some(s=>s.cls==="9Z")&&!Object.values(NAMES).includes("Fiktiv Eins")),"Klassenliste samt Namen gelöscht");
   // XSS: Kürzel mit HTML wird maskiert
   await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("text=+ Schüler:in");await p.fill("#scode",'7<img src=x onerror=alert(1)>');await p.click("button:has-text('Hinzufügen')");

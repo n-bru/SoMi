@@ -1,11 +1,11 @@
-# SoMi – Funktionen (Version 0.4.8, Stand 05.11.2026)
+# SoMi – Funktionen (Version 0.4.9, Stand 06.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
 ## Bereiche
 - **Heute:** „Schnell erfassen“ für jede aktive Mathe-Gruppe, Zähler (aktive Lerngruppen, Schüler:innen, Archiv), Einrichtung, Sicherungs-Erinnerung (nach 3 Tagen), Hinweis auf abgelaufene Aufbewahrungsfristen, Liste der aktiven Lerngruppen.
 - **Lerngruppen:** anlegen mit Fach (Mathe, Sport), Klasse und Kurs (ohne, E, G). Archiv eingeklappt.
-- **Lerngruppe:** Schüler:innen per Kürzel hinzufügen (Vorschlag: nächste freie Nummer, z. B. 7B-03), aus anderen Gruppen derselben Klasse übernehmen, archivieren, wieder aktivieren, löschen (nur archiviert, vor Fristende mit doppelter Rückfrage).
+- **Lerngruppe:** Schüler:innen per Kürzel hinzufügen (Vorschlag: nächste freie Nummer, z. B. 7B-03), aus den Klassenlisten wählen (ab 0.4.9, alle Klassen), archivieren, wieder aktivieren, löschen (nur archiviert, vor Fristende mit doppelter Rückfrage).
 - **Schüler:in:** Symbol, Profil (Regel, Nachteilsausgleich mit Freitext, zieldifferent mit Schalter „Note im Zeugnis“), aus der Gruppe entfernen mit Rückgängig.
 - **Einstellungen:** Erscheinungsbild, Schriftgröße, App-Sperre, Sicherung speichern und laden, Beispielklasse, Aufbewahrung, Datenschutz.
 
@@ -79,6 +79,13 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - „Liste abschließen“: nur lesbar, unter „Abgeschlossen“; „Wieder öffnen“ geht. Löschen mit Rückgängig.
 - „Heute“ zeigt offene Listen; nach dem Fälligkeitsdatum rot. Keine Erinnerungen an Eltern.
 - Daten: `db.rl = [{id,gid,t,art,aus,bis,ct,r:{sid:{st,pc}},arch,upd}]` (Beträge in Cent), geprüft mit `okRl`, in Sicherung und Import enthalten.
+
+## Klassenlisten (ab 0.4.9)
+- Unter „Lerngruppen“ → „Klassenlisten“. Eine Klassenliste sind alle Kürzel mit derselben Klasse (`s.cls`), auch die, die über eine Lerngruppe angelegt wurden.
+- „+ Klassenliste“: Klasse (z. B. 75) und Liste einfügen, eine Zeile pro Kind (höchstens 60). Zeilen mit Ziffer (z. B. 75-01) gelten als Kürzel. Alle anderen Zeilen gelten als Name: SoMi vergibt das nächste Kürzel (75-01, 75-02 … in der Reihenfolge der Liste) und legt den Namen in die Namensliste. Das geht nur mit App-Sperre. Doppelte Zeilen und vorhandene Namen werden übersprungen.
+- Klassenseite: alle Kürzel mit Name und Lerngruppen, „Namen eintragen“, „+ Weitere Kinder einfügen“, löschen nur für Kürzel ohne Lerngruppe (auch alle auf einmal).
+- Lerngruppe → „Aus Klassenlisten wählen“: alle Kürzel, die noch nicht in der Gruppe sind, nach Klasse (eigene Klasse zuerst), nichts vorausgewählt, Knopf „alle“ je Klasse. Beispielkinder nur in Beispielgruppen. Für Kurse aus mehreren Klassen als Klasse z. B. „7“ eintragen.
+- Daten: `s.kl = true` = steht auf einer Klassenliste. Solche Kürzel bleiben, wenn eine Lerngruppe gelöscht wird. Geprüft in `okSus`.
 
 ## Namensliste (ab 0.2.3)
 - In der Lerngruppe „Namen eintragen“: zu jedem Kürzel ein Name. Geht nur mit App-Sperre.
