@@ -197,6 +197,24 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Sport"}).click();await p.click("button:has-text('Schriftliche Überprüfungen')");
   await p.click("button:has-text('+ Schriftliche Überprüfung')");await p.fill("#kdt","Test Regeln");await p.fill("#kdm","20");await p.click("button:has-text('Anlegen')");
   await p.fill("#kp","18");await p.press("#kp","Enter");ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Test Regeln");return a&&groupById(a.gid).fach==="Sport"&&Object.keys(a.r).length===1}),"Schriftliche Überprüfung in Sport");
+  // 0.5.0 Punktuelle Überprüfungen in Sport mit Gruppen
+  await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Sport"}).click();await p.click("button:has-text('Punktuelle Überprüfungen')");
+  ok(await p.locator(".card.tap",{hasText:"Handstand (fiktiv)"}).count()===1,"fiktive Überprüfung Handstand");
+  await p.click("button:has-text('+ Punktuelle Überprüfung')");await p.click(".pick button:text-is('Motorischer Test')");ok(await p.locator("#kdm").count()===0,"Überprüfung: keine Punkte");
+  await p.fill("#kdt","Cooper-Test Probe");await p.click("button:has-text('Anlegen')");
+  ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Cooper-Test Probe");return a&&a.k==="pue"&&a.b==="mot"&&a.art==="Motorischer Test"&&a.rg&&Object.keys(a.rg).length===6&&okKa(a)}),"Überprüfung angelegt, Gruppen übernommen");
+  await p.click(".rgbar button:has-text('Gr. 2')");ok(await p.locator(".card b",{hasText:"Gruppe 2: 1 von 3"}).count()===1,"nur Gruppe 2");
+  await p.click(".pad button[data-n='2']");
+  ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Cooper-Test Probe"),m=groupById(a.gid).members;return a.r[m[1]]?.n==="2"&&!a.r[m[0]]&&plObs(a.gid,m[1]).some(o=>o.k==="mot"&&o.n==="2")}),"Note in Gruppe 2 gespeichert, zählt bei Motorik");
+  await p.click(".pad button[data-n='3']");await p.click(".pad button[data-n='4']");ok(await p.locator("button:has-text('Weiter mit Gruppe')").count()===0&&await p.locator("text=Gruppe 2 fertig").count()===1,"Gruppe 2 fertig");
+  await p.click(".rgbar button:has-text('Gr. 1')");await p.click("button:text-is('Einteilen')");
+  await p.locator("[aria-label='Gruppe für DEMO-01'] button",{hasText:"3"}).click();
+  ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Cooper-Test Probe");return a.rg[groupById(a.gid).members[0]]===3}),"Gruppe umgeteilt");
+  await p.locator("[aria-label='Gruppe für DEMO-01'] button",{hasText:"3"}).click();
+  ok(await p.evaluate(()=>{const a=db.ka.find(a=>a.t==="Cooper-Test Probe");return a.rg[groupById(a.gid).members[0]]==null}),"nochmal tippen nimmt heraus");
+  await p.locator(".card button:text-is('Fertig')").click();
+  ok(await p.evaluate(()=>!okKa({id:"x1",gid:"g1",t:"x",d:"2026-11-05",k:"pue",r:{},upd:1})&&!okKa({id:"x1",gid:"g1",t:"x",d:"2026-11-05",k:"pue",b:"qual",r:{},upd:1})&&!okKa({id:"x1",gid:"g1",t:"x",d:"2026-11-05",k:"pue",b:"mot",rg:{s1:7},r:{},upd:1})&&!okKa({id:"x1",gid:"g1",t:"x",d:"2026-11-05",k:"port",b:"mot",r:{},upd:1})&&okKa({id:"x1",gid:"g1",t:"x",d:"2026-11-05",k:"pue",b:"kog",art:"Sonstiges",rg:{s1:2},r:{s1:{n:"2-"}},upd:1})),"okKa prüft punktuelle Überprüfungen");
+  ok(await p.evaluate(()=>!kritGew("Sport").some(k=>k.k==="pue")&&!plk({fach:"Mathe"}).some(k=>k.k==="pue")),"Überprüfung ohne eigenes Gewicht, nicht in Mathe");
   // 0.4.3 Störungen und gesonderte Leistungen (Präsentation, Heft, Übung)
   await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   ok(await p.locator("button:has-text('Verhalten')").count()===0,"kein Arbeits- und Sozialverhalten mehr");

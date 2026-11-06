@@ -146,6 +146,9 @@ body.erf .fill>*{flex:none}body.erf .padwrap{position:static;box-shadow:none;mar
 .mxw .mx{margin:0}.mxw .mx>*{min-height:0!important;height:100%}.mxw .mxh{margin:4px 0 0}
 .erx{display:flex;gap:6px;margin-top:6px}.erx #erT{flex:1;min-width:0}.erx #erD{flex:none;width:auto;max-width:44%}
 body.erf .stgrid{flex:1 1 auto!important;min-height:0;grid-template-rows:repeat(2,minmax(0,96px));align-content:start}body.erf .stgrid .btn{min-height:0;height:100%}
+.rgbar{gap:6px;margin:0 0 10px}.rgbar .pick button{padding:6px 2px}.rgr{gap:8px;margin:5px 0}.rgr .code{min-width:88px;flex:none;white-space:nowrap}
+.four{display:grid;grid-template-columns:.6fr 1fr 1fr 1fr;gap:6px}.four .btn{padding-left:4px;padding-right:4px}
+.kan .seqsus{margin:8px 0 6px}.kan .seqsus .code{font-size:1.5rem}.kan .kic.big{width:44px;height:44px;font-size:1.5rem}.kan .pad button{min-height:44px}.rgr .pick button{min-height:40px;padding:4px 0}
 .tilew{flex:1 1 auto!important;min-height:0;overflow-y:auto;margin-top:6px}
 .chips.one{flex:1;min-width:0;gap:5px}.chips.one button{padding:6px 10px;font-size:.84rem}
 .ein{padding:10px 12px}.ein .tiles{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:6px;margin:0}.ein .tiles:has(.nm){grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
@@ -166,7 +169,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.4.10 Beta",SOMI_STAND="06.11.2026";
+const SOMI_VERSION="0.5.0 Beta",SOMI_STAND="06.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -280,15 +283,21 @@ const KRIT=[
   aus:["arbeitet nur wenig mit anderen zusammen","braucht bei Konflikten oft Hilfe","hält Regeln nicht immer ein"]},
  {k:"arb",f:"Sport",t:"Arbeitsverhalten",kz:"Arbeits­verhalten",hint:"Lern-, Leistungs- und Anstrengungsbereitschaft, Zuverlässigkeit, Selbstständigkeit. Zählt laut SILP Sport zur Note.",
   gut:["ist leistungs- und anstrengungsbereit","ist zuverlässig, z. B. beim Auf- und Abbau","übt selbstständig an Aufgaben"],
-  aus:["strengt sich nur teilweise an","ist nicht immer zuverlässig","übt nur mit Aufforderung"]}];
+  aus:["strengt sich nur teilweise an","ist nicht immer zuverlässig","übt nur mit Aufforderung"]},
+ /* 0.5.0: punktuelle Überprüfung im Sport (Nicks Wahl 06.11.). Note direkt, zählt im gewählten Bereich (a.b), kein eigenes Gewicht. */
+ {k:"pue",f:"Sport",t:"Punktuelle Überprüfung",pl:"n",nogw:true,gut:[],aus:[]}];
 const KMAP=Object.fromEntries(KRIT.map(x=>[x.k,x]));
 // Ab 0.4.3 (Nicks Wunsch 05.11.): Runde immer mit Qualität, Beteiligung, Selbstständigkeit, Kooperation; Fachsprache entfällt (alte Einträge zählen weiter); Werkzeuge und Hausaufgaben zuschaltbar.
 // Kontinuität heißt jetzt „Beteiligung“; Qualität zählt standardmäßig doppelt. Präsentation, Portfolio/Heft und Schriftliche Übung legst du gesondert an (wie Klassenarbeiten).
 const optOn=x=>!x.opt||!!db[x.opt];
 const kF=x=>x.f||"Mathe",fOf=g=>g&&g.fach==="Sport"?"Sport":"Mathe";
 const kritList=(f="Mathe")=>KRIT.filter(x=>kF(x)===f&&!x.alt&&!x.pl&&optOn(x));
-const kritGew=(f="Mathe")=>KRIT.filter(x=>kF(x)===f&&!x.alt&&optOn(x));
-const PLK=KRIT.filter(x=>x.pl);
+const kritGew=(f="Mathe")=>KRIT.filter(x=>kF(x)===f&&!x.alt&&!x.nogw&&optOn(x));
+const plk=g=>KRIT.filter(x=>x.pl&&kF(x)===fOf(g));
+// Punktuelle Überprüfungen (Sport): Art, Bereich, Gruppen (Riegen 1 bis 6)
+const PUEART=["Demonstration","Motorischer Test","Aufwärmen gestalten","Sportabzeichen","Bundesjugendspiele","Sonstiges"];
+const PUEB=["mot","kog","soz","arb"];
+const okRg=v=>v==null||!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).length<=60&&Object.entries(v).every(([k,n])=>okId(k)&&Number.isInteger(n)&&n>=1&&n<=6);
 function okObs(o){try{return !!o&&okId(o.id)&&okId(o.gid)&&okId(o.sid)&&Object.hasOwn(KMAP,o.k)&&(o.s==null?NOTEN.includes(o.n):Object.hasOwn(STUF,o.s)&&o.n==null)&&(o.fb==null||typeof o.fb==="boolean")&&okDate(o.d)&&okStr(o.t,300)&&okNum(o.upd)}catch(e){return false}}
 const obsOf=(gid,sid)=>db.obs.filter(o=>o.gid===gid&&(!sid||o.sid===sid));
 /* Sport: Stundenstatus. db.att = [{id,gid,sid,d,st,upd}], höchstens einer pro Gruppe, Kürzel und Tag */
@@ -504,13 +513,14 @@ function okKaR(r,max){return !!r&&typeof r==="object"&&!Array.isArray(r)&&Object
   &&(x.mx==null||max!=null&&okP(x.mx,1000)&&x.mx>0)&&(x.p==null||max!=null&&okP(x.p,x.mx||max))&&(x.n==null||max==null&&NOTEN.includes(x.n))&&(x.st==null||Object.hasOwn(KAST,x.st))&&(x.na==null||typeof x.na==="boolean")&&okStr(x.nat,300))}
 const plNote=a=>!!a.k&&KMAP[a.k]?.pl==="n";
 function okKa(a){try{return !!a&&okId(a.id)&&okId(a.gid)&&typeof a.t==="string"&&a.t.trim().length>0&&a.t.length<=80&&okDate(a.d)&&(a.k==null||!!KMAP[a.k]?.pl)
-  &&(plNote(a)?a.max==null&&a.sk==null:okP(a.max,1000)&&a.max>0&&Object.hasOwn(KASCHL,a.sk))&&okKaR(a.r,plNote(a)?null:a.max)&&(a.demo==null||typeof a.demo==="boolean")&&okNum(a.upd)}catch(e){return false}}
+  &&(plNote(a)?a.max==null&&a.sk==null:okP(a.max,1000)&&a.max>0&&Object.hasOwn(KASCHL,a.sk))&&okKaR(a.r,plNote(a)?null:a.max)
+  &&(a.k==="pue"?PUEB.includes(a.b)&&(a.art==null||PUEART.includes(a.art))&&okRg(a.rg):a.b==null&&a.art==null&&a.rg==null)&&(a.demo==null||typeof a.demo==="boolean")&&okNum(a.upd)}catch(e){return false}}
 const kaTend=()=>db.kaTend!==false;
 const kaById=id=>db.ka.find(a=>a.id===id);
 const kaOf=(gid,from,pl)=>db.ka.filter(a=>a.gid===gid&&!a.k===!pl&&(!from||a.d>=from)).sort((a,b)=>a.d.localeCompare(b.d)||a.upd-b.upd);
 const plOf=(gid,from)=>kaOf(gid,from,true);
 // Gesonderte Leistungen als zusätzliche Einträge der Sonstigen Mitarbeit (nur lesen; bearbeitet wird in der Liste)
-const plObs=(gid,sid,from)=>plOf(gid,from).flatMap(a=>(sid?[sid]:Object.keys(a.r)).map(id=>{const n=kaNote(a,id);return n?{id:a.id+"~"+id,gid,sid:id,k:a.k,n,d:a.d,t:a.t,pl:a.id,upd:a.upd}:null}).filter(Boolean));
+const plObs=(gid,sid,from)=>plOf(gid,from).flatMap(a=>(sid?[sid]:Object.keys(a.r)).map(id=>{const n=kaNote(a,id);return n?{id:a.id+"~"+id,gid,sid:id,k:a.k==="pue"?a.b:a.k,n,d:a.d,t:a.t,pl:a.id,upd:a.upd}:null}).filter(Boolean));
 // Mindestpunkte für die Noten 1 bis 5, auf halbe Punkte gerundet
 const kaGr=(sk,max)=>(KASCHL[sk]||KASCHL["-"]).map(q=>Math.round(max*q/100*2)/2);
 function kaNoteP(sk,max,p){if(p==null)return null;const gr=kaGr(sk,max);let n=6;for(let i=0;i<5;i++)if(p>=gr[i]){n=i+1;break}
@@ -524,54 +534,64 @@ const KAW0={Mathe:60,Sport:20};
 const kaw=fach=>(db.kaw&&db.kaw[fach]!=null?db.kaw[fach]:KAW0[fach]??50);
 const okKaw=v=>!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).every(k=>FAECHER.includes(k)&&Number.isInteger(v[k])&&v[k]>=10&&v[k]<=90&&v[k]%10===0);
 const gesamt=(somi,ka,fach="Mathe")=>somi==null||ka==null?null:(1-kaw(fach)/100)*somi+kaw(fach)/100*ka;
-const kaL=(g,pl)=>pl?["Gesonderte Leistung","Präsentation, Heft, Übung"]:g.fach==="Mathe"?["Klassenarbeit","Klassenarbeiten"]:["Schriftliche Überprüfung","Schriftliche Überprüfungen"];
+const kaL=(g,pl)=>pl?(g.fach==="Sport"?["Punktuelle Überprüfung","Punktuelle Überprüfungen"]:["Gesonderte Leistung","Präsentation, Heft, Übung"]):g.fach==="Mathe"?["Klassenarbeit","Klassenarbeiten"]:["Schriftliche Überprüfung","Schriftliche Überprüfungen"];
 const kaStL=(a,st)=>a.k?{fehlt:"fehlt",nach:"holt nach"}[st]:KAST[st];
 const wTxt=g=>`${kaL(g)[1]} ${kaw(g.fach)} %, Sonstige Mitarbeit ${100-kaw(g.fach)} %`;
 function setKaw(fach,n){if(!FAECHER.includes(fach)||!okKaw({[fach]:n}))return;const o={...(db.kaw||{}),[fach]:n};if(n===KAW0[fach])delete o[fach];if(Object.keys(o).length)db.kaw=o;else delete db.kaw;save();render()}
 const kaSt=a=>{const v=Object.values(a.r);return {p:v.filter(x=>(x.p!=null||x.n)&&!x.st).length,fehlt:v.filter(x=>x.st==="fehlt").length,nach:v.filter(x=>x.st==="nach").length}};
 
-let KD=null,KE={kid:null,i:0};
+let KD=null,KE={kid:null,i:0,rg:0};
+const kaArt=a=>a.k==="pue"?`${a.art?esc(a.art)+" · ":""}${esc(KMAP[a.b].t)}`:esc(KMAP[a.k].t);
+// Kürzel für die Eingabe: bei punktuellen Überprüfungen ggf. nur eine Gruppe
+const kaMs=(a,g)=>{const ms=msOf(g);return a.k==="pue"&&KE.rg?ms.filter(s=>a.rg?.[s.id]===KE.rg):ms};
+const rgUsed=a=>[...new Set(Object.values(a.rg||{}))].sort();
+function lastRg(g){const l=plOf(g.id).filter(a=>a.k==="pue"&&a.rg);if(!l.length)return null;const o={};
+  for(const [sid,n] of Object.entries(l[l.length-1].rg))if(g.members.includes(sid))o[sid]=n;return Object.keys(o).length?o:null}
 function kaListV(){const g=groupById(view.ka);if(!g){view={tab:view.tab,group:view.ka};return groupV()}
   const PL=!!view.plm,ro=!!g.arch,list=kaOf(g.id,null,PL).reverse(),n=g.members.length,L=kaL(g,PL);
-  const pts=!PL||KD?.k==="sue";
+  const pts=!PL||KD?.k==="sue",SP=PL&&g.fach==="Sport";
   return `<button class="btn ghost" onclick="KD=null;back()">‹ Zurück</button>
   <div class="between"><h1 style="margin-bottom:4px">${L[1]}</h1>${ssBtn()}</div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>
   ${ro?"":KD?`<div class="card"><b>${PL?"Neu anlegen":`Neue ${L[0]}`}</b>
-    ${PL?`<label>Art</label><div class="pick">${PLK.map(x=>`<button class="${KD.k===x.k?"on":""}" aria-pressed="${KD.k===x.k}" onclick="KD.k='${x.k}';render()">${esc(x.t)}</button>`).join("")}</div>`:""}
-    <label for="kdt">Titel</label><input id="kdt" maxlength="80" value="${esc(KD.t)}" oninput="KD.t=this.value" placeholder="${PL?(KD.k==="praes"?"z. B. Referat Prismen":KD.k==="port"?"z. B. Heftkontrolle Brüche":"z. B. Übung Terme"):g.fach==="Mathe"?"z. B. KA 2 Brüche":"z. B. Test Regelkunde Basketball"}">
+    ${SP?`<label>Art</label><div class="pick">${PUEART.map(t=>`<button class="${KD.art===t?"on":""}" aria-pressed="${KD.art===t}" onclick="KD.art=${ja(t)};render()">${esc(t)}</button>`).join("")}</div>
+    <label>Zählt im Bereich</label><div class="pick" style="grid-template-columns:repeat(2,1fr)">${PUEB.map(b=>`<button class="${KD.b===b?"on":""}" aria-pressed="${KD.b===b}" onclick="KD.b='${b}';render()">${esc(KMAP[b].t)}</button>`).join("")}</div>`
+    :PL?`<label>Art</label><div class="pick">${plk(g).map(x=>`<button class="${KD.k===x.k?"on":""}" aria-pressed="${KD.k===x.k}" onclick="KD.k='${x.k}';render()">${esc(x.t)}</button>`).join("")}</div>`:""}
+    <label for="kdt">Titel</label><input id="kdt" maxlength="80" value="${esc(KD.t)}" oninput="KD.t=this.value" placeholder="${SP?"z. B. Handstand, Cooper-Test":PL?(KD.k==="praes"?"z. B. Referat Prismen":KD.k==="port"?"z. B. Heftkontrolle Brüche":"z. B. Übung Terme"):g.fach==="Mathe"?"z. B. KA 2 Brüche":"z. B. Test Regelkunde Basketball"}">
     <div class="two"><div><label for="kdd">Datum</label><input id="kdd" type="date" value="${esc(KD.d)}" onchange="KD.d=this.value"></div>
     ${pts?`<div><label for="kdm">Höchstpunktzahl</label><input id="kdm" inputmode="decimal" value="${esc(KD.max)}" oninput="KD.max=this.value" placeholder="z. B. 40"></div>`:""}</div>
-    ${pts?`<label>Notenschlüssel (SILP 4.3)</label><div class="pick">${[["-","ohne Kurs"],["E","E-Kurs"],["G","G-Kurs"]].map(([k,t])=>`<button class="${KD.sk===k?"on":""}" aria-pressed="${KD.sk===k}" onclick="KD.sk='${k}';render()">${t}</button>`).join("")}</div>`:`<p class="small muted" style="margin:8px 0 0">Du gibst jedem Kürzel direkt eine Note.</p>`}
+    ${pts?`<label>Notenschlüssel (SILP 4.3)</label><div class="pick">${[["-","ohne Kurs"],["E","E-Kurs"],["G","G-Kurs"]].map(([k,t])=>`<button class="${KD.sk===k?"on":""}" aria-pressed="${KD.sk===k}" onclick="KD.sk='${k}';render()">${t}</button>`).join("")}</div>`:`<p class="small muted" style="margin:8px 0 0">Du gibst jedem Kürzel direkt eine Note.${SP&&lastRg(g)?" Die Gruppen übernimmt SoMi von der letzten Überprüfung.":""}</p>`}
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="KD=null;render()">Abbrechen</button><button class="btn pri" onclick="addKa(${ja(g.id)})">Anlegen</button></div></div>`
-  :`<p><button class="btn pri" onclick="KD={t:'',d:today(),max:'',sk:${ja(g.kurs||"-")},k:${PL?"'praes'":"null"}};render();$('#kdt')?.focus()">+ ${PL?"Präsentation, Heft oder Übung":L[0]}</button></p>`}
+  :`<p><button class="btn pri" onclick="KD={t:'',d:today(),max:'',sk:${ja(g.kurs||"-")},k:${SP?"'pue'":PL?"'praes'":"null"},art:null,b:'mot'};render();$('#kdt')?.focus()">+ ${SP?"Punktuelle Überprüfung":PL?"Präsentation, Heft oder Übung":L[0]}</button></p>`}
   ${list.length?list.map(a=>{const c=kaSt(a),z=Object.keys(a.r).filter(id=>kaNote(a,id)),m=z.length?z.reduce((s,id)=>s+Math.round(nWert(kaNote(a,id))),0)/z.length:null;
-    return `<button class="card tap row" onclick="KE={kid:${ja(a.id)},i:0};go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)},plm:${PL},kad:${ja(a.id)}})"><div class="grow"><div class="code">${esc(a.t)}${a.demo?' <span class="tag">Beispiel</span>':""}</div>
-    <div class="muted small">${dDEy(a.d)}${a.k?` · ${esc(KMAP[a.k].t)}`:""}${a.max?` · ${fmtP(a.max)} Punkte`:""} · ${c.p} von ${n} eingetragen${c.nach?` · ${c.nach} ${kaStL(a,"nach")}`:""}${m!=null?` · Schnitt ${hid(fmt1(m))}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`}).join("")
+    return `<button class="card tap row" onclick="KE={kid:${ja(a.id)},i:0,rg:0};go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)},plm:${PL},kad:${ja(a.id)}})"><div class="grow"><div class="code">${esc(a.t)}${a.demo?' <span class="tag">Beispiel</span>':""}</div>
+    <div class="muted small">${dDEy(a.d)}${a.k?` · ${kaArt(a)}`:""}${a.max?` · ${fmtP(a.max)} Punkte`:""} · ${c.p} von ${n} eingetragen${c.nach?` · ${c.nach} ${kaStL(a,"nach")}`:""}${m!=null?` · Schnitt ${hid(fmt1(m))}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`}).join("")
   :`<p class="muted">Noch nichts angelegt.</p>`}
-  <p class="muted small">${PL?"Präsentationen, Portfolio/Heft und Schriftliche Übungen zählen zur Sonstigen Mitarbeit, jeweils als eigenes Kriterium (Gewicht unter Einstellungen). Bei der Schriftlichen Übung trägst du Punkte ein, sonst direkt die Note.":`Du trägst Punkte ein, SoMi rechnet die Note nach dem Prozentschlüssel aus SILP Mathe 4.3${g.fach==="Mathe"?"":" (Sport hat keinen eigenen Schlüssel)"}. Im Gesamtvorschlag: ${wTxt(g)} (Einstellungen).`}</p>`}
+  <p class="muted small">${SP?"Punktuelle Überprüfungen zählen zu den Sonstigen Leistungen, und zwar im gewählten Bereich (meist Motorik). Du gibst jedem Kürzel direkt eine Note. Die Gruppen (Riegen) teilst du in der Überprüfung ein.":PL?"Präsentationen, Portfolio/Heft und Schriftliche Übungen zählen zur Sonstigen Mitarbeit, jeweils als eigenes Kriterium (Gewicht unter Einstellungen). Bei der Schriftlichen Übung trägst du Punkte ein, sonst direkt die Note.":`Du trägst Punkte ein, SoMi rechnet die Note nach dem Prozentschlüssel aus SILP Mathe 4.3${g.fach==="Mathe"?"":" (Sport hat keinen eigenen Schlüssel)"}. Im Gesamtvorschlag: ${wTxt(g)} (Einstellungen).`}</p>`}
 function addKa(gid){const g=groupById(gid);if(!g||g.arch)return;const PL=!!view.plm,k=PL?KD.k:null;
-  if(PL&&!PLK.some(x=>x.k===k))return toast("Bitte die Art wählen.");const note=PL&&KMAP[k].pl==="n";
-  const t=KD.t.trim()||(PL?KMAP[k].t:""),max=note?null:parseP(KD.max);
+  if(PL&&!plk(g).some(x=>x.k===k))return toast("Bitte die Art wählen.");const note=PL&&KMAP[k].pl==="n";
+  const art=k==="pue"&&PUEART.includes(KD.art)?KD.art:null,t=KD.t.trim()||art||(PL?KMAP[k].t:""),max=note?null:parseP(KD.max);
+  const pue=k==="pue"?{b:PUEB.includes(KD.b)?KD.b:"mot",...(art?{art}:{}),...(lastRg(g)?{rg:lastRg(g)}:{})}:{};
   if(!t)return toast("Bitte einen Titel eintragen.");if(looksLikeName(t))toast("Bitte keine Namen in den Titel schreiben.");
   if(!note&&!(max>0&&max<=1000))return toast("Bitte die Höchstpunktzahl eintragen, z. B. 40.");if(!okDate(KD.d))return toast("Bitte ein Datum wählen.");
-  const a=touch({id:uid(),gid,t,d:KD.d,...(note?{}:{max,sk:Object.hasOwn(KASCHL,KD.sk)?KD.sk:"-"}),...(k?{k}:{}),r:{},...(g.demo?{demo:true}:{})});db.ka.push(a);KD=null;KE={kid:a.id,i:0};save();
+  const a=touch({id:uid(),gid,t,d:KD.d,...(note?{}:{max,sk:Object.hasOwn(KASCHL,KD.sk)?KD.sk:"-"}),...(k?{k}:{}),...pue,r:{},...(g.demo?{demo:true}:{})});db.ka.push(a);KD=null;KE={kid:a.id,i:0,rg:0};save();
   go({tab:view.tab,group:gid,ka:gid,plm:PL,kad:a.id})}
 
 function kaV(){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g){view={tab:view.tab,group:view.ka,ka:view.ka,plm:view.plm};return kaListV()}
-  if(KE.kid!==a.id)KE={kid:a.id,i:0};
-  const ro=!!g.arch,ms=msOf(g),NO=plNote(a),gr=NO?[]:kaGr(a.sk,a.max),c=kaSt(a),L=kaL(g,!!a.k);
+  if(KE.kid!==a.id)KE={kid:a.id,i:0,rg:0};
+  const ro=!!g.arch,ms=msOf(g),PU=a.k==="pue",mF=kaMs(a,g),NO=plNote(a),gr=NO?[]:kaGr(a.sk,a.max),c=kaSt(a),L=kaL(g,!!a.k);
   const spg=[1,2,3,4,5,6].map(n=>ms.filter(s=>{const x=kaNote(a,s.id);return x&&Math.round(nWert(x))===n}).length),sum=spg.reduce((s,x)=>s+x,0);
   const schnitt=sum?spg.reduce((s,x,i)=>s+x*(i+1),0)/sum:null;
   const row=(s,i)=>{const x=a.r[s.id]||{},n=kaNote(a,s.id);
-    return `<tr onclick="KE.i=${i};render();window.scrollTo(0,0)"><th scope="row"><span class="code">${esc(s.code)}</span> ${profTag(s)}${nm(s)}</th>
+    return `<tr onclick="kaGoto(${ja(s.id)})"><th scope="row"><span class="code">${esc(s.code)}</span> ${profTag(s)}${nm(s)}</th>${PU?`<td class="num">${a.rg?.[s.id]||"–"}</td>`:""}
     ${NO?"":`<td class="num">${x.st?`<span class="muted small">${kaStL(a,x.st)}</span>`:x.p!=null?hid(fmtP(x.p)+(x.mx?` / ${fmtP(x.mx)}`:"")):"–"}</td>`}<td class="num">${NO&&x.st?`<span class="muted small">${kaStL(a,x.st)}</span>`:n?hid(nTxt(n)):"–"}</td><td class="small">${x.na?"NA gewährt":""}</td></tr>`};
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
-  <div class="between"><h1 style="margin-bottom:4px">${esc(a.t)}</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div>
-  <p class="muted" style="margin-top:0">${esc(gName(g))}${a.k?` · ${esc(KMAP[a.k].t)}`:""} · ${dDEy(a.d)}${NO?"":` · ${fmtP(a.max)} Punkte · Schlüssel ${KASN[a.sk]}`}${a.demo?" · fiktives Beispiel":""}</p>
-  ${ro||!ms.length?"":kaCard(a,ms)}
+  <div class="between"><h1 style="margin-bottom:4px${NO?";font-size:1.4rem":""}">${esc(a.t)}</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div>
+  <p class="muted" style="margin-top:0">${esc(gName(g))}${a.k?` · ${kaArt(a)}`:""} · ${dDEy(a.d)}${NO?"":` · ${fmtP(a.max)} Punkte · Schlüssel ${KASN[a.sk]}`}${a.demo?" · fiktives Beispiel":""}</p>
+  ${PU&&!ro&&ms.length?rgBar(a,g):""}
+  ${ro||!ms.length?"":PU&&KE.ein?rgEdit(a,g):kaCard(a,mF)}
   <div class="card"><b>Notenspiegel</b><div class="spg" style="margin-top:8px">${spg.map((x,i)=>`<div><span class="muted small">${i+1}</span><b>${hid(String(x))}</b></div>`).join("")}</div>
   <p class="small muted" style="margin:8px 0 0">${c.p} ${a.k?"bewertet":"mitgeschrieben"}${c.fehlt?` · ${c.fehlt} ${kaStL(a,"fehlt")}`:""}${c.nach?` · ${c.nach} ${a.k?"holen nach":c.nach===1?"schreibt nach":"schreiben nach"}`:""}${schnitt!=null?` · Schnitt ${hid(fmt1(schnitt))}`:""}. Der Spiegel zählt ganze Noten.</p></div>
-  ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th>${NO?"":`<th class="num">Punkte</th>`}<th class="num">Note</th><th>Vermerk</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
+  ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th>${PU?`<th class="num">Gruppe</th>`:""}${NO?"":`<th class="num">Punkte</th>`}<th class="num">Note</th><th>Vermerk</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   ${NO?"":`<div class="card"><b>Notenschlüssel</b><p class="small muted" style="margin:4px 0 8px">SILP Mathe 4.3, ${KASN[a.sk]}. Mindestpunkte auf halbe Punkte gerundet.${kaTend()?" Tendenz: Jede Note ist in drei gleich große Bereiche geteilt (oberes Drittel +, unteres Drittel −).":""}</p>
   <table class="tbl" style="cursor:default"><thead><tr><th>Note</th><th class="num">ab Punkte</th><th class="num">ab %</th></tr></thead><tbody>${gr.map((p,i)=>`<tr style="cursor:default"><td>${i+1}</td><td class="num">${fmtP(p)}</td><td class="num">${KASCHL[a.sk][i]} %</td></tr>`).join("")}<tr style="cursor:default"><td>6</td><td class="num">darunter</td><td class="num"></td></tr></tbody></table></div>`}
   ${ro?"":`<details class="card"><summary style="font-weight:800">${L[0]} bearbeiten</summary>
@@ -579,20 +599,34 @@ function kaV(){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g){view={t
     <div class="two"><div><label for="ked">Datum</label><input id="ked" type="date" value="${esc(a.d)}" onchange="kaEdit('d',this.value)"></div>
     ${NO?"":`<div><label for="kem">Höchstpunktzahl</label><input id="kem" inputmode="decimal" value="${fmtP(a.max)}" onchange="kaEdit('max',this.value)"></div>`}</div>
     ${NO?"":`<label>Notenschlüssel</label><div class="pick">${[["-","ohne Kurs"],["E","E-Kurs"],["G","G-Kurs"]].map(([k,t])=>`<button class="${a.sk===k?"on":""}" aria-pressed="${a.sk===k}" onclick="kaEdit('sk','${k}')">${t}</button>`).join("")}</div>`}
+    ${PU?`<label>Art</label><div class="pick">${PUEART.map(t=>`<button class="${a.art===t?"on":""}" aria-pressed="${a.art===t}" onclick="kaEdit('art',${ja(t)})">${esc(t)}</button>`).join("")}</div>
+    <label>Zählt im Bereich</label><div class="pick" style="grid-template-columns:repeat(2,1fr)">${PUEB.map(b=>`<button class="${a.b===b?"on":""}" aria-pressed="${a.b===b}" onclick="kaEdit('b','${b}')">${esc(KMAP[b].t)}</button>`).join("")}</div>`:""}
     <p style="margin:14px 0 0"><button class="btn ghost danger" onclick="kaDel(${ja(a.id)})">${a.k?"Löschen":`${L[0]} löschen`}</button></p></details>`}`}
 
-function kaCard(a,ms){if(KE.i>=ms.length)return `<div class="card seqdone"><b style="font-size:1.2rem">Alle durch</b><p>${kaSt(a).p} von ${ms.length} mit Punkten.</p>
-  <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="KE.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="KE.i=0;render()">Von vorn</button></p></div>`;
+function rgBar(a,g){const u=rgUsed(a),cnt=n=>g.members.filter(id=>a.rg?.[id]===n).length;
+  return `<div class="row rgbar" role="group" aria-label="Gruppe">${KE.ein?`<b class="grow">Gruppen einteilen</b><button class="btn pri small" onclick="KE.ein=false;render()">Fertig</button>`
+  :`<div class="pick grow" style="grid-template-columns:repeat(${u.length+1},1fr)"><button class="${KE.rg?"":"on"}" aria-pressed="${!KE.rg}" onclick="KE.rg=0;KE.i=0;render()">Alle</button>${u.map(n=>`<button class="${KE.rg===n?"on":""}" aria-pressed="${KE.rg===n}" aria-label="Gruppe ${n}, ${cnt(n)} Kürzel" onclick="KE.rg=${n};KE.i=0;render()">Gr. ${n}</button>`).join("")}</div><button class="btn small" onclick="KE.ein=true;render()">Einteilen</button>`}</div>`}
+function rgEdit(a,g){const N=Math.max(KE.n||0,...rgUsed(a),3);
+  return `<div class="card"><p class="small muted" style="margin:0 0 8px">Tippe für jedes Kürzel die Gruppe an. Nochmal tippen nimmt es heraus.</p>
+  <div class="row" style="margin-bottom:8px;gap:6px"><span class="grow small">Anzahl Gruppen</span><div class="pick" style="grid-template-columns:repeat(4,1fr);width:200px">${[3,4,5,6].map(n=>`<button class="${N===n?"on":""}" aria-pressed="${N===n}" ${n<Math.max(0,...rgUsed(a))?"disabled":""} onclick="KE.n=${n};render()">${n}</button>`).join("")}</div></div>
+  ${msOf(g).map(s=>`<div class="row rgr"><span class="code">${esc(s.code)}</span><div class="pick grow" style="grid-template-columns:repeat(${N},1fr)" role="group" aria-label="Gruppe für ${esc(s.code)}">${Array.from({length:N},(_,i)=>i+1).map(n=>`<button class="${a.rg?.[s.id]===n?"on":""}" aria-pressed="${a.rg?.[s.id]===n}" onclick="setRg(${ja(s.id)},${n})">${n}</button>`).join("")}</div></div>`).join("")}
+  <p style="margin:10px 0 0"><button class="btn pri block" onclick="KE.ein=false;KE.rg=0;KE.i=0;render()">Fertig</button></p></div>`}
+function setRg(sid,n){const a=kaById(KE.kid),g=a&&groupById(a.gid);if(!a||a.k!=="pue"||!g||g.arch||!g.members.includes(sid)||!(Number.isInteger(n)&&n>=1&&n<=6))return;
+  const o={...(a.rg||{})};if(o[sid]===n)delete o[sid];else o[sid]=n;if(Object.keys(o).length)a.rg=o;else delete a.rg;touch(a);save();render()}
+function kaGoto(sid){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g)return;KE.ein=false;let i=kaMs(a,g).findIndex(s=>s.id===sid);
+  if(i<0){KE.rg=0;i=msOf(g).findIndex(s=>s.id===sid)}KE.i=Math.max(0,i);render();window.scrollTo(0,0)}
+function kaCard(a,ms){if(KE.i>=ms.length){const nx=a.k==="pue"&&KE.rg?rgUsed(a).find(n=>n>KE.rg):null;return `<div class="card seqdone"><b style="font-size:1.2rem">${KE.rg?`Gruppe ${KE.rg} fertig`:"Alle durch"}</b><p>${plNote(a)?`${ms.filter(s=>kaNote(a,s.id)).length} von ${ms.length} bewertet`:`${kaSt(a).p} von ${ms.length} mit Punkten`}.</p>
+  ${nx?`<p><button class="btn pri block" onclick="KE.rg=${nx};KE.i=0;render()">Weiter mit Gruppe ${nx} ›</button></p>`:""}
+  <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="KE.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="KE.i=0;render()">Von vorn</button></p></div>`;}
   const s=ms[KE.i],x=a.r[s.id]||{},zd=(s.profil||"r")==="zd",na=s.profil==="na",max=x.mx||a.max;
-  if(plNote(a))return `<div class="card"><div class="between"><b>${KE.i+1} von ${ms.length}</b><span class="muted small">${kaSt(a).p} bewertet</span></div>
+  if(plNote(a))return `<div class="card kan"><div class="between"><b>${KE.rg?`Gruppe ${KE.rg}: `:""}${KE.i+1} von ${ms.length}</b><span class="muted small">${kaSt(a).p} bewertet</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(KE.i/ms.length*100)}%"></i></div>
   ${bigSus(s)}
   ${x.st?`<p class="small" style="text-align:center;margin:0 0 6px">Vermerkt: ${kaStL(a,x.st)}. Eine Note ersetzt das.</p>`:x.n?`<p class="small" style="text-align:center;margin:0 0 6px">Schon bewertet: ${hid(nTxt(x.n))}. Eine neue Note ersetzt sie.</p>`:""}
   <div class="pad" role="group" aria-label="Note">${NOTEN.map(v=>`<button data-n="${v}" onclick="kaSetN('${v}')">${nTxt(v)}</button>`).join("")}</div>
   ${na?`<label class="swr"><span class="grow">Nachteilsausgleich gewährt<span class="sub">${s.na?esc(s.na):"Im Profil steht noch kein Nachteilsausgleich."}</span></span><input type="checkbox" class="sw" ${x.na?"checked":""} onchange="kaNa(this.checked)"></label>
     <input id="knat" maxlength="300" value="${esc(x.nat||"")}" placeholder="Vermerk, z. B. Präsentation allein statt vor der Klasse" onchange="kaNat(this.value)" aria-label="Vermerk zum Nachteilsausgleich">`:""}
-  <div class="three" style="margin-top:12px"><button class="btn" ${KE.i?"":"disabled"} onclick="KE.i--;render()">‹ Zurück</button><button class="btn abw" onclick="kaSetSt('fehlt')">fehlt</button><button class="btn abw" onclick="kaSetSt('nach')">holt nach</button></div>
-  <p style="margin:6px 0 0"><button class="btn block" onclick="KE.i++;render()">Ohne Note weiter ›</button></p></div>`;
+  <div class="four" style="margin-top:8px"><button class="btn" ${KE.i?"":"disabled"} onclick="KE.i--;render()" aria-label="Zurück zum vorigen Kürzel">‹</button><button class="btn abw" onclick="kaSetSt('fehlt')">fehlt</button><button class="btn abw" onclick="kaSetSt('nach')">holt nach</button><button class="btn" onclick="KE.i++;render()" aria-label="Ohne Note weiter">weiter ›</button></div></div>`;
   return `<div class="card"><div class="between"><b>${KE.i+1} von ${ms.length}</b><span class="muted small">${kaSt(a).p} eingetragen</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(KE.i/ms.length*100)}%"></i></div>
   ${bigSus(s)}
@@ -605,7 +639,7 @@ function kaCard(a,ms){if(KE.i>=ms.length)return `<div class="card seqdone"><b st
     <input id="knat" maxlength="300" value="${esc(x.nat||"")}" placeholder="Vermerk, z. B. 10 Minuten mehr Zeit" onchange="kaNat(this.value)" aria-label="Vermerk zum Nachteilsausgleich">`:""}
   <div class="duo" style="margin-top:12px"><button class="btn" ${KE.i?"":"disabled"} onclick="KE.i--;render()">‹ Zurück</button><button class="btn pri" onclick="kaSave()">Speichern und weiter</button></div>
   <div class="two" style="margin-top:6px"><button class="btn abw" onclick="kaSetSt('fehlt')">nicht mitgeschrieben</button><button class="btn abw" onclick="kaSetSt('nach')">schreibt nach</button></div></div>`}
-function kaCur(){const a=kaById(KE.kid),g=a&&groupById(a.gid);if(!a||!g||g.arch)return {};return {a,g,s:msOf(g)[KE.i]}}
+function kaCur(){const a=kaById(KE.kid),g=a&&groupById(a.gid);if(!a||!g||g.arch)return {};return {a,g,s:kaMs(a,g)[KE.i]}}
 const kaFocus=()=>{const el=$("#kp");if(el){el.focus();el.select?.()}};
 function kaSave(){const {a,s}=kaCur();if(!s)return;const v=parseP($("#kp")?.value),x={...(a.r[s.id]||{})},max=x.mx||a.max;
   if(Number.isNaN(v)||v!=null&&(v<0||v>max))return toast(`Bitte eine Zahl von 0 bis ${fmtP(max)}.`);
@@ -626,7 +660,8 @@ function kaEdit(f,v){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g||g
   else if(f==="d"){if(!okDate(v))return render();a.d=v}
   else if(f==="max"&&!plNote(a)){const m=parseP(v);if(!(m>0&&m<=1000))return render(),toast("Bitte eine Zahl größer als 0.");
     if(Object.values(a.r).some(x=>!x.mx&&x.p!=null&&x.p>m))return render(),toast("Es sind schon mehr Punkte eingetragen.");a.max=m}
-  else if(f==="sk"&&!plNote(a)&&Object.hasOwn(KASCHL,v))a.sk=v;else return;
+  else if(f==="sk"&&!plNote(a)&&Object.hasOwn(KASCHL,v))a.sk=v;
+  else if(f==="b"&&a.k==="pue"&&PUEB.includes(v))a.b=v;else if(f==="art"&&a.k==="pue"&&PUEART.includes(v))a.art=v;else return;
   touch(a);save();render();toast("Gespeichert")}
 async function kaDel(id){const a=kaById(id);if(!a)return;
   if(!await ask(`„${a.t}“ löschen?`,{ok:"Löschen",danger:true,sub:"Alle Punkte gehen verloren."}))return;
@@ -637,6 +672,8 @@ function kaSusV(s,g){const list=kaOf(g.id);if(!list.length)return "";
     return `<li><div class="grow"><span class="small muted">${dDEy(a.d)} · ${kaL(g)[0]}</span><br><b>${esc(a.t)}</b>: ${x.st?`<span class="muted">${KAST[x.st]}</span>`:x.p!=null?`${hid(fmtP(x.p))} von ${fmtP(x.mx||a.max)} Punkten · Note ${hid(nTxt(n))}`:`<span class="muted">nichts eingetragen</span>`}${x.na?` <span class="tag na">NA gewährt</span>`:""}${x.nat?` <span class="small">${esc(x.nat)}</span>`:""}</div></li>`}).join("")}</ul>`}
 function demoPl(g){const n=["2","1-","3+","2-",null,"3","2+","4"],a={id:uid(),gid:g.id,t:"Referat (fiktiv)",d:daysAgo(12),k:"praes",r:{},upd:Date.now(),demo:true};
   g.members.forEach((sid,i)=>{if(n[i])a.r[sid]={n:n[i]}});return a}
+function demoPue(g){const n=["2+","3","2-",null,"3+","1-"],a={id:uid(),gid:g.id,t:"Handstand (fiktiv)",d:daysAgo(5),k:"pue",b:"mot",art:"Demonstration",rg:{},r:{},upd:Date.now(),demo:true};
+  g.members.forEach((sid,i)=>{a.rg[sid]=i%2+1;if(n[i])a.r[sid]={n:n[i]}});return a}
 function demoKa(g){const p=[34,28,22.5,17,14,null,12,30.5],a={id:uid(),gid:g.id,t:"KA 1 (fiktiv)",d:daysAgo(9),max:40,sk:"-",r:{},upd:Date.now(),demo:true};
   g.members.forEach((sid,i)=>{a.r[sid]=i===5?{st:"nach"}:{p:p[i]};if(i===4)a.r[sid].mx=20;if(i===2)a.r[sid]={...a.r[sid],na:true,nat:"Fiktiv: 10 Minuten mehr Zeit."}});return a}
 
@@ -879,7 +916,7 @@ function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};retu
     <label for="scode">Kürzel</label><input id="scode" value="${esc(SD.code)}" maxlength="40" oninput="SD.code=this.value">
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="SD=null;render()">Abbrechen</button><button class="btn pri" onclick="addSus(${ja(g.id)})">Hinzufügen</button></div></div>`
     :`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="SD={code:nextCode(${ja(g.cls)})};render();$('#scode')?.focus()">+ Schüler:in</button>${others.length?`<button class="btn" onclick="addExisting(${ja(g.id)})">Aus Klassenlisten wählen</button>`:""}${ms.length?`<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},names:${ja(g.id)}})">Namen eintragen</button>`:""}</p>`}
-  ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)},plm:true})">Präsentation, Heft, Übung${plOf(g.id).length?` (${plOf(g.id).length})`:""}</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Klassenarbeiten${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`:`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'s')">Stundenstatus erfassen</button><button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse bewerten</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Leistungen</button><button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)},att:true})">Übersicht Stundenstatus</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Schriftliche Überprüfungen${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`}
+  ${g.fach==="Mathe"?`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse nacheinander</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Mitarbeit</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)},plm:true})">Präsentation, Heft, Übung${plOf(g.id).length?` (${plOf(g.id).length})`:""}</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Klassenarbeiten${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`:`<p class="row" style="flex-wrap:wrap">${ro?"":`<button class="btn pri" onclick="erStart(${ja(g.id)},'s')">Stundenstatus erfassen</button><button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Ganze Klasse bewerten</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln bewerten</button>`}<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Übersicht Sonstige Leistungen</button><button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)},att:true})">Übersicht Stundenstatus</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)},plm:true})">Punktuelle Überprüfungen${plOf(g.id).length?` (${plOf(g.id).length})`:""}</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">Schriftliche Überprüfungen${kaOf(g.id).length?` (${kaOf(g.id).length})`:""}</button></p>`}
   ${!ro&&ms.length&&stale(g).length?`<p class="small" style="margin:0 0 10px"><b>Seit 2 Wochen ohne Eintrag:</b> ${stale(g).map(x=>esc(x.code)).join(", ")}</p>`:""}
   <p class="row" style="flex-wrap:wrap"><button class="btn" onclick="RD=null;go({tab:view.tab,group:${ja(g.id)},rl:${ja(g.id)}})">Rückläufe${rlOf(g.id).filter(a=>!a.arch).length?` (${rlOf(g.id).filter(a=>!a.arch).length})`:""}</button></p>
   ${ms.length?ms.map(s=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)},sus:${ja(s.id)}})">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${nm(s)}${(s.profil||"r")!=="r"?`<span class="tag ${s.profil}">${esc(PROFILE[s.profil])}${s.profil==="zd"?(s.zdNote?" · mit Note":" · Bericht"):""}</span>`:`<span class="muted small">Regel</span>`}</div><span aria-hidden="true" class="muted">›</span></button>`).join(""):`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
@@ -1130,7 +1167,7 @@ function demo(){if(db.groups.some(g=>g.demo))return toast("Beispielklasse ist sc
   const gm=touch({id:uid(),fach:"Mathe",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.map(s=>s.id),arch:null,demo:true});db.obs.push(...demoObs(gm));db.ka.push(demoKa(gm),demoPl(gm));db.asv.push(...demoStoer(gm));db.rl.push(demoRl(gm));
   const gs=touch({id:uid(),fach:"Sport",cls:"DEMO",kurs:"-",sy:syNow(),members:sus.slice(0,6).map(s=>s.id),arch:null,demo:true});
   db.obs.push(...[[0,"4","mot"],[0,"3","soz"],[1,"3","mot"],[1,"2","arb"],[2,"3","kog"],[3,"2","mot"],[4,"3","soz"],[5,"4","arb"],[0,"3","kog"]].map(([i,v,k],j)=>({id:uid(),gid:gs.id,sid:gs.members[i],k,s:v,fb:false,d:daysAgo(3+j*2),t:j===0?"Fiktiv: Handstand sicher gehalten.":"",upd:Date.now(),demo:true})));
-  db.groups.push(gm,gs);
+  db.ka.push(demoPue(gs));db.groups.push(gm,gs);
   save();toast("Beispielklasse geladen");go(view.mark?{tab:"profil",mark:"demo"}:{tab:"gruppen"})}
 
 /* ===== App-Sperre mit Verschlüsselung (aus Pfad; in SoMi Standard an) =====
