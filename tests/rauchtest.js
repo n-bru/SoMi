@@ -262,8 +262,16 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.locator(".card.tap .code").count()===2,"zwei Kinder in den Kurs übernommen");
   await p.click("text=Lerngruppe archivieren");await dlgBtn("Archivieren");await p.click("button:text-is('Löschen')");await dlgBtn("Endgültig löschen");await dlgBtn("Ja, löschen");
   ok(await p.evaluate(()=>db.sus.filter(s=>s.cls==="9Z").length===4),"Kurs gelöscht, Klassenliste bleibt");
-  await p.locator(".card.tap",{hasText:"Klasse 9Z"}).click();await p.click("button:has-text('Kürzel ohne Lerngruppe löschen')");await dlgBtn("Löschen");
-  ok(await p.evaluate(()=>!db.sus.some(s=>s.cls==="9Z")&&!Object.values(NAMES).includes("Fiktiv Eins")),"Klassenliste samt Namen gelöscht");
+  // Schuljahreswechsel (ab 0.4.10): Klasse versetzen, alte Lerngruppen archivieren
+  await p.locator(".card.tap",{hasText:"Klasse 9Z"}).click();await p.click("button:has-text('Klasse versetzen')");
+  ok(await p.inputValue("#dlgIn")==="10Z","Vorschlag nächste Klasse 10Z");await dlgBtn("Versetzen");
+  ok(await p.locator("h1",{hasText:"Klasse 10Z"}).count()===1&&await p.evaluate(()=>db.sus.filter(s=>s.cls==="10Z").map(s=>s.code).sort().join()==="10Z-01,10Z-02,10Z-03,10Z-07"&&NAMES[db.sus.find(s=>s.code==="10Z-01").id]==="Fiktiv Eins"),"Klasse versetzt, Kürzel und Namen passen");
+  await p.evaluate(()=>{const g=touch({id:uid(),fach:"Mathe",cls:"5A",kurs:"-",sy:"2020/21",members:[],arch:null});db.groups.push(g);save()});
+  await nav("Heute");await nav("Lerngruppen");ok(await p.locator("text=aus einem früheren Schuljahr noch aktiv").count()===1,"Hinweis auf alte Lerngruppen");
+  await p.click("button:has-text('Alle 1 archivieren')");await dlgBtn("Archivieren");
+  ok(await p.evaluate(()=>!!db.groups.find(g=>g.sy==="2020/21").arch)&&await p.locator("text=aus einem früheren Schuljahr noch aktiv").count()===0,"alte Lerngruppen archiviert");
+  await p.locator(".card.tap",{hasText:"Klasse 10Z"}).click();await p.click("button:has-text('Kürzel ohne Lerngruppe löschen')");await dlgBtn("Löschen");
+  ok(await p.evaluate(()=>!db.sus.some(s=>s.cls==="9Z")&&!Object.values(NAMES).includes("Fiktiv Eins")&&!db.sus.some(s=>s.cls==="10Z")),"Klassenliste samt Namen gelöscht");
   // XSS: Kürzel mit HTML wird maskiert
   await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("text=+ Schüler:in");await p.fill("#scode",'7<img src=x onerror=alert(1)>');await p.click("button:has-text('Hinzufügen')");
