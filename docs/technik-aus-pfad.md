@@ -21,5 +21,6 @@ Stand der Kopie: Pfad 1.1.3 (26.10.2026), Technik-Korrekturen nachgezogen bis Pf
 | App-Sperre (`codeKey`, `tryCode`, `askCode`, `setLock`, `offLock`, `lockNow`, `renderLock`, `lockPress`, `lockForgot`, Fehlversuche) | gleich | in SoMi Standard an, Ausschalten mit Warnung |
 | Symbole (`ICONS`, `freeIcon`, `pickIcon`) | gleich | frei pro Klasse statt global |
 | Bauwege `beta-bauen.py`, `hauptversion-freigeben.py` | angepasst | Namen und Schlüssel |
+| PDF-Erzeugung (`HW`, `HBW`, `WINA`, `pdfTxt`, `Pdf`) | gleich (ab SoMi 0.5.2, Stand Pfad 1.2.6) | eigene Farben `PC`, `pdfTxt` wandelt − in -; Inhalt `susPdf` neu |
 
-Nicht übernommen: Teilen mit Kolleg:innen, Schulserver, Wochenziel, Verhalten mit Skalen, Tagebuch, Gesprächsblatt, Anleitung. Noch nicht übernommen, kommt später: eigene PDF-Erzeugung, CSV-Export, Stundenraster.
+Nicht übernommen: Teilen mit Kolleg:innen, Schulserver, Wochenziel, Verhalten mit Skalen, Tagebuch, Gesprächsblatt, Anleitung. Noch nicht übernommen, kommt später: CSV-Export, Stundenraster.

@@ -171,7 +171,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.1 Beta",SOMI_STAND="06.11.2026";
+const SOMI_VERSION="0.5.2 Beta",SOMI_STAND="06.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -1044,6 +1044,7 @@ function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){vie
   ${p==="zd"?`<label class="swr"><span class="grow">Note im Zeugnis<span class="sub">Aus: Leistungsbeschreibung als Bericht. An: Note auf Grundlage der Förderplanziele.</span></span><input type="checkbox" class="sw" ${s.zdNote?"checked":""} ${dis} onchange="setZd(${ja(s.id)},this.checked)"></label><p class="muted small">Die Förderplanziele als Bewertungskriterien kommen in einer späteren Version.</p>`:""}</div>
   ${susObsV(s,g)}
   ${stSusCard(s,g)}
+  ${pdfCard(s,g)}
   ${ro?"":`<p><button class="btn ghost danger" onclick="removeFromGroup(${ja(g.id)},${ja(s.id)})">Aus ${esc(gName(g))} entfernen</button></p>`}`}
 async function setIcon(id){const s=susById(id),i=await pickIcon(s.icon,s.cls);if(!i)return;s.icon=i;touch(s);save();render()}
 function setProfil(id,p){const s=susById(id);s.profil=p;touch(s);save();render()}
@@ -1053,6 +1054,80 @@ async function removeFromGroup(gid,sid){const g=groupById(gid),s=susById(sid);
   if(!await ask(`${s.code} aus ${gName(g)} entfernen?`,{ok:"Entfernen",sub:"Die Einträge bleiben gespeichert und sind wieder da, wenn du das Kürzel erneut hinzufügst."}))return;
   const old=g.members.slice();g.members=g.members.filter(x=>x!==sid);touch(g);save();back();
   undoToast(`${s.code} entfernt`,()=>{g.members=old;touch(g);save();render()})}
+
+/* ===== PDF pro Kürzel (ab 0.5.2) =====
+   Bausteine (Pdf, pdfTxt, Schriftbreiten) aus Pfad. Drucken geht in Home-Bildschirm-Apps auf dem iPad nicht,
+   deshalb baut SoMi die PDF selbst (Helvetica, WinAnsi) und gibt sie übers Teilen-Fenster weiter. */
+const HW=[278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,350,556,350,222,556,333,1000,556,556,333,1000,667,333,1000,350,611,350,350,222,222,333,333,350,556,1000,333,1000,500,333,944,350,500,667,278,333,556,556,556,556,260,556,333,737,370,556,584,333,737,333,400,584,333,333,333,556,537,278,333,333,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,584,611,556,556,556,556,500,556,500];
+const HBW=[278,333,474,556,556,889,722,238,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,333,333,584,584,584,611,975,722,722,722,722,667,611,778,722,278,556,722,611,833,722,778,667,778,722,667,611,722,667,944,667,667,611,333,278,333,584,556,333,556,611,556,611,556,333,611,611,278,278,556,278,889,611,611,611,611,389,556,333,611,556,778,556,556,500,389,280,389,584,350,556,350,278,556,500,1000,556,556,333,1000,667,333,1000,350,611,350,350,278,278,500,500,350,556,1000,333,1000,556,333,944,350,500,667,278,333,556,556,556,556,280,556,333,737,370,556,584,333,737,333,400,584,333,333,333,611,556,278,333,333,365,556,834,834,834,611,722,722,722,722,722,722,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,556,556,556,556,556,278,278,278,278,611,611,611,611,611,611,611,584,611,611,611,611,611,556,611,556];
+const WINA={"€":128,"‚":130,"„":132,"…":133,"‘":145,"’":146,"“":147,"”":148,"•":149,"–":150,"—":151};
+function pdfTxt(t){let o="";for(const ch of String(t??"").replace(/≤/g,"<=").replace(/≥/g,">=").replace(/→/g,"->").replace(/−/g,"-").replace(/\s+/g," ")){let c=WINA[ch]||ch.codePointAt(0);if(!WINA[ch]&&(c>255||(c>=127&&c<160)||c<32))continue;o+=String.fromCharCode(c)}return o}
+class Pdf{constructor(w,h,m=40){this.W=w;this.H=h;this.M=m;this.pages=[];this.add()}
+  add(){this.c=[];this.pages.push(this.c);this.y=this.M+8}
+  need(h){if(this.y+h>this.H-this.M-14)this.add()}
+  f(n){return (Math.round(n*100)/100).toString()}
+  col(c,s){c=PC[c]||c;return c.map(x=>this.f(x/255)).join(" ")+(s?" RG":" rg")}
+  tw(s,size,b){const W=b?HBW:HW;let w=0;for(const ch of pdfTxt(s))w+=W[ch.charCodeAt(0)-32]||556;return w*size/1000}
+  text(x,y,s,o={}){const size=o.size||10,t=pdfTxt(s);if(!t)return;if(o.align==="right")x-=this.tw(s,size,o.bold);else if(o.align==="center")x-=this.tw(s,size,o.bold)/2;
+    this.c.push(`BT ${this.col(o.color||"ink")} /${o.bold?"F2":"F1"} ${size} Tf ${this.f(x)} ${this.f(this.H-y)} Td (${t.replace(/[\\()]/g,"\\$&")}) Tj ET`)}
+  lines(s,w,size,b){const out=[];let cur="";for(const word of String(s??"").split(/\s+/).filter(Boolean)){const t=cur?cur+" "+word:word;if(this.tw(t,size,b)<=w||!cur)cur=t;else{out.push(cur);cur=word}}if(cur)out.push(cur);return out}
+  wrap(s,x,w,o={}){const size=o.size||10,lh=o.lh||size*1.38;for(const l of this.lines(s,w,size,o.bold)){this.need(lh);this.text(x,this.y+size,l,o);this.y+=lh}}
+  line(x1,y1,x2,y2,o={}){this.c.push(`${this.col(o.color||"line",1)} ${o.w||1} w ${o.dash?`[${o.dash}] 0 d`:"[] 0 d"} ${this.f(x1)} ${this.f(this.H-y1)} m ${this.f(x2)} ${this.f(this.H-y2)} l S`)}
+  poly(p,o={}){if(p.length<2)return;this.c.push(`${this.col(o.color||"acc",1)} ${o.w||1.6} w [] 0 d 1 j 1 J `+p.map((q,i)=>`${this.f(q[0])} ${this.f(this.H-q[1])} ${i?"l":"m"}`).join(" ")+" S")}
+  rect(x,y,w,h,o={}){this.c.push(`${o.fill?this.col(o.fill):""} ${o.stroke?this.col(o.stroke,1)+" 1 w [] 0 d":""} ${this.f(x)} ${this.f(this.H-y-h)} ${this.f(w)} ${this.f(h)} re ${o.fill&&o.stroke?"B":o.fill?"f":"S"}`)}
+  circle(cx,cy,r,o={}){const k=r*.5523,Y=this.H-cy,f=n=>this.f(n);
+    this.c.push(`${o.fill?this.col(o.fill):""} ${o.stroke?this.col(o.stroke,1)+" 1 w [] 0 d":""} ${f(cx+r)} ${f(Y)} m ${f(cx+r)} ${f(Y+k)} ${f(cx+k)} ${f(Y+r)} ${f(cx)} ${f(Y+r)} c ${f(cx-k)} ${f(Y+r)} ${f(cx-r)} ${f(Y+k)} ${f(cx-r)} ${f(Y)} c ${f(cx-r)} ${f(Y-k)} ${f(cx-k)} ${f(Y-r)} ${f(cx)} ${f(Y-r)} c ${f(cx+k)} ${f(Y-r)} ${f(cx+r)} ${f(Y-k)} ${f(cx+r)} ${f(Y)} c ${o.fill&&o.stroke?"B":o.fill?"f":"S"}`)}
+  bytes(foot){const n=this.pages.length;if(foot)this.pages.forEach((p,i)=>{this.c=p;this.text(this.M,this.H-this.M+16,foot,{size:7.5,color:"muted"});this.text(this.W-this.M,this.H-this.M+16,`Seite ${i+1} von ${n}`,{size:7.5,color:"muted",align:"right"})});
+    const objs=["<< /Type /Catalog /Pages 2 0 R >>","",`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>`,`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>`],kids=[];
+    this.pages.forEach(p=>{const s=p.join("\n");objs.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${this.W} ${this.H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${objs.length+2} 0 R >>`);kids.push(objs.length);objs.push(`<< /Length ${s.length} >>\nstream\n${s}\nendstream`)});
+    objs[1]=`<< /Type /Pages /Kids [${kids.map(i=>i+" 0 R").join(" ")}] /Count ${kids.length} >>`;
+    let out="%PDF-1.4\n%\xe2\xe3\xcf\xd3\n";const off=[];objs.forEach((o,i)=>{off.push(out.length);out+=`${i+1} 0 obj\n${o}\nendobj\n`});
+    const x=out.length;out+=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`+off.map(o=>String(o).padStart(10,"0")+" 00000 n \n").join("")+`trailer\n<< /Size ${objs.length+1} /Root 1 0 R >>\nstartxref\n${x}\n%%EOF`;
+    return Uint8Array.from(out,c=>c.charCodeAt(0))}}
+const PC={ink:[30,38,34],muted:[96,108,101],acc:[46,107,87],line:[210,220,214],soft:[220,237,228],white:[255,255,255]};
+let PDFNM=false;
+const pTxt=t=>String(t??"").replace(/−/g,"-");
+async function susPdf(sid,gid){const s=susById(sid),g=groupById(gid);if(!s||!g||!g.members.includes(sid))return;
+  const from=ovFrom(),SP=g.fach==="Sport",per={hj:"dieses Halbjahr",sj:"dieses Schuljahr",all:"alle Einträge"}[OVP]||"";
+  const d=new Pdf(595,842,46),L=d.M,W=d.W-2*d.M,CW=118;
+  const kv=(k,v)=>{d.need(15);const y=d.y;d.text(L,y+10,k,{size:9.5,color:"muted"});d.y=y;d.wrap(pTxt(v),L+CW,W-CW,{size:10,lh:14})};
+  const sec=t=>{d.y+=14;d.need(50);d.text(L,d.y+12,t,{size:13,bold:1,color:"acc"});d.y+=18;d.line(L,d.y,L+W,d.y);d.y+=6};
+  const row=(cols,o={})=>{d.need(15);const y=d.y;let h=14;cols.forEach(([x,w,t])=>{d.y=y;d.wrap(pTxt(t),L+x,w,{size:9.5,lh:13,bold:o.bold,color:o.color});h=Math.max(h,d.y-y)});d.y=y+h+1};
+  d.text(L,d.y+16,`Leistungsübersicht ${g.fach}`,{size:18,bold:1});d.y+=30;
+  kv("Kürzel",s.code+(PDFNM&&NAMES[s.id]?` · ${NAMES[s.id]}`:""));kv("Lerngruppe",gName(g));
+  kv("Zeitraum",per+(OVP==="all"?"":` (ab ${dDEy(from)})`));kv("Profil",PROFILE[s.profil||"r"]);
+  if(s.profil==="na"&&s.na)kv("Nachteilsausgleich",s.na);kv("Erstellt am",dDEy(today()));
+  // Sonstige Mitarbeit / Sonstige Leistungen
+  const os=[...obsOf(g.id,s.id),...plObs(g.id,s.id)].filter(o=>o.d>=from&&!o.fb).sort((a,b)=>a.d.localeCompare(b.d)||a.upd-b.upd);
+  sec(SP?"Sonstige Leistungen":"Sonstige Mitarbeit");
+  const ks=KRIT.filter(K=>!K.nogw&&os.some(o=>o.k===K.k));
+  if(!os.length)d.wrap("Keine Einträge in diesem Zeitraum.",L,W,{size:10,color:"muted"});
+  else{row([[0,200,"Kriterium"],[210,70,"Einträge"],[290,90,"Schnitt"],[390,80,"Gewicht"]],{bold:1,color:"muted"});
+    ks.forEach(K=>{const a=os.filter(o=>o.k===K.k);row([[0,200,K.t],[210,70,String(a.length)],[290,90,noteTxt(mean(a))],[390,80,kgw(K.k)+"x"]])});
+    d.y+=4;d.wrap(genug(os)?`Rechnerischer Notenvorschlag: ${pTxt(vorschlag(os))}`:"Noch kein Notenvorschlag (ab 3 Einträgen in 2 Kriterien).",L,W,{size:10.5,bold:1});
+    d.y+=6;d.wrap("Einzelne Einträge",L,W,{size:10,bold:1});
+    os.forEach(o=>row([[0,62,dDEy(o.d)],[66,120,KMAP[o.k].t],[190,100,o.s?`${STUF[o.s].l} (${STUF[o.s].t})`:`Note ${o.n}`],[294,W-294,(o.pl?"gesondert: ":"")+(o.t||"")]]))}
+  // Klassenarbeiten / schriftliche Überprüfungen
+  const ka=kaOf(g.id,from);
+  if(ka.length){sec(kaL(g)[1]);row([[0,62,"Datum"],[66,190,"Titel"],[260,110,"Punkte"],[374,W-374,"Note"]],{bold:1,color:"muted"});
+    ka.forEach(a=>{const x=a.r[s.id]||{},n=kaNote(a,s.id);row([[0,62,dDEy(a.d)],[66,190,a.t],[260,110,x.st?KAST[x.st]:x.p!=null?`${fmtP(x.p)} von ${fmtP(x.mx||a.max)}`:"–"],[374,W-374,(n?n:"–")+(x.na?" (NA gewährt)":"")]])});
+    const k=kaMean(g.id,s.id,from),t=gesamt(genug(os)?noteMean(os):null,k,g.fach);
+    d.y+=4;d.wrap(`Schnitt: ${pTxt(noteTxt(k))} · Gesamtvorschlag: ${pTxt(t==null?"–":noteTxt(t))}`,L,W,{size:10.5,bold:1});d.wrap(`Gewichtung: ${wTxt(g)}.`,L,W,{size:9,color:"muted"})}
+  // Sport: Stundenstatus
+  if(SP){const at=db.att.filter(a=>a.gid===g.id&&a.sid===s.id&&a.d>=from);sec("Stundenstatus");
+    if(!at.length)d.wrap("Kein Stundenstatus in diesem Zeitraum.",L,W,{size:10,color:"muted"});
+    else Object.entries(ST).forEach(([k,t])=>row([[0,200,t],[210,80,String(at.filter(a=>a.st===k).length)]]))}
+  // Störungen
+  const st=stOf(g.id,s.id,from).sort((a,b)=>a.d.localeCompare(b.d));
+  if(st.length){sec("Massive Unterrichtsstörungen");d.wrap("Zählen nicht zur Note.",L,W,{size:9,color:"muted"});st.forEach(a=>row([[0,62,dDEy(a.d)],[66,W-66,a.t||""]]))}
+  d.y+=14;d.wrap("Notenvorschläge sind rechnerisch. Die Note legt die Lehrkraft fest; laut Lehrplan zählt die Gesamtentwicklung.",L,W,{size:9,color:"muted"});
+  const name=`somi-${s.code.replace(/[^\w-]/g,"_")}-${g.fach}-${today()}.pdf`;
+  if(await giveFile(name,d.bytes(`SoMi · ${s.code} · ${gName(g)} · vertraulich`),"application/pdf"))toast("PDF erstellt")}
+function pdfCard(s,g){const hasN=!!NAMES[s.id];
+  return `<div class="card"><b>PDF</b><p class="small muted" style="margin:4px 0 8px">Übersicht für ${esc(s.code)} in ${esc(gName(g))}: alle Einträge, Noten und Vorschläge im gewählten Zeitraum. ${isIOS?"Es öffnet sich das Teilen-Fenster: „In Dateien sichern“ oder „Drucken“.":"Die Datei wird heruntergeladen."} Enthält Noten, also nicht am Beamer öffnen.</p>
+  <div class="pick" style="margin-bottom:8px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" aria-pressed="${OVP===k}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
+  ${hasN?`<label class="swr"><span class="grow">Name ins PDF<span class="sub">Sonst steht nur das Kürzel drin.</span></span><input type="checkbox" class="sw" ${PDFNM?"checked":""} onchange="PDFNM=this.checked"></label>`:""}
+  <button class="btn pri block" onclick="susPdf(${ja(s.id)},${ja(g.id)})">PDF erstellen</button></div>`}
 
 /* ===== Einstellungen ===== */
 function profilV(){

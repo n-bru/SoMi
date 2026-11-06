@@ -57,6 +57,11 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Eintragen (ab 0.5.1) ist ein Vollbild-Schritt ohne Menüleiste und passt ohne Scrollen auf alle iPhones (gilt auch für Präsentation und Heft). Die Übersichtsseite zeigt Gruppen, „Einteilen“, Notenspiegel und Tabelle.
 - Gespeichert in db.ka mit k:"pue", b (Bereich), art, rg {Kürzel-ID: Gruppe}. Geprüft in okKa/okRg.
 
+## PDF pro Kürzel (ab 0.5.2)
+- Seite eines Kürzels in einer Lerngruppe → Karte „PDF“: Zeitraum wählen, optional „Name ins PDF“ (nur wenn ein Name hinterlegt ist), „PDF erstellen“.
+- Inhalt: Kürzel, Lerngruppe, Zeitraum, Profil, ggf. Nachteilsausgleich; Kriterien mit Anzahl, Schnitt, Gewicht; Notenvorschlag; alle Einträge mit Datum und Stichwort; Klassenarbeiten/schriftliche Überprüfungen mit Punkten, Note, NA-Vermerk, Gesamtvorschlag; Sport: Stundenstatus; Störungen mit Notiz.
+- SoMi baut die PDF selbst (Helvetica, Pdf-Klasse aus Pfad). Auf dem iPad öffnet sich das Teilen-Fenster („In Dateien sichern“, „Drucken“), sonst Download. Fußzeile „vertraulich“.
+
 ## Erfassen auf dem iPhone (ab 0.4.5, Matrix ab 0.4.6, volle Höhe ab 0.4.8)
 - Die Erfassen-Seiten füllen genau den Bildschirm und scrollen nie. Getestet bei 375 × 548 (iPhone SE im Safari-Tab), 390 × 664 und 430 × 740. Bei „Einzeln“ mit großer Klasse scrollt nur die Kürzel-Liste.
 - Runde als Matrix: oben einmal die Stufen, links die Kriterien, Knöpfe zeigen den Notenwert. Fragezeichen am Kriterium öffnet Hinweis und Ankertexte.
