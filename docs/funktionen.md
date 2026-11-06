@@ -62,6 +62,13 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Inhalt: Kürzel, Lerngruppe, Zeitraum, Profil, ggf. Nachteilsausgleich; Kriterien mit Anzahl, Schnitt, Gewicht; Notenvorschlag; alle Einträge mit Datum und Stichwort; Klassenarbeiten/schriftliche Überprüfungen mit Punkten, Note, NA-Vermerk, Gesamtvorschlag; Sport: Stundenstatus; Störungen mit Notiz.
 - SoMi baut die PDF selbst (Helvetica, Pdf-Klasse aus Pfad). Auf dem iPad öffnet sich das Teilen-Fenster („In Dateien sichern“, „Drucken“), sonst Download. Fußzeile „vertraulich“.
 
+## Förderplanziele LE (ab 0.5.3)
+- Nur bei Profil „zieldifferent (LE)“: auf der Seite des Kürzels unter „Förderplanziele <Fach>“ 2 bis 4 Ziele (höchstens 120 Zeichen, ohne Diagnosen). Gespeichert in s.lez {Fach: [{id,t}]}, geprüft mit okLez.
+- Runde: Für dieses Kürzel Zeilen je Ziel statt der Kriterien. Eintrag k:"lez", z = Ziel-ID. Einzeln bewerten bietet keine Ziele; auf der Seite des Kürzels „Ziele für … bewerten“ öffnet die Runde bei diesem Kürzel.
+- Zählt: nur die Ziel-Einträge (zaehl). Notenvorschlag ab 3 Einträgen in 2 Zielen, Ziele gleich gewichtet. „Note im Zeugnis“ aus → kein Vorschlag, Übersicht zeigt „Bericht“.
+- Textbaustein je Ziel aus dem Schnitt der Stufen: ab 3,5 „sicher erreicht“, ab 2,75 „erreicht“, ab 1,75 „teilweise erreicht“, sonst „noch nicht erreicht“. Auf der Seite und im PDF.
+- Ziel löschen: Einträge bleiben, zählen aber nicht mehr.
+
 ## Erfassen auf dem iPhone (ab 0.4.5, Matrix ab 0.4.6, volle Höhe ab 0.4.8)
 - Die Erfassen-Seiten füllen genau den Bildschirm und scrollen nie. Getestet bei 375 × 548 (iPhone SE im Safari-Tab), 390 × 664 und 430 × 740. Bei „Einzeln“ mit großer Klasse scrollt nur die Kürzel-Liste.
 - Runde als Matrix: oben einmal die Stufen, links die Kriterien, Knöpfe zeigen den Notenwert. Fragezeichen am Kriterium öffnet Hinweis und Ankertexte.

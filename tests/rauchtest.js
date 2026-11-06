@@ -294,6 +294,20 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>!!db.groups.find(g=>g.sy==="2020/21").arch)&&await p.locator("text=aus einem früheren Schuljahr noch aktiv").count()===0,"alte Lerngruppen archiviert");
   await p.locator(".card.tap",{hasText:"Klasse 10Z"}).click();await p.click("button:has-text('Kürzel ohne Lerngruppe löschen')");await dlgBtn("Löschen");
   ok(await p.evaluate(()=>!db.sus.some(s=>s.cls==="9Z")&&!Object.values(NAMES).includes("Fiktiv Eins")&&!db.sus.some(s=>s.cls==="10Z")),"Klassenliste samt Namen gelöscht");
+  // 0.5.3 Förderplanziele (LE)
+  ok(await p.evaluate(()=>{const s=db.sus.find(x=>x.code==="DEMO-05");return lezOf(s,"Mathe").length===2&&okSus(s)&&!okSus({...s,lez:{Mathe:[1,2]}})&&!okSus({...s,lez:{Bio:[]}})&&!okSus({...s,lez:{Mathe:Array.from({length:5},(_,i)=>({id:"z"+i,t:"x"}))}})}),"okSus prüft Förderplanziele");
+  ok(await p.evaluate(()=>!okObs({id:"o1",gid:"g1",sid:"s1",k:"lez",s:"3",d:"2026-11-05",upd:1})&&okObs({id:"o1",gid:"g1",sid:"s1",k:"lez",z:"z1",s:"3",d:"2026-11-05",upd:1})&&!okObs({id:"o1",gid:"g1",sid:"s1",k:"qual",z:"z1",s:"3",d:"2026-11-05",upd:1})),"okObs prüft Ziel-Einträge");
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");ER={...erNeu(g.id,"k"),i:4};go({tab:"gruppen",group:g.id,erf:g.id})});
+  ok(await p.locator(".seqsus:has-text('DEMO-05')").count()===1&&await p.locator(".mxz").count()===2&&await p.locator(".seqk:has-text('Qualität')").count()===0,"Runde zeigt bei LE die Förderplanziele statt Kriterien");
+  {const vp=p.viewportSize();await p.setViewportSize({width:375,height:548});ok(await p.evaluate(()=>document.documentElement.scrollHeight<=innerHeight),"375×548: Runde mit Zielen ohne Scrollen");await p.setViewportSize(vp)}
+  {const n0=await p.evaluate(()=>db.obs.length);await p.locator(".mxz").first().locator("button[data-s='4']").click();
+  ok(await p.evaluate(n=>{const o=db.obs.at(-1),s=db.sus.find(x=>x.code==="DEMO-05");return db.obs.length===n+1&&o.k==="lez"&&o.z===s.lez.Mathe[0].id&&o.s==="4"&&okObs(o)},n0),"Ziel-Eintrag gespeichert")}
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");SHOW=true;go({tab:"gruppen",group:g.id,sus:g.members[4]})});
+  ok(await p.locator("text=Textbausteine fürs Zeugnis").count()===1&&await p.locator("text=Notenvorschlag").count()>0,"Seite zeigt Ziele, Textbausteine und Notenvorschlag");
+  await p.fill("#lezNeu","Uhrzeit ablesen (fiktiv)");await p.click("button:text-is('Hinzufügen')");
+  ok(await p.evaluate(()=>lezOf(db.sus.find(x=>x.code==="DEMO-05"),"Mathe").length===3),"Ziel hinzugefügt");
+  await p.click("label.swr:has-text('Note im Zeugnis') input");ok(await p.locator("text=Bericht statt Note").count()===1,"ohne Note: Bericht statt Notenvorschlag");
+  await p.click("label.swr:has-text('Note im Zeugnis') input");await p.evaluate(()=>{SHOW=false;render();return true});
   // 0.5.2 PDF pro Kürzel
   await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Sport");go({tab:"gruppen",group:g.id,sus:g.members[0]})});OVP="all";
   await p.evaluate(()=>{OVP="all";render()});
