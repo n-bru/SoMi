@@ -294,6 +294,18 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>!!db.groups.find(g=>g.sy==="2020/21").arch)&&await p.locator("text=aus einem früheren Schuljahr noch aktiv").count()===0,"alte Lerngruppen archiviert");
   await p.locator(".card.tap",{hasText:"Klasse 10Z"}).click();await p.click("button:has-text('Kürzel ohne Lerngruppe löschen')");await dlgBtn("Löschen");
   ok(await p.evaluate(()=>!db.sus.some(s=>s.cls==="9Z")&&!Object.values(NAMES).includes("Fiktiv Eins")&&!db.sus.some(s=>s.cls==="10Z")),"Klassenliste samt Namen gelöscht");
+  // 0.5.2 PDF pro Kürzel
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Sport");go({tab:"gruppen",group:g.id,sus:g.members[0]})});OVP="all";
+  await p.evaluate(()=>{OVP="all";render()});
+  {const [dl]=await Promise.all([p.waitForEvent("download"),p.click("button:has-text('PDF erstellen')")]);const pf=path.join(require("os").tmpdir(),"somi-test.pdf");await dl.saveAs(pf);
+  const t=fs.readFileSync(pf,"latin1");ok(t.startsWith("%PDF-1.4")&&t.includes("%%EOF")&&t.includes("(DEMO-01)")&&t.includes("Leistungs\xfcbersicht Sport")&&t.includes("Handstand")&&t.includes("Stundenstatus")&&!t.includes("Fiktiv Testname"),"PDF pro Kürzel mit Sport-Einträgen, ohne Namen");
+  fs.copyFileSync(pf,"/tmp/claude-0/sp/somi-test.pdf")}
+  await p.click("label.swr:has-text('Name ins PDF') input");
+  {const [dl]=await Promise.all([p.waitForEvent("download"),p.click("button:has-text('PDF erstellen')")]);const pf=path.join(require("os").tmpdir(),"somi-test2.pdf");await dl.saveAs(pf);
+  ok(fs.readFileSync(pf,"latin1").includes("Fiktiv Testname"),"Name nur, wenn eingeschaltet")}
+  await p.evaluate(()=>{PDFNM=false;const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");go({tab:"gruppen",group:g.id,sus:g.members[2]})});
+  {const [dl]=await Promise.all([p.waitForEvent("download"),p.click("button:has-text('PDF erstellen')")]);const pf=path.join(require("os").tmpdir(),"somi-test3.pdf");await dl.saveAs(pf);
+  const t=fs.readFileSync(pf,"latin1");ok(t.includes("Klassenarbeiten")&&t.includes("KA 1")&&t.includes("NA gew")&&t.includes("Nachteilsausgleich"),"Mathe-PDF mit Klassenarbeit und NA-Vermerk");fs.copyFileSync(pf,"/tmp/claude-0/sp/somi-test3.pdf")}
   // XSS: Kürzel mit HTML wird maskiert
   await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("text=+ Schüler:in");await p.fill("#scode",'7<img src=x onerror=alert(1)>');await p.click("button:has-text('Hinzufügen')");
