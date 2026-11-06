@@ -165,7 +165,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.4.9",SOMI_STAND="06.11.2026";
+const SOMI_VERSION="0.4.10",SOMI_STAND="06.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -846,6 +846,7 @@ function gruppenV(){
     <label>Kurs</label><div class="sub">Mathe hat ab Klasse 7 E- und G-Kurse. Danach richtet sich der Notenschlüssel der Klassenarbeiten.</div><div class="pick">${Object.entries(KURSE).map(([k,t])=>`<button class="${GD.kurs===k?"on":""}" onclick="GD.kurs='${k}';render()">${t}</button>`).join("")}</div>
     <div class="duo" style="margin-top:14px"><button class="btn" onclick="GD=null;view.adding=false;render()">Abbrechen</button><button class="btn pri" onclick="addGroup()">Anlegen</button></div></div>`
   :`<p><button class="btn pri" onclick="GD={fach:'Mathe',cls:'',kurs:'-'};render();$('#gcls')?.focus()">+ Lerngruppe</button></p>`}
+  ${syCard()}
   ${act.length?act.map(groupCard).join(""):`<p class="muted">Noch keine aktiven Lerngruppen.</p>`}
   ${klSection()}
   ${arch.length?`<details class="card"><summary style="font-weight:800">Archiv (${arch.length})</summary><p class="muted small">Archivierte Gruppen sind nur lesbar. Aufbewahrung ${FRIST_JAHRE} Jahre ab Ende des Kalenderjahres der Archivierung (VO-DV I § 9).</p>${arch.map(groupCard).join("")}</details>`:""}`}
@@ -940,7 +941,31 @@ function klV(){const cls=view.kl,ms=klOf(cls);if(!ms.length){view={tab:"gruppen"
   <p class="row" style="flex-wrap:wrap">${ms.some(s=>!s.demo)?`<button class="btn" onclick="go({tab:'gruppen',kl:${ja(cls)},nkl:${ja(cls)}})">Namen eintragen</button>`:""}${nmBtn()}</p>
   ${ms.map(s=>{const gs=inGroups(s.id);return `<div class="card row">${susIcon(s)}<div class="grow"><div class="code">${esc(s.code)}</div>${nm(s)}<div class="muted small">${gs.length?esc(gs.map(gName).join(", ")):"noch in keiner Lerngruppe"}</div></div>${!gs.length&&!s.demo?`<button class="btn ghost danger" aria-label="${esc(s.code)} von der Klassenliste löschen" onclick="klDel(${ja(s.id)})">Löschen</button>`:""}</div>`}).join("")}
   ${ms.some(s=>s.demo)?"":KLD.open?`<div class="card"><b>Weitere Kinder einfügen</b>${klForm()}<div class="duo" style="margin-top:14px"><button class="btn" onclick="KLD.open=false;render()">Abbrechen</button><button class="btn pri" onclick="if(klImport(KLD.cls,KLD.txt)){KLD.txt='';KLD.open=false;render()}">Hinzufügen</button></div></div>`
-    :`<p class="row" style="flex-wrap:wrap"><button class="btn" onclick="KLD.open=true;render();$('#kltxt')?.focus()">+ Weitere Kinder einfügen</button>${frei.length>1?`<button class="btn ghost danger" onclick="klDelAll(${ja(cls)})">Kürzel ohne Lerngruppe löschen (${frei.length})</button>`:""}</p>`}`}
+    :`<p class="row" style="flex-wrap:wrap"><button class="btn" onclick="KLD.open=true;render();$('#kltxt')?.focus()">+ Weitere Kinder einfügen</button><button class="btn" onclick="klMove(${ja(cls)})">Klasse versetzen</button>${frei.length>1?`<button class="btn ghost danger" onclick="klDelAll(${ja(cls)})">Kürzel ohne Lerngruppe löschen (${frei.length})</button>`:""}</p>`}`}
+/* Schuljahreswechsel (ab 0.4.10): Klasse versetzen (75 → 85, Kürzel 75-01 → 85-01; Namen, Profile, Einträge bleiben, weil sie an der inneren Kennung hängen)
+   und Lerngruppen aus früheren Schuljahren gesammelt archivieren. */
+const nextCls=c=>{let m=/^(\d)(\d)$/.exec(c);if(m)return `${+m[1]+1}${m[2]}`;m=/^(\d+)(.*)$/.exec(c);return m?`${+m[1]+1}${m[2]}`:c};
+async function klMove(cls){const ms=klOf(cls).filter(s=>!s.demo);if(!ms.length)return;
+  /* Ein Dialog statt zwei: Enter im Feld würde sonst gleich die Rückfrage bestätigen */
+  const v=await dlg(`<p style="font-weight:700;margin:0 0 6px">Klasse ${esc(cls)} versetzen</p><p class="small muted" style="margin:0 0 10px">Alle ${ms.length} Kürzel bekommen die neue Klasse, z. B. ${esc(ms[0].code)} → ${esc(nextCls(cls))}${esc(ms[0].code.slice(cls.length))}. Namen, Profile und Einträge bleiben. Auch in archivierten Lerngruppen steht dann das neue Kürzel.</p>
+    <label for="dlgIn">Neue Klasse</label><input id="dlgIn" autocomplete="off" maxlength="10" value="${esc(nextCls(cls))}">
+    <div class="duo" style="margin-top:14px"><button class="btn" data-a="0">Abbrechen</button><button class="btn pri" data-a="1">Versetzen</button></div>`,
+    (el,done)=>{const i=el.querySelector("#dlgIn");i.focus();i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();done(i.value)}};el.querySelector('[data-a="0"]').onclick=()=>done(null);el.querySelector('[data-a="1"]').onclick=()=>done(i.value)});
+  if(v==null)return;
+  const neu=(v.trim()||nextCls(cls)).toUpperCase();
+  if(neu===cls)return toast("Das ist dieselbe Klasse.");
+  if(looksLikeName(v)||!/^[A-Za-z0-9ÄÖÜäöü._-]{1,10}$/.test(neu))return toast("Bitte nur die Klasse eintragen, z. B. 85 oder 8B.");
+  const pre=cls.toLowerCase()+"-",code=s=>s.code.toLowerCase().startsWith(pre)?neu+s.code.slice(cls.length):s.code;
+  const ids=new Set(ms.map(s=>s.id)),taken=new Set(db.sus.filter(s=>!ids.has(s.id)).map(s=>s.code.toLowerCase()));
+  const clash=ms.filter(s=>taken.has(code(s).toLowerCase()));if(clash.length)return toast(`Geht nicht: ${clash.map(code).slice(0,3).join(", ")} gibt es schon.`);
+  for(const s of ms){s.code=code(s);s.cls=neu;touch(s)}save();KLD=null;view={tab:"gruppen",kl:neu};render();toast(`Klasse ${neu}: ${ms.length} Kürzel versetzt`)}
+const oldGroups=()=>db.groups.filter(g=>!g.arch&&!g.demo&&g.sy!==syNow());
+function syCard(){const o=oldGroups();if(!o.length)return "";
+  return `<div class="card" style="border:2px solid var(--sig)"><b>Neues Schuljahr ${esc(syNow())}</b><p class="small" style="margin:6px 0 10px">${o.length} ${o.length===1?"Lerngruppe ist":"Lerngruppen sind"} aus einem früheren Schuljahr noch aktiv: ${esc(o.map(gName).join(", "))}. Archivieren macht sie nur noch lesbar, die Noten bleiben ${FRIST_JAHRE} Jahre erhalten. Danach Klassen versetzen (Klassenliste → „Klasse versetzen“) und neue Lerngruppen anlegen.</p>
+  <button class="btn" onclick="archiveOld()">Alle ${o.length} archivieren</button></div>`}
+async function archiveOld(){const o=oldGroups();if(!o.length)return;
+  if(!await ask(`${o.length} Lerngruppen archivieren?`,{ok:"Archivieren",sub:`${o.map(gName).join(", ")}. Sie sind danach nur noch lesbar. Aufbewahren bis ${dDEy(`${new Date().getFullYear()+FRIST_JAHRE}-12-31`)}.`}))return;
+  const d=today();for(const g of o){g.arch=d;touch(g)}save();render();undoToast(`${o.length} archiviert`,()=>{for(const g of o){g.arch=null;touch(g)}save();render()})}
 function klDrop(ids){const set=new Set(ids);db.sus=db.sus.filter(s=>!set.has(s.id));db.obs=db.obs.filter(o=>!set.has(o.sid));db.att=db.att.filter(a=>!set.has(a.sid));db.asv=db.asv.filter(a=>!set.has(a.sid));
   for(const id of ids)delete NAMES[id];db.del.push(...ids);save();saveNames()}
 async function klDel(sid){const s=susById(sid);if(!s||inGroups(sid).length)return;

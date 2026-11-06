@@ -1,4 +1,4 @@
-# SoMi – Funktionen (Version 0.4.9, Stand 06.11.2026)
+# SoMi – Funktionen (Version 0.4.10, Stand 06.11.2026)
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
@@ -85,6 +85,8 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - „+ Klassenliste“: Klasse (z. B. 75) und Liste einfügen, eine Zeile pro Kind (höchstens 60). Zeilen mit Ziffer (z. B. 75-01) gelten als Kürzel. Alle anderen Zeilen gelten als Name: SoMi vergibt das nächste Kürzel (75-01, 75-02 … in der Reihenfolge der Liste) und legt den Namen in die Namensliste. Das geht nur mit App-Sperre. Doppelte Zeilen und vorhandene Namen werden übersprungen.
 - Klassenseite: alle Kürzel mit Name und Lerngruppen, „Namen eintragen“, „+ Weitere Kinder einfügen“, löschen nur für Kürzel ohne Lerngruppe (auch alle auf einmal).
 - Lerngruppe → „Aus Klassenlisten wählen“: alle Kürzel, die noch nicht in der Gruppe sind, nach Klasse (eigene Klasse zuerst), nichts vorausgewählt, Knopf „alle“ je Klasse. Beispielkinder nur in Beispielgruppen. Für Kurse aus mehreren Klassen als Klasse z. B. „7“ eintragen.
+- Schuljahreswechsel (ab 0.4.10): Klassenseite → „Klasse versetzen“. Vorschlag: 75 → 85, 7B → 8B, änderbar. Kürzel mit der alten Klasse vorne bekommen die neue (75-01 → 85-01), Namen, Profile und Einträge bleiben (hängen an der inneren Kennung). Auch archivierte Lerngruppen zeigen danach das neue Kürzel. Gibt es ein Kürzel schon, bricht SoMi ab.
+- Ab August zeigt „Lerngruppen“ aktive Lerngruppen aus früheren Schuljahren mit „Alle archivieren“.
 - Daten: `s.kl = true` = steht auf einer Klassenliste. Solche Kürzel bleiben, wenn eine Lerngruppe gelöscht wird. Geprüft in `okSus`.
 
 ## Namensliste (ab 0.2.3)
