@@ -147,6 +147,8 @@ body.erf .fill>*{flex:none}body.erf .padwrap{position:static;box-shadow:none;mar
 .erx{display:flex;gap:6px;margin-top:6px}.erx #erT{flex:1;min-width:0}.erx #erD{flex:none;width:auto;max-width:44%}
 body.erf .stgrid{flex:1 1 auto!important;min-height:0;grid-template-rows:repeat(2,minmax(0,96px));align-content:start}body.erf .stgrid .btn{min-height:0;height:100%}
 .rgbar{gap:6px;margin:0 0 10px}.rgbar .pick button{padding:6px 2px}.rgr{gap:8px;margin:5px 0}.rgr .code{min-width:88px;flex:none;white-space:nowrap}
+body.erf .kan .padn{flex:1 1 auto!important;min-height:0;grid-template-rows:repeat(3,minmax(0,64px));align-content:start}body.erf .kan .padn button{min-height:0;height:100%}
+body.erf .rgbar{margin:0 0 6px}body.erf .kan .seqsus{margin:4px 0}body.erf .kan .bar{margin:4px 0}
 .four{display:grid;grid-template-columns:.6fr 1fr 1fr 1fr;gap:6px}.four .btn{padding-left:4px;padding-right:4px}
 .kan .seqsus{margin:8px 0 6px}.kan .seqsus .code{font-size:1.5rem}.kan .kic.big{width:44px;height:44px;font-size:1.5rem}.kan .pad button{min-height:44px}.rgr .pick button{min-height:40px;padding:4px 0}
 .tilew{flex:1 1 auto!important;min-height:0;overflow-y:auto;margin-top:6px}
@@ -169,7 +171,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.0 Beta",SOMI_STAND="06.11.2026";
+const SOMI_VERSION="0.5.1 Beta",SOMI_STAND="06.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -574,7 +576,7 @@ function addKa(gid){const g=groupById(gid);if(!g||g.arch)return;const PL=!!view.
   if(!t)return toast("Bitte einen Titel eintragen.");if(looksLikeName(t))toast("Bitte keine Namen in den Titel schreiben.");
   if(!note&&!(max>0&&max<=1000))return toast("Bitte die Höchstpunktzahl eintragen, z. B. 40.");if(!okDate(KD.d))return toast("Bitte ein Datum wählen.");
   const a=touch({id:uid(),gid,t,d:KD.d,...(note?{}:{max,sk:Object.hasOwn(KASCHL,KD.sk)?KD.sk:"-"}),...(k?{k}:{}),...pue,r:{},...(g.demo?{demo:true}:{})});db.ka.push(a);KD=null;KE={kid:a.id,i:0,rg:0};save();
-  go({tab:view.tab,group:gid,ka:gid,plm:PL,kad:a.id})}
+  go({tab:view.tab,group:gid,ka:gid,plm:PL,kad:a.id});if(note)go({...view,kae:true})}
 
 function kaV(){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g){view={tab:view.tab,group:view.ka,ka:view.ka,plm:view.plm};return kaListV()}
   if(KE.kid!==a.id)KE={kid:a.id,i:0,rg:0};
@@ -588,7 +590,7 @@ function kaV(){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g){view={t
   <div class="between"><h1 style="margin-bottom:4px${NO?";font-size:1.4rem":""}">${esc(a.t)}</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div>
   <p class="muted" style="margin-top:0">${esc(gName(g))}${a.k?` · ${kaArt(a)}`:""} · ${dDEy(a.d)}${NO?"":` · ${fmtP(a.max)} Punkte · Schlüssel ${KASN[a.sk]}`}${a.demo?" · fiktives Beispiel":""}</p>
   ${PU&&!ro&&ms.length?rgBar(a,g):""}
-  ${ro||!ms.length?"":PU&&KE.ein?rgEdit(a,g):kaCard(a,mF)}
+  ${ro||!ms.length?"":PU&&KE.ein?rgEdit(a,g):NO?`<p><button class="btn pri block" onclick="kaEin()">Noten eintragen${KE.rg?` (Gruppe ${KE.rg})`:""}</button></p>`:kaCard(a,mF)}
   <div class="card"><b>Notenspiegel</b><div class="spg" style="margin-top:8px">${spg.map((x,i)=>`<div><span class="muted small">${i+1}</span><b>${hid(String(x))}</b></div>`).join("")}</div>
   <p class="small muted" style="margin:8px 0 0">${c.p} ${a.k?"bewertet":"mitgeschrieben"}${c.fehlt?` · ${c.fehlt} ${kaStL(a,"fehlt")}`:""}${c.nach?` · ${c.nach} ${a.k?"holen nach":c.nach===1?"schreibt nach":"schreiben nach"}`:""}${schnitt!=null?` · Schnitt ${hid(fmt1(schnitt))}`:""}. Der Spiegel zählt ganze Noten.</p></div>
   ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th>${PU?`<th class="num">Gruppe</th>`:""}${NO?"":`<th class="num">Punkte</th>`}<th class="num">Note</th><th>Vermerk</th></tr></thead><tbody>${ms.map(row).join("")}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
@@ -603,9 +605,9 @@ function kaV(){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g){view={t
     <label>Zählt im Bereich</label><div class="pick" style="grid-template-columns:repeat(2,1fr)">${PUEB.map(b=>`<button class="${a.b===b?"on":""}" aria-pressed="${a.b===b}" onclick="kaEdit('b','${b}')">${esc(KMAP[b].t)}</button>`).join("")}</div>`:""}
     <p style="margin:14px 0 0"><button class="btn ghost danger" onclick="kaDel(${ja(a.id)})">${a.k?"Löschen":`${L[0]} löschen`}</button></p></details>`}`}
 
-function rgBar(a,g){const u=rgUsed(a),cnt=n=>g.members.filter(id=>a.rg?.[id]===n).length;
+function rgBar(a,g,noEdit){const u=rgUsed(a),cnt=n=>g.members.filter(id=>a.rg?.[id]===n).length;
   return `<div class="row rgbar" role="group" aria-label="Gruppe">${KE.ein?`<b class="grow">Gruppen einteilen</b><button class="btn pri small" onclick="KE.ein=false;render()">Fertig</button>`
-  :`<div class="pick grow" style="grid-template-columns:repeat(${u.length+1},1fr)"><button class="${KE.rg?"":"on"}" aria-pressed="${!KE.rg}" onclick="KE.rg=0;KE.i=0;render()">Alle</button>${u.map(n=>`<button class="${KE.rg===n?"on":""}" aria-pressed="${KE.rg===n}" aria-label="Gruppe ${n}, ${cnt(n)} Kürzel" onclick="KE.rg=${n};KE.i=0;render()">Gr. ${n}</button>`).join("")}</div><button class="btn small" onclick="KE.ein=true;render()">Einteilen</button>`}</div>`}
+  :`<div class="pick grow" style="grid-template-columns:repeat(${u.length+1},1fr)"><button class="${KE.rg?"":"on"}" aria-pressed="${!KE.rg}" onclick="KE.rg=0;KE.i=0;render()">Alle</button>${u.map(n=>`<button class="${KE.rg===n?"on":""}" aria-pressed="${KE.rg===n}" aria-label="Gruppe ${n}, ${cnt(n)} Kürzel" onclick="KE.rg=${n};KE.i=0;render()">Gr. ${n}</button>`).join("")}</div>${noEdit?"":`<button class="btn small" onclick="KE.ein=true;render()">Einteilen</button>`}`}</div>`}
 function rgEdit(a,g){const N=Math.max(KE.n||0,...rgUsed(a),3);
   return `<div class="card"><p class="small muted" style="margin:0 0 8px">Tippe für jedes Kürzel die Gruppe an. Nochmal tippen nimmt es heraus.</p>
   <div class="row" style="margin-bottom:8px;gap:6px"><span class="grow small">Anzahl Gruppen</span><div class="pick" style="grid-template-columns:repeat(4,1fr);width:200px">${[3,4,5,6].map(n=>`<button class="${N===n?"on":""}" aria-pressed="${N===n}" ${n<Math.max(0,...rgUsed(a))?"disabled":""} onclick="KE.n=${n};render()">${n}</button>`).join("")}</div></div>
@@ -614,16 +616,22 @@ function rgEdit(a,g){const N=Math.max(KE.n||0,...rgUsed(a),3);
 function setRg(sid,n){const a=kaById(KE.kid),g=a&&groupById(a.gid);if(!a||a.k!=="pue"||!g||g.arch||!g.members.includes(sid)||!(Number.isInteger(n)&&n>=1&&n<=6))return;
   const o={...(a.rg||{})};if(o[sid]===n)delete o[sid];else o[sid]=n;if(Object.keys(o).length)a.rg=o;else delete a.rg;touch(a);save();render()}
 function kaGoto(sid){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g)return;KE.ein=false;let i=kaMs(a,g).findIndex(s=>s.id===sid);
-  if(i<0){KE.rg=0;i=msOf(g).findIndex(s=>s.id===sid)}KE.i=Math.max(0,i);render();window.scrollTo(0,0)}
-function kaCard(a,ms){if(KE.i>=ms.length){const nx=a.k==="pue"&&KE.rg?rgUsed(a).find(n=>n>KE.rg):null;return `<div class="card seqdone"><b style="font-size:1.2rem">${KE.rg?`Gruppe ${KE.rg} fertig`:"Alle durch"}</b><p>${plNote(a)?`${ms.filter(s=>kaNote(a,s.id)).length} von ${ms.length} bewertet`:`${kaSt(a).p} von ${ms.length} mit Punkten`}.</p>
+  if(i<0){KE.rg=0;i=msOf(g).findIndex(s=>s.id===sid)}KE.i=Math.max(0,i);if(plNote(a)&&!g.arch)return go({...view,kae:true});render();window.scrollTo(0,0)}
+// 0.5.0: Noten direkt eintragen (Präsentation, Heft, punktuelle Überprüfung) füllt wie Erfassen genau den Bildschirm, ohne Scrollen
+function kaEin(){KE.i=0;KE.ein=false;go({...view,kae:true})}
+function kaeV(){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g||g.arch||!plNote(a)){view={...view,kae:false};return kaV()}
+  if(KE.kid!==a.id)KE={kid:a.id,i:0,rg:0};KE.ein=false;
+  return `<h1 class="sr">${esc(a.t)}</h1><div class="erhd"><button class="btn ghost" onclick="back()" aria-label="Zurück">‹</button><b>${esc(a.t)}</b>${hasNames()?`<button class="btn ss${NSHOW?"":" on"}" onclick="NSHOW=!NSHOW;render()" aria-pressed="${!NSHOW}">${NSHOW?"Namen aus":"Namen an"}</button>`:""}<button class="btn ss ic${SHOW?" on":""}" onclick="SHOW=!SHOW;render()" aria-pressed="${SHOW}" aria-label="${SHOW?"Noten verbergen":"Noten zeigen"}">${EYE}</button></div>
+  ${a.k==="pue"&&rgUsed(a).length?rgBar(a,g,true):""}${kaCard(a,kaMs(a,g))}`}
+function kaCard(a,ms){if(KE.i>=ms.length){const nx=a.k==="pue"&&KE.rg?rgUsed(a).find(n=>n>KE.rg):null;return `<div class="card seqdone"><b style="font-size:1.2rem">${KE.rg?`Gruppe ${KE.rg} fertig`:"Alle durch"}</b>${plNote(a)?`<p style="margin:8px 0 0"><button class="btn block" onclick="back()">Zur Übersicht</button></p>`:""}<p>${plNote(a)?`${ms.filter(s=>kaNote(a,s.id)).length} von ${ms.length} bewertet`:`${kaSt(a).p} von ${ms.length} mit Punkten`}.</p>
   ${nx?`<p><button class="btn pri block" onclick="KE.rg=${nx};KE.i=0;render()">Weiter mit Gruppe ${nx} ›</button></p>`:""}
   <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="KE.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="KE.i=0;render()">Von vorn</button></p></div>`;}
   const s=ms[KE.i],x=a.r[s.id]||{},zd=(s.profil||"r")==="zd",na=s.profil==="na",max=x.mx||a.max;
-  if(plNote(a))return `<div class="card kan"><div class="between"><b>${KE.rg?`Gruppe ${KE.rg}: `:""}${KE.i+1} von ${ms.length}</b><span class="muted small">${kaSt(a).p} bewertet</span></div>
+  if(plNote(a))return `<div class="card kan fill"><div class="between"><b>${KE.rg?`Gruppe ${KE.rg}: `:""}${KE.i+1} von ${ms.length}</b><span class="muted small">${kaSt(a).p} bewertet</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(KE.i/ms.length*100)}%"></i></div>
   ${bigSus(s)}
-  ${x.st?`<p class="small" style="text-align:center;margin:0 0 6px">Vermerkt: ${kaStL(a,x.st)}. Eine Note ersetzt das.</p>`:x.n?`<p class="small" style="text-align:center;margin:0 0 6px">Schon bewertet: ${hid(nTxt(x.n))}. Eine neue Note ersetzt sie.</p>`:""}
-  <div class="pad" role="group" aria-label="Note">${NOTEN.map(v=>`<button data-n="${v}" onclick="kaSetN('${v}')">${nTxt(v)}</button>`).join("")}</div>
+  ${x.st?`<p class="small" style="text-align:center;margin:0 0 6px">Vermerkt: ${kaStL(a,x.st)}. Eine Note ersetzt das.</p>`:x.n?`<p class="small" style="text-align:center;margin:0 0 6px">Schon bewertet: ${hid(nTxt(x.n))}. Neue Note ersetzt sie.</p>`:""}
+  <div class="pad padn" role="group" aria-label="Note">${NOTEN.map(v=>`<button data-n="${v}" onclick="kaSetN('${v}')">${nTxt(v)}</button>`).join("")}</div>
   ${na?`<label class="swr"><span class="grow">Nachteilsausgleich gewährt<span class="sub">${s.na?esc(s.na):"Im Profil steht noch kein Nachteilsausgleich."}</span></span><input type="checkbox" class="sw" ${x.na?"checked":""} onchange="kaNa(this.checked)"></label>
     <input id="knat" maxlength="300" value="${esc(x.nat||"")}" placeholder="Vermerk, z. B. Präsentation allein statt vor der Klasse" onchange="kaNat(this.value)" aria-label="Vermerk zum Nachteilsausgleich">`:""}
   <div class="four" style="margin-top:8px"><button class="btn" ${KE.i?"":"disabled"} onclick="KE.i--;render()" aria-label="Zurück zum vorigen Kürzel">‹</button><button class="btn abw" onclick="kaSetSt('fehlt')">fehlt</button><button class="btn abw" onclick="kaSetSt('nach')">holt nach</button><button class="btn" onclick="KE.i++;render()" aria-label="Ohne Note weiter">weiter ›</button></div></div>`;
@@ -785,17 +793,18 @@ gruppen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width
 profil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1"/></svg>'};
 function renderNav(){$("#nav").innerHTML=[["heute","Heute"],["gruppen","Lerngruppen"],["profil","Einstellungen"]].map(([k,t])=>`<button class="${view.tab===k?"on":""}" ${view.tab===k?'aria-current="page"':""} onclick="navTo('${k}')">${ICON[k].replace("<svg ",'<svg aria-hidden="true" ')}${t}</button>`).join("")}
 // Verlauf der Ansichten: „Zurück“ führt dorthin, wo man herkam
-let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,!!v.plm,v.kad,v.names,v.rl,v.rld,!!v.imp,v.kl,v.nkl]);
+let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,!!v.plm,v.kad,!!v.kae,v.names,v.rl,v.rld,!!v.imp,v.kl,v.nkl]);
 function go(v){const i=HIST.findIndex(h=>vkey(h)===vkey(v));if(i>=0)HIST.length=i;else if(view&&vkey(view)!==vkey(v))HIST.push(view);view=v;render();window.scrollTo(0,0)}
 function back(){view=HIST.pop()||{tab:view.tab};render();window.scrollTo(0,0)}
 function navTo(k){HIST=[];go({tab:k})}
 function render(){
-  renderNav();const a=$("#app");document.body.classList.toggle("erf",!!view.erf);
+  renderNav();const a=$("#app");document.body.classList.toggle("erf",!!(view.erf||view.kae&&view.kad));
   if(view.imp)a.innerHTML=importV();
   else if(view.names||view.nkl)a.innerHTML=namesV();
   else if(view.erf)a.innerHTML=erfV();
   else if(view.rld)a.innerHTML=rlV();
   else if(view.rl)a.innerHTML=rlListV();
+  else if(view.kad&&view.kae)a.innerHTML=kaeV();
   else if(view.kad)a.innerHTML=kaV();
   else if(view.ka)a.innerHTML=kaListV();
   else if(view.ov)a.innerHTML=ovV();
