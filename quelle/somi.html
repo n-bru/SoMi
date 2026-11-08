@@ -171,7 +171,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.3",SOMI_STAND="06.11.2026";
+const SOMI_VERSION="0.5.4",SOMI_STAND="08.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -210,7 +210,7 @@ const byNum=(a,b)=>a.localeCompare(b,"de",{numeric:true});
 const okId=s=>typeof s==="string"&&/^[A-Za-z0-9_-]{1,40}$/.test(s),okDate=s=>typeof s==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(s);
 const okStr=(s,n=4000)=>s==null||typeof s==="string"&&s.length<=n,okNum=v=>v==null||typeof v==="number"&&isFinite(v);
 const okSY=s=>typeof s==="string"&&/^\d{4}\/\d{2}$/.test(s);
-function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&(s.kl==null||typeof s.kl==="boolean")&&okLez(s.lez)&&okNum(s.upd)}catch(e){return false}}
+function okSus(s){try{return !!s&&okId(s.id)&&typeof s.code==="string"&&s.code.length<=40&&okStr(s.cls,20)&&okStr(s.icon,16)&&Object.hasOwn(PROFILE,s.profil||"r")&&okStr(s.na,2000)&&(s.zdNote==null||typeof s.zdNote==="boolean")&&(s.kl==null||typeof s.kl==="boolean")&&okLez(s.lez)&&okLezAus(s.lezAus)&&okNum(s.upd)}catch(e){return false}}
 function okGroup(g){try{return !!g&&okId(g.id)&&FAECHER.includes(g.fach)&&okStr(g.cls,20)&&Object.hasOwn(KURSE,g.kurs||"-")&&okSY(g.sy)&&Array.isArray(g.members)&&g.members.length<=60&&g.members.every(okId)&&(g.arch==null||okDate(g.arch))&&(g.lastK==null||Object.hasOwn(KMAP,g.lastK))&&(g.lastKs==null||Array.isArray(g.lastKs)&&g.lastKs.length<=12&&g.lastKs.every(k=>Object.hasOwn(KMAP,k)))&&(g.lastM==null||Object.hasOwn(AMAP,g.lastM))&&okNum(g.upd)}catch(e){return false}}
 const okSetting={theme:t=>["system","light","dark"].includes(t),fs:f=>["m","l","xl"].includes(f),hausa:v=>typeof v==="boolean",werkz:v=>typeof v==="boolean",stw:v=>okStw(v),kgw:v=>okKgw(v),kaTend:v=>typeof v==="boolean",kaw:v=>okKaw(v)};
 const susById=id=>db.sus.find(s=>s.id===id);
@@ -302,7 +302,10 @@ const plk=g=>KRIT.filter(x=>x.pl&&kF(x)===fOf(g));
    Hat ein LE-Kürzel Ziele, bewertest du in der Runde die Ziele statt der Kriterien; nur sie zählen dann.
    „Note im Zeugnis“ aus: kein Notenvorschlag, stattdessen Textbausteine je Ziel. */
 const okLez=v=>v==null||!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).every(f=>FAECHER.includes(f)&&Array.isArray(v[f])&&v[f].length<=4&&v[f].every(z=>!!z&&okId(z.id)&&typeof z.t==="string"&&z.t.trim().length>0&&z.t.length<=120));
-const lezOf=(s,f)=>(s&&(s.profil||"r")==="zd"&&s.lez?.[f])||[];
+// 0.5.4 (Nick 08.11.): s.lezAus = Fächer, in denen das LE-Kürzel wie alle anderen bewertet wird (Ziele bleiben gespeichert)
+const okLezAus=v=>v==null||Array.isArray(v)&&v.length<=FAECHER.length&&v.every(f=>FAECHER.includes(f));
+const lezRoh=(s,f)=>(s&&(s.profil||"r")==="zd"&&s.lez?.[f])||[];
+const lezOf=(s,f)=>s?.lezAus?.includes(f)?[]:lezRoh(s,f);
 const zdBer=(s,g)=>lezOf(s,fOf(g)).length>0&&!s.zdNote;
 const zaehl=(s,g,os)=>{const lz=lezOf(s,fOf(g));if(!lz.length)return os.filter(o=>o.k!=="lez");const ids=new Set(lz.map(z=>z.id));return os.filter(o=>o.k==="lez"&&ids.has(o.z))};
 const okey=o=>o.k==="lez"?"z:"+o.z:o.k;
@@ -1070,10 +1073,13 @@ function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){vie
 async function setIcon(id){const s=susById(id),i=await pickIcon(s.icon,s.cls);if(!i)return;s.icon=i;touch(s);save();render()}
 function setProfil(id,p){const s=susById(id);s.profil=p;touch(s);save();render()}
 function setNA(id,v){const s=susById(id);if(looksLikeName(v.split(/\s+/)[0]||""))toast("Bitte keine Namen eintragen.");s.na=v.trim();touch(s);save();toast("Gespeichert")}
-function lezEd(s,g,dis){const f=fOf(g),lz=lezOf(s,f);
-  return `<label style="margin-top:12px">Förderplanziele ${f}</label><div class="sub">2 bis 4 Ziele aus dem Förderplan, kurz formuliert, ohne Diagnosen. In der Runde bewertest du für ${esc(s.code)} dann diese Ziele statt der Kriterien.</div>
+function lezEd(s,g,dis){const f=fOf(g),lz=lezRoh(s,f),aus=!!s.lezAus?.includes(f);
+  return `<label class="swr" style="margin-top:12px"><span class="grow">Nach Förderplanzielen bewerten (${f})<span class="sub">Aus: ${esc(s.code)} wird in ${f} wie alle anderen nach den Kriterien bewertet. Die Ziele bleiben gespeichert.</span></span><input type="checkbox" class="sw" ${aus?"":"checked"} ${dis} onchange="setLezAus(${ja(s.id)},${ja(f)},!this.checked)"></label>
+  ${aus?"":`<label style="margin-top:12px">Förderplanziele ${f}</label><div class="sub">2 bis 4 Ziele aus dem Förderplan, kurz formuliert, ohne Diagnosen. In der Runde bewertest du für ${esc(s.code)} dann diese Ziele statt der Kriterien.</div>
   ${lz.map((z,i)=>`<div class="row" style="margin:6px 0;gap:6px"><input class="grow" maxlength="120" value="${esc(z.t)}" aria-label="Förderplanziel ${i+1}" ${dis} onchange="lezEdit(${ja(s.id)},${ja(f)},${ja(z.id)},this.value)"><button class="btn ghost danger small" ${dis} aria-label="Ziel ${i+1} löschen" onclick="lezDel(${ja(s.id)},${ja(f)},${ja(z.id)})">✕</button></div>`).join("")}
-  ${lz.length<4&&!dis?`<div class="row" style="margin:6px 0;gap:6px"><input id="lezNeu" class="grow" maxlength="120" placeholder="z. B. Zahlen bis 100 ordnen" aria-label="Neues Förderplanziel"><button class="btn small" onclick="lezAdd(${ja(s.id)},${ja(f)})">Hinzufügen</button></div>`:""}`}
+  ${lz.length<4&&!dis?`<div class="row" style="margin:6px 0;gap:6px"><input id="lezNeu" class="grow" maxlength="120" placeholder="z. B. Zahlen bis 100 ordnen" aria-label="Neues Förderplanziel"><button class="btn small" onclick="lezAdd(${ja(s.id)},${ja(f)})">Hinzufügen</button></div>`:""}`}`}
+function setLezAus(id,f,on){const s=susById(id);if(!s||!FAECHER.includes(f))return;const l=(s.lezAus||[]).filter(x=>x!==f);if(on)l.push(f);if(l.length)s.lezAus=l;else delete s.lezAus;
+  touch(s);save();render();toast(on?`${s.code} wird in ${f} wie alle anderen bewertet`:`${s.code} wird in ${f} nach den Förderplanzielen bewertet`)}
 function lezSet(s,f,list){const o={...(s.lez||{})};if(list.length)o[f]=list;else delete o[f];if(Object.keys(o).length)s.lez=o;else delete s.lez;touch(s);save();render()}
 function lezAdd(id,f){const s=susById(id);if(!s||!FAECHER.includes(f))return;const t=String($("#lezNeu")?.value||"").trim().slice(0,120),l=s.lez?.[f]||[];
   if(!t)return toast("Bitte ein Ziel eintragen.");if(l.length>=4)return toast("Höchstens 4 Ziele.");if(looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen eintragen.");
