@@ -68,6 +68,7 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 - Zählt: nur die Ziel-Einträge (zaehl). Notenvorschlag ab 3 Einträgen in 2 Zielen, Ziele gleich gewichtet. „Note im Zeugnis“ aus → kein Vorschlag, Übersicht zeigt „Bericht“.
 - Textbaustein je Ziel aus dem Schnitt der Stufen: ab 3,5 „sicher erreicht“, ab 2,75 „erreicht“, ab 1,75 „teilweise erreicht“, sonst „noch nicht erreicht“. Auf der Seite und im PDF.
 - Ziel löschen: Einträge bleiben, zählen aber nicht mehr.
+- Ab 0.5.4: Schalter „Nach Förderplanzielen bewerten“ je Fach. Aus (s.lezAus enthält das Fach): Kürzel wird wie alle anderen nach den Kriterien bewertet, Ziele bleiben gespeichert.
 
 ## Erfassen auf dem iPhone (ab 0.4.5, Matrix ab 0.4.6, volle Höhe ab 0.4.8)
 - Die Erfassen-Seiten füllen genau den Bildschirm und scrollen nie. Getestet bei 375 × 548 (iPhone SE im Safari-Tab), 390 × 664 und 430 × 740. Bei „Einzeln“ mit großer Klasse scrollt nur die Kürzel-Liste.

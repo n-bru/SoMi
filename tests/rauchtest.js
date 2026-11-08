@@ -308,6 +308,14 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>lezOf(db.sus.find(x=>x.code==="DEMO-05"),"Mathe").length===3),"Ziel hinzugefügt");
   await p.click("label.swr:has-text('Note im Zeugnis') input");ok(await p.locator("text=Bericht statt Note").count()===1,"ohne Note: Bericht statt Notenvorschlag");
   await p.click("label.swr:has-text('Note im Zeugnis') input");await p.evaluate(()=>{SHOW=false;render();return true});
+  // 0.5.4 LE auf Wunsch wie alle anderen bewerten
+  await p.click("label.swr:has-text('Nach Förderplanzielen bewerten') input");
+  ok(await p.evaluate(()=>{const s=db.sus.find(x=>x.code==="DEMO-05");return s.lezAus?.[0]==="Mathe"&&lezOf(s,"Mathe").length===0&&lezRoh(s,"Mathe").length===3&&okSus(s)&&!okSus({...s,lezAus:["Bio"]})}),"Schalter: LE wie alle anderen, Ziele bleiben");
+  ok(await p.locator("#lezNeu").count()===0&&await p.locator("text=Textbausteine fürs Zeugnis").count()===0,"Ziele ausgeblendet");
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");ER={...erNeu(g.id,"k"),i:4};go({tab:"gruppen",group:g.id,erf:g.id})});
+  ok(await p.locator(".mxz").count()===0&&await p.locator(".seqk:has-text('Qualität')").count()===1,"Runde zeigt bei ausgeschalteten Zielen die Kriterien");
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");go({tab:"gruppen",group:g.id,sus:g.members[4]})});
+  await p.click("label.swr:has-text('Nach Förderplanzielen bewerten') input");ok(await p.evaluate(()=>!db.sus.find(x=>x.code==="DEMO-05").lezAus),"wieder nach Zielen");
   // 0.5.2 PDF pro Kürzel
   await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Sport");go({tab:"gruppen",group:g.id,sus:g.members[0]})});OVP="all";
   await p.evaluate(()=>{OVP="all";render()});
