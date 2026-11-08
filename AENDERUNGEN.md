@@ -4,6 +4,7 @@ Neueste oben.
 
 | Datum | Version | Was | Beta/Haupt |
 |---|---|---|---|
+| 08.11.2026 | 0.5.5 | Startseite „Heute“ neu (Nicks Zustimmung): eine Zeile pro Lerngruppe mit zwei Knöpfen (Mathe: Runde/Einzeln, Sport: Status/Runde) und Zusatzinfo „x noch ohne Eintrag“ im Halbjahr statt doppelter Liste; Zähler-Kacheln und veralteter Versionstext entfernt; Kopf einzeilig; Sicherungs-Hinweis und Rückläufe einzeilig; Beispielgruppen auf „Heute“ ausgeblendet, sobald es eigene gibt. Mit bis zu 6 Gruppen ohne Scrollen auf dem iPhone SE | Beta |
 | 08.11.2026 | 0.5.4 | Hauptversion 0.5.4 freigegeben (Nicks Kommando): enthält alles bis Beta 0.5.4 (Matrix-Runde, Sport-Kriterien, Störungen mit Notiz, Klassenlisten, Schuljahreswechsel, punktuelle Überprüfungen, PDF, LE-Förderplanziele) | Haupt |
 | 08.11.2026 | 0.5.4 | LE auf Wunsch wie alle anderen bewerten (Nicks Wunsch): im Profil eines LE-Kürzels je Fach Schalter „Nach Förderplanzielen bewerten“. Aus: Runde, Notenvorschlag und PDF wie bei allen anderen nach den Kriterien; die Ziele bleiben gespeichert | Beta |
 | 06.11.2026 | 0.5.3 | Förderplanziele für zieldifferent Lernende (Nicks Wahl): im Profil eines LE-Kürzels 2 bis 4 Ziele je Fach eintragen. In der Runde stehen für dieses Kürzel die Ziele statt der Kriterien (gleiche vier Stufen). Nur die Ziel-Einträge zählen. „Note im Zeugnis“ an: Notenvorschlag aus den Zielen; aus: kein Vorschlag, „Bericht“. Je Ziel ein Textbaustein fürs Zeugnis („sicher erreicht“ bis „noch nicht erreicht“), auch im PDF | Beta |

@@ -73,9 +73,9 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.waitForSelector("#lock",{state:"detached"});ok(true,"Entsperrt mit richtigem Code");
   ok(await p.locator("text=DEMO Mathe").count()>0,"Daten nach Entsperren da");
   // 0.2 Sonstige Mitarbeit: Erfassen, Sichtschutz, nur Rückmeldung, Übersicht
-  await nav("Heute");ok(await p.locator("text=Schnell erfassen").count()===1,"Schnell erfassen auf Heute");
+  await nav("Heute");ok(await p.locator(".hrow").count()===2&&/ohne Eintrag|alle mit Eintrag/.test(await p.locator(".hrow:has-text('DEMO Mathe') .nm").innerText())&&await p.locator(".stat").count()===0,"Heute: eine Zeile pro Gruppe mit Zusatzinfo, keine Zahlenkacheln");
   // 0.4.3 Ganze Klasse: feste Kriterien und Störungs-Knopf pro Kind auf einem Bildschirm
-  await p.click(".card >> button:has-text('DEMO Mathe: ganze Klasse')");ok(await p.locator("h1",{hasText:"Erfassen"}).count()===1,"Erfassen geöffnet");
+  await p.click(".hrow:has-text('DEMO Mathe') >> button:has-text('Runde')");ok(await p.locator("h1",{hasText:"Erfassen"}).count()===1,"Erfassen geöffnet");
   ok(await p.locator(".seqsus:has-text('DEMO-01')").count()===1&&await p.locator("text=Was hast du heute beobachtet?").count()===0,"Runde startet ohne Kriterienwahl");
   {const vp=p.viewportSize();for(const [w,h] of [[375,548],[390,664],[430,740]]){await p.setViewportSize({width:w,height:h});
   ok(await p.evaluate(()=>document.documentElement.scrollHeight<=innerHeight&&document.querySelector("#erT").getBoundingClientRect().bottom<=innerHeight),`${w}×${h}: Runde passt ohne Scrollen, Stichwort sichtbar`)}
@@ -138,11 +138,11 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.locator('button',{hasText:"Gewichte zurücksetzen"}).click();
   ok(await p.evaluate(()=>!db.kgw),"Gewichte zurückgesetzt");
   await p.screenshot({path:process.env.SHOT||"/dev/null",fullPage:true}).catch(()=>{});
-  await nav("Heute");await p.click(".card >> button:has-text('DEMO Mathe')");
+  await nav("Heute");await p.click(".hrow:has-text('DEMO Mathe') >> button:has-text('Runde')");
   ok(await p.locator(".pad button[data-k='hausa']").count()===4,"Kriterium Hausaufgaben zuschaltbar");
   ok(await p.evaluate(()=>!okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"7",d:"2026-01-01"})&&!okObs({id:"a",gid:"b",sid:"c",k:"x",n:"2",d:"2026-01-01"})&&okObs({id:"a",gid:"b",sid:"c",k:"qual",n:"2+",d:"2026-01-01"})),"Prüfhelfer okObs");
   // Sport: Stundenstatus
-  await nav("Heute");await p.click("button:has-text('DEMO Sport: Stundenstatus')");
+  await nav("Heute");await p.click(".hrow:has-text('DEMO Sport') >> button:has-text('Status')");
   ok(await p.locator("h1",{hasText:"Stundenstatus"}).count()===1,"Sport: Stundenstatus geöffnet");
   const sa0=await p.evaluate(()=>db.asv.length);
   await p.click("button.stb");await dlgIn("Fiktiv: Ball weggeschossen");ok(await p.evaluate(n=>db.asv.length===n+1&&db.asv.at(-1).t==="Fiktiv: Ball weggeschossen"&&ER.i===0,sa0),"Sport: Störung im Stundenstatus, bleibt beim Kind");
@@ -155,7 +155,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.click("button:has-text('Zur Übersicht')");ok(await p.locator(".tbl tr:has-text('DEMO-02') td").nth(1).innerText().then(t=>t==="1"),"Sport-Übersicht zählt ohne Sachen");
   ok(await p.evaluate(()=>!okAtt({id:"a",gid:"b",sid:"c",st:"x",d:"2026-01-01",upd:1})),"Prüfhelfer okAtt");
   // 0.4.6 Sport: Kriterien nach SILP Sport, Runde als Matrix, Fragezeichen zeigt Ankertexte
-  await nav("Heute");await p.locator(".card button:has-text('Bewerten')").first().click();
+  await nav("Heute");await p.click(".hrow:has-text('DEMO Sport') >> button:has-text('Runde')");
   ok(await p.evaluate(()=>JSON.stringify(ER.ks)==='["mot","kog","soz","arb"]')&&await p.locator(".mxh").count()===1,"Sport-Runde: Motorik, Wissen, Sozial- und Arbeitsverhalten als Matrix");
   const so0=await p.evaluate(()=>db.obs.length);await p.click(".pad button[data-k='mot'][data-s='3']");
   ok(await p.evaluate(n=>db.obs.length===n+1&&db.obs.at(-1).k==="mot"&&groupById(db.obs.at(-1).gid).fach==="Sport",so0),"Sport: Motorik gespeichert");
@@ -242,7 +242,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe"),x={id:"zzasv1",gid:g.id,sid:g.members[0],m:"stoer",v:"-",d:today(),t:"",upd:Date.now()};
     IMP={d:{groups:[],sus:[],obs:[],att:[],ka:[],asv:[x,{...x,id:"zzasv2",m:"böse"}].filter(okAsv),rl:[],del:[]},settings:false};applyImport();return db.asv.some(a=>a.id==="zzasv1")&&!db.asv.some(a=>a.id==="zzasv2")}),"Sicherung laden übernimmt Störungen, prüft sie vorher");
   // 0.4.1 Rücklauf-Listen: anlegen, abhaken, Teilbetrag, Summe, Heute-Hinweis, abschließen
-  await nav("Heute");ok(await p.locator(".card b",{hasText:"Offene Rückläufe"}).count()===1&&await p.locator(".card.tap",{hasText:"Wandertag (fiktiv)"}).count()===1,"Heute zeigt offene Rückläufe");
+  await nav("Heute");ok(await p.locator(".rlrow",{hasText:"Wandertag (fiktiv)"}).count()===1,"Heute zeigt offene Rückläufe");
   await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();await p.click("button:has-text('Rückläufe')");
   await p.click("button:has-text('+ Rücklauf-Liste')");await p.fill("#rdt","Elternbrief Ausflug");await p.click(".pick button:text-is('Geld')");await p.click("button:has-text('Anlegen')");
   ok(await p.locator(".toast",{hasText:"Betrag"}).count()===1,"Geld ohne Betrag wird abgelehnt");
@@ -262,7 +262,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.click("button:has-text('Namen speichern')");ok(await p.locator(".nm:has-text('Fiktiv Testname')").count()===1,"Name wird beim Kürzel angezeigt");
   await p.waitForTimeout(300);
   ok(await p.evaluate(()=>{const n=localStorage.getItem("somi-beta-namen"),m=localStorage.getItem("somi-beta");return !!n&&n.includes('"somiEnc":1')&&!n.includes("Testname")&&!m.includes("Testname")&&!JSON.stringify(db).includes("Testname")}),"Namen getrennt und verschlüsselt gespeichert");
-  await nav("Heute");await p.click(".card >> button:has-text('DEMO Mathe: ganze Klasse')");
+  await nav("Heute");await p.click(".hrow:has-text('DEMO Mathe') >> button:has-text('Runde')");
   await p.click(".erhd button:has-text('Namen aus')");ok(await p.locator(".nm").count()===0,"Namen verbergen");await p.click(".erhd button:has-text('Namen an')");
   await p.reload();for(const d of "2468")await p.click(`#lock .keys button:text-is("${d}")`);await p.waitForSelector("#lock",{state:"detached"});
   ok(await p.evaluate(()=>NAMES[db.sus.find(s=>s.code==="DEMO-01").id]==="Fiktiv Testname"),"Namen nach Entsperren wieder da");
@@ -332,6 +332,13 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("text=+ Schüler:in");await p.fill("#scode",'7<img src=x onerror=alert(1)>');await p.click("button:has-text('Hinzufügen')");
   ok(await p.locator("main img").count()===0&&await p.locator(".toast",{hasText:"keinen Namen"}).count()===1,"Kürzel mit Sonderzeichen werden abgelehnt");
+  // 0.5.5 Startseite: Beispielgruppen weg, sobald eigene da sind; 6 Gruppen + 1 Rücklauf passen ohne Scrollen aufs iPhone SE
+  await p.evaluate(()=>{const dm=db.groups.find(g=>g.demo&&g.fach==="Mathe");for(const [f,c] of [["Mathe","5A"],["Mathe","7B"],["Mathe","9A"],["Sport","6C"],["Sport","8D"],["Mathe","10E"]])db.groups.push(touch({id:"t"+c,fach:f,cls:c,kurs:"-",sy:syNow(),members:c==="7B"?dm.members.slice():[],arch:null}));
+    db.rl.filter(a=>!a.arch).forEach(a=>a.arch=today());db.rl.push(touch({id:"trl",gid:"t7B",t:"Fiktiv: Ausflug",art:"z",aus:today(),ct:0,r:{},arch:null}));db.lastBackup=Date.now();save()});
+  await nav("Heute");ok(await p.locator(".hrow").count()===6&&await p.locator(".hrow:has-text('DEMO')").count()===0,"Heute: nur eigene Gruppen, Beispiele ausgeblendet");
+  {const vp=p.viewportSize();await p.setViewportSize({width:375,height:548});
+  ok(await p.evaluate(()=>[...document.querySelectorAll("#app > *")].pop().getBoundingClientRect().bottom<=document.querySelector("nav").getBoundingClientRect().top),"375×548: Heute mit 6 Gruppen und Rücklauf ohne Scrollen");await p.setViewportSize(vp)}
+  await p.evaluate(()=>{db.groups=db.groups.filter(g=>!g.id.startsWith("t"));db.rl=db.rl.filter(a=>a.id!=="trl");save()});
   ok(!errs.length,"keine Fehler in der Konsole"+(errs.length?": "+errs.join(" | "):""));
   for(const w of [390,820,1280]){await p.setViewportSize({width:w,height:900});await nav("Heute");await p.screenshot({path:path.join(require("os").tmpdir(),`somi-${w}.png`),fullPage:true})}
   await b.close();srv.close();console.log("Alle Prüfungen bestanden.")})().catch(e=>{console.error(e.message);process.exit(1)});
