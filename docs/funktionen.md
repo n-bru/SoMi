@@ -3,7 +3,7 @@
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
 ## Bereiche
-- **Heute:** „Schnell erfassen“ für jede aktive Mathe-Gruppe, Zähler (aktive Lerngruppen, Schüler:innen, Archiv), Einrichtung, Sicherungs-Erinnerung (nach 3 Tagen), Hinweis auf abgelaufene Aufbewahrungsfristen, Liste der aktiven Lerngruppen.
+- **Heute (ab 0.5.5):** Kopf in einer Zeile (Logo, Heute, Datum). Eine Zeile pro aktiver Lerngruppe: Name (tippen öffnet die Gruppe) mit Zusatzinfo „x noch ohne Eintrag“ (Kinder ohne Beobachtung im laufenden Halbjahr), rechts zwei Knöpfe: Mathe „Runde“ und „Einzeln“, Sport „Status“ (Stundenstatus) und „Runde“. Auf dem iPad quer zwei Spalten. Beispielgruppen erscheinen hier nur, solange es keine eigenen aktiven Gruppen gibt. Darunter offene Rückläufe als einzeilige Zeilen. Hinweise nur bei Bedarf: Einrichtung, Sicherung fällig (einzeilig, nach 3 Tagen), abgelaufene Aufbewahrungsfristen. Mit bis zu 6 Gruppen und einem Rücklauf passt alles ohne Scrollen aufs iPhone SE. Keine Zähler und kein Versionstext mehr (Version steht in den Einstellungen).
 - **Lerngruppen:** anlegen mit Fach (Mathe, Sport), Klasse und Kurs (ohne, E, G). Archiv eingeklappt.
 - **Lerngruppe:** Schüler:innen per Kürzel hinzufügen (Vorschlag: nächste freie Nummer, z. B. 7B-03), aus den Klassenlisten wählen (ab 0.4.9, alle Klassen), archivieren, wieder aktivieren, löschen (nur archiviert, vor Fristende mit doppelter Rückfrage).
 - **Schüler:in:** Symbol, Profil (Regel, Nachteilsausgleich mit Freitext, zieldifferent mit Schalter „Note im Zeugnis“), aus der Gruppe entfernen mit Rückgängig.

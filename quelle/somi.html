@@ -64,6 +64,14 @@ input.sw:checked{background:var(--acc)}input.sw:checked::after{left:23px}
 .kic{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:color-mix(in srgb,var(--kc) 22%,var(--card));font-size:1.3rem;line-height:1;border:none;padding:0}
 .icgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-height:50vh;overflow:auto}.icgrid button{font-size:1.6rem;padding:6px 0;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}
 .icgrid .used{opacity:.35}.icgrid .on{border:2px solid var(--acc);background:var(--accs)}
+.hhead{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding-right:56px}.hhead h1{margin:0;font-size:1.6rem}.hhead h1::before{display:none}.hhead .muted{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hint{padding:8px 8px 8px 16px;align-items:center}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:0 10px}
+.hrow{display:flex;align-items:center;gap:6px;padding:4px 4px 4px 14px;margin-bottom:5px;line-height:1.25}.hrow .btn{padding:8px 12px}
+.hrow .nm{flex:1;min-width:0;min-height:44px;padding:0;background:none;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer;display:flex;flex-direction:column;justify-content:center}
+.hrow .nm b,.hrow .nm span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hrow .nm>span{font-size:.8rem;color:var(--muted)}
+.rlbox{margin-top:12px}
+.rlrow{display:flex;align-items:center;gap:8px;padding:10px 14px;margin-bottom:6px;min-height:44px}.rlrow .grow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.rlrow .late{color:var(--down);font-weight:700;font-size:.92rem}
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
 .stat div{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:10px}.stat b{display:block;font-size:1.6rem;color:var(--acc);font-variant-numeric:tabular-nums}
 nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:0 6px max(6px,env(safe-area-inset-bottom));z-index:5}
@@ -171,7 +179,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.4",SOMI_STAND="08.11.2026";
+const SOMI_VERSION="0.5.5",SOMI_STAND="08.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -803,8 +811,8 @@ async function rlArch(on){const a=rlById(view.rld);if(!a)return;
   a.arch=on?today():null;touch(a);save();render();toast(on?"Abgeschlossen":"Wieder offen")}
 async function rlDel(){const a=rlById(view.rld);if(!a)return;if(!await ask(`„${a.t}“ löschen?`,{ok:"Löschen",danger:true}))return;
   db.rl=db.rl.filter(x=>x.id!==a.id);db.del.push(a.id);save();back();undoToast("Liste gelöscht",()=>{db.del=db.del.filter(x=>x!==a.id);db.rl.push(touch(a));save();render()})}
-function rlHint(){const l=db.rl.filter(a=>!a.arch&&groupById(a.gid)&&!groupById(a.gid).arch).map(a=>[a,rlSt(a)]).filter(([,s])=>s.open.length+s.teil.length);if(!l.length)return "";
-  return `<div class="card"><b>Offene Rückläufe</b>${l.map(([a,s])=>`<button class="card tap row" style="margin:8px 0 0" onclick="go({tab:'heute',group:${ja(a.gid)},rl:${ja(a.gid)},rld:${ja(a.id)}})"><div class="grow"><div class="code">${esc(a.t)}</div><div class="small${rlLate(a)?" old":" muted"}">${esc(gName(groupById(a.gid)))} · noch ${s.open.length+s.teil.length} offen${a.bis?` · fällig ${dDEy(a.bis)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`).join("")}</div>`}
+function rlHint(gids){const l=db.rl.filter(a=>!a.arch&&gids.includes(a.gid)).map(a=>[a,rlSt(a)]).filter(([,s])=>s.open.length+s.teil.length);if(!l.length)return "";
+  return `<div class="rlbox">${l.map(([a,s])=>`<button class="card tap rlrow" onclick="go({tab:'heute',group:${ja(a.gid)},rl:${ja(a.gid)},rld:${ja(a.id)}})"><span class="grow"><span class="muted">Rücklauf</span> <b>${esc(a.t)}</b> <span class="${rlLate(a)?"late":"muted"}">${esc(gName(groupById(a.gid)))} · ${s.open.length+s.teil.length} offen${a.bis?` · bis ${dDEy(a.bis).slice(0,6)}`:""}</span></span><span aria-hidden="true" class="muted">›</span></button>`).join("")}</div>`}
 function demoRl(g){const r={};g.members.forEach((id,i)=>{if(i<4)r[id]={st:"ok"};else if(i===5)r[id]={st:"teil",pc:500}});
   return touch({id:uid(),gid:g.id,t:"Wandertag (fiktiv)",art:"g",aus:daysAgo(6),bis:daysAgo(-5),ct:850,r,arch:null,demo:true})}
 
@@ -886,23 +894,27 @@ const mtip=k=>{const t=markFor(k);return t?`<div class="marktip">↓ ${t}</div>`
 const own=()=>db.groups.filter(g=>!g.demo);
 function backupHint(){const n=own().length,last=db.lastBackup||0,days=(Date.now()-last)/864e5;
   if(!n||days<3)return ""; // Noten wiegen schwerer: Erinnerung nach 3 Tagen (Pfad: 5)
-  return `<div class="card row"><div class="grow small"><b>Sicherung fällig.</b> ${last?`Letzte vor ${Math.floor(days)} Tagen.`:"Noch keine Sicherung."} Ohne Sicherung sind die Daten weg, wenn das Gerät verloren geht, das App-Symbol gelöscht oder der Browserspeicher geleert wird.</div><button class="btn pri" onclick="exportJSON()">Sichern</button></div>`}
+  return `<div class="card row hint"><div class="grow"><b>Sicherung fällig</b> <span class="muted">${last?`· vor ${Math.floor(days)} Tagen`:"· noch keine"}</span></div><button class="btn pri" onclick="exportJSON()">Sichern</button></div>`}
 // Aufbewahrung: 5 Jahre ab Ende des Kalenderjahres, in dem die Lerngruppe archiviert wurde. Gelöscht wird nur nach Rückfrage.
 const keepUntil=g=>`${+g.arch.slice(0,4)+FRIST_JAHRE}-12-31`;
 const due=()=>db.groups.filter(g=>g.arch&&!g.demo&&keepUntil(g)<today());
 function dueHint(){const d=due();if(!d.length)return "";
   return `<div class="card" style="border:2px solid var(--new)"><b>Aufbewahrungsfrist abgelaufen</b><p class="small" style="margin:6px 0 8px">Diese archivierten Lerngruppen musst du nicht mehr aufbewahren: ${d.map(g=>esc(gName(g))+" ("+esc(g.sy)+")").join(", ")}. Prüfe, ob du sie löschen möchtest. SoMi löscht nichts von selbst.</p>
   <p class="row" style="flex-wrap:wrap;margin:0">${d.map(g=>`<button class="btn" onclick="go({tab:'gruppen',group:${ja(g.id)}})">${esc(gName(g))} ansehen</button>`).join("")}</p></div>`}
+// Startseite (ab 0.5.5): „ohne Eintrag“ zählt Kinder ohne Beobachtung im laufenden Halbjahr. Eine Zeile pro Lerngruppe mit den beiden Erfassen-Knöpfen. Passt mit bis zu 6 Gruppen ohne Scrollen aufs iPhone SE.
+const ohneEintrag=g=>{const from=hjStart(),hat=new Set(db.obs.filter(o=>o.gid===g.id&&o.d>=from).map(o=>o.sid));return g.members.filter(id=>!hat.has(id)).length};
+function homeInfo(g){if(!g.members.length)return "noch leer";const n=ohneEintrag(g);return n?`${n} noch ohne Eintrag`:"alle mit Eintrag"}
+const homeRow=g=>`<div class="card hrow"><button class="nm" onclick="go({tab:'gruppen',group:${ja(g.id)}})"><b>${esc(gName(g))}${g.demo?' <span class="tag">Beispiel</span>':""}</b><span>${homeInfo(g)}</span></button>${g.fach==="Mathe"
+  ?`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">Runde</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln</button>`
+  :`<button class="btn pri" onclick="erStart(${ja(g.id)},'s')">Status</button><button class="btn" onclick="erStart(${ja(g.id)},'k')">Runde</button>`}</div>`;
+// Beispielgruppen verschwinden von „Heute“, sobald es eigene aktive Gruppen gibt (Nick 08.11.2026). Unter „Lerngruppen“ bleiben sie.
+const homeGroups=()=>{const act=db.groups.filter(g=>!g.arch).sort((a,b)=>byNum(gName(a),gName(b)));return act.some(g=>!g.demo)?act.filter(g=>!g.demo):act};
 function heuteV(){
-  const dateLong=new Date().toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"});
-  const act=db.groups.filter(g=>!g.arch).sort((a,b)=>byNum(gName(a),gName(b)));
-  let h=`<div class="head">${LOGO}<span class="kl"><b>HBG Köln</b> · SoMi</span></div><p class="muted">${dateLong}</p><h1>Heute</h1>${envHint()}${setupCard()}${backupHint()}${dueHint()}`;
-  const rh=rlHint();
-  h+=`<div class="stat"><div>Lerngruppen<b>${act.length}</b><span class="muted small">aktiv</span></div><div>Schüler:innen<b>${new Set(act.flatMap(g=>g.members)).size}</b><span class="muted small">in aktiven Gruppen</span></div><div>Archiv<b>${db.groups.filter(g=>g.arch).length}</b><span class="muted small">Gruppen</span></div></div>`;
+  const date=new Date().toLocaleDateString("de-DE",{weekday:"short",day:"numeric",month:"long"});
+  const act=homeGroups();
+  let h=`<div class="hhead">${LOGO}<h1>Heute</h1><span class="muted">${date}</span></div>${envHint()}${setupCard()}${backupHint()}${dueHint()}`;
   if(!act.length)return h+`<div class="card"><p>Noch keine Lerngruppen.</p><p class="muted">Lege unter „Lerngruppen“ eine Gruppe an oder lade unter „Einstellungen“ die fiktive Beispielklasse.</p><p><button class="btn pri" onclick="go({tab:'gruppen',adding:true})">Lerngruppe anlegen</button></p></div>`;
-  if(act.length)h+=`<div class="card"><b>Schnell erfassen</b><p class="row" style="flex-wrap:wrap;margin:8px 0 0">${act.map(g=>`<span class="row" style="gap:6px;flex-wrap:wrap">${g.fach==="Mathe"?`<button class="btn pri" onclick="erStart(${ja(g.id)},'k')">${esc(gName(g))}: ganze Klasse</button><button class="btn" onclick="erStart(${ja(g.id)},'e')">Einzeln</button>`:`<button class="btn pri" onclick="erStart(${ja(g.id)},'s')">${esc(gName(g))}: Stundenstatus</button><button class="btn" onclick="erStart(${ja(g.id)},'k')">Bewerten</button>`}</span>`).join("")}</p></div>`;
-  h+=rh+`<h2>Deine Lerngruppen</h2>`+act.map(groupCard).join("");
-  return h+`<p class="muted small">Version 0.4: Sonstige Mitarbeit, gesonderte Leistungen (Präsentation, Heft, Übung) und Klassenarbeiten in Mathe. Sonstige Leistungen (Motorik, Wissen, Sozial- und Arbeitsverhalten), Stundenstatus und schriftliche Überprüfungen in Sport. Rücklauf-Listen.</p>`}
+  return h+`<div class="hgrid">${act.map(homeRow).join("")}</div>`+rlHint(act.map(g=>g.id))}
 const groupCard=g=>`<button class="card tap row" onclick="go({tab:'gruppen',group:${ja(g.id)}})"><div class="grow"><div class="code">${esc(gName(g))}${g.demo?' <span class="tag">Beispiel</span>':""}</div><div class="muted small">${esc(g.sy)} · ${g.members.length} Schüler:innen${g.arch?` · archiviert am ${dDEy(g.arch)}`:""}</div></div><span aria-hidden="true" class="muted">›</span></button>`;
 
 /* ===== Lerngruppen ===== */
