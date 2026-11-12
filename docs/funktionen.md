@@ -27,6 +27,7 @@ Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iP
 
 ## Sport: Stundenstatus (ab 0.2.2)
 - Runde durch die Gruppe: aktiv, ohne Sportsachen, sportunfähig, nicht anwesend. „Alle übrigen: aktiv“ füllt den Rest. Pro Tag ein Status je Kürzel; erneutes Tippen ersetzt ihn.
+- **Sport-Runde mit Status (ab 0.5.8):** „Runde“ bzw. „Ganze Klasse“ zeigt pro Kürzel oben den Status (aktiv vorausgewählt, o. Sachen, unfähig, nicht da), darunter die Kriterien-Matrix, unten „⚠ Störung“, „o. Planer“ und „Weiter ›“. Ohne Tippen wird bei „Weiter“ „aktiv“ gespeichert. „nicht da“ speichert und geht weiter; eine Stufe tippen setzt das Kind wieder auf aktiv. Zurück über ‹ neben dem Zähler. Status und Bewertung landen in denselben Daten wie bisher (`db.att`, `db.obs`). Der reine Status-Durchgang („Status“) bleibt für Stunden ohne Bewertung.
 - Übersicht pro Halbjahr/Schuljahr: Anzahl je Status, ab 3 markiert.
 - Daten: `db.att = [{id,gid,sid,d,st,upd}]`, geprüft mit `okAtt`, in Sicherung und Import enthalten.
 
