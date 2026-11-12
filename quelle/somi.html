@@ -179,7 +179,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.5",SOMI_STAND="08.11.2026";
+const SOMI_VERSION="0.5.6",SOMI_STAND="12.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -327,9 +327,10 @@ const PUEB=["mot","kog","soz","arb"];
 const okRg=v=>v==null||!!v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).length<=60&&Object.entries(v).every(([k,n])=>okId(k)&&Number.isInteger(n)&&n>=1&&n<=6);
 function okObs(o){try{return !!o&&okId(o.id)&&okId(o.gid)&&okId(o.sid)&&Object.hasOwn(KMAP,o.k)&&(o.k==="lez"?okId(o.z):o.z==null)&&(o.s==null?NOTEN.includes(o.n):Object.hasOwn(STUF,o.s)&&o.n==null)&&(o.fb==null||typeof o.fb==="boolean")&&okDate(o.d)&&okStr(o.t,300)&&okNum(o.upd)}catch(e){return false}}
 const obsOf=(gid,sid)=>db.obs.filter(o=>o.gid===gid&&(!sid||o.sid===sid));
-/* Sport: Stundenstatus. db.att = [{id,gid,sid,d,st,upd}], höchstens einer pro Gruppe, Kürzel und Tag */
+/* Sport: Stundenstatus. db.att = [{id,gid,sid,d,st,np?,upd}], höchstens einer pro Gruppe, Kürzel und Tag.
+   np:true = Schulplaner fehlte (ab 0.5.6). Zählt nicht zur Note. Bei „nicht anwesend“ nie gesetzt. */
 const ST={akt:"aktiv",ohne:"ohne Sportsachen",unf:"sportunfähig",abw:"nicht anwesend"};
-function okAtt(a){try{return !!a&&okId(a.id)&&okId(a.gid)&&okId(a.sid)&&Object.hasOwn(ST,a.st)&&okDate(a.d)&&okNum(a.upd)}catch(e){return false}}
+function okAtt(a){try{return !!a&&okId(a.id)&&okId(a.gid)&&okId(a.sid)&&Object.hasOwn(ST,a.st)&&(a.np==null||a.np===true&&a.st!=="abw")&&okDate(a.d)&&okNum(a.upd)}catch(e){return false}}
 const msOf=g=>g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code));
 const profTag=s=>(s.profil||"r")==="zd"?'<span class="tag zd">LE</span>':(s.profil==="na"?'<span class="tag na">NA</span>':"");
 const bigSus=s=>`<div class="seqsus">${susIcon(s).replace('class="kic"','class="kic big"')}<span><span class="code">${esc(s.code)}</span>${nm(s)}</span>${profTag(s)}</div>`;
@@ -370,7 +371,7 @@ const stale=g=>{const lim=daysAgo(14);return g.members.map(susById).filter(Boole
 
 // Modus: "e" einzeln (Kürzel antippen), "k" ganze Klasse nacheinander (i = Position, run = in diesem Durchgang erfasst)
 // ks = Kriterien der Runde (null = noch nicht gewählt), j = Position im Kriterium, pre = Auswahl vor dem Start
-const erNeu=(gid,mode)=>({gid,mode:mode||"e",sel:[],k:null,fb:false,d:today(),t:"",i:0,j:0,run:{},ks:null,pre:null});
+const erNeu=(gid,mode)=>({gid,mode:mode||"e",sel:[],k:null,fb:false,d:today(),t:"",i:0,j:0,run:{},ks:null,pre:null,np:{}});
 let ER=erNeu(null);
 function erStart(gid,mode){ER=erNeu(gid,mode);go({tab:view.tab,group:gid,erf:gid})}
 function erMode(m){if(ER.mode!==m){ER.i=0;ER.run={};ER.ks=null}ER.mode=m;ER.sel=[];render()}
@@ -461,7 +462,7 @@ function addObs(v){const g=groupById(ER.gid);if(!g||!Object.hasOwn(STUF,v))retur
 function sportV(g){const ms=msOf(g),d=ER.d||today(),day=new Map(db.att.filter(a=>a.gid===g.id&&a.d===d).map(a=>[a.sid,a]));
   const cnt=Object.keys(ST).map(k=>[k,ms.filter(s=>day.get(s.id)?.st===k).length]).filter(x=>x[1]);
   const head=erHd(g,"Stundenstatus",false)+erPick(g);
-  const dat=`<div class="erx" style="justify-content:flex-end">${erDate("ER.i=0;ER.run={};")}</div>`;
+  const dat=`<div class="erx" style="justify-content:flex-end">${erDate("ER.i=0;ER.run={};ER.np={};")}</div>`;
   const sum=cnt.map(([k,n])=>`${n} ${ST[k]}`).join(" · ")||"noch nichts erfasst";
   if(!ms.length)return head+`<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
   if(ER.i>=ms.length)return head+`<div class="card seqdone fill"><b style="font-size:1.2rem">Fertig</b><p>${esc(sum)}.</p>
@@ -469,23 +470,30 @@ function sportV(g){const ms=msOf(g),d=ER.d||today(),day=new Map(db.att.filter(a=
   const s=ms[ER.i],a=day.get(s.id),rest=ms.slice(ER.i).filter(x=>!day.has(x.id)).length;
   return head+`<div class="card seqc fill"><div class="seqhd">${bigSus(s)}<span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
-  ${stRow(s.id)}
+  ${spRow(s.id,a)}
   <div class="stgrid" style="margin-top:8px">${Object.entries(ST).map(([k,t])=>`<button class="btn${k==="akt"?" pri":k==="abw"?" abw":""}${a?.st===k?" cur":""}" onclick="setAtt('${k}')">${t}</button>`).join("")}</div>
   <div class="two" style="margin-top:8px"><button class="btn" ${ER.i?"":"disabled"} onclick="ER.i--;render()">‹ Zurück</button><button class="btn" ${rest?"":"disabled"} onclick="attRest()">Alle übrigen: aktiv</button></div>
   ${dat}</div>`}
+// Stundenstatus: Störung und Schulplaner nebeneinander. Schulplaner: Standard „dabei“, Tippen vermerkt „fehlt“.
+// Vor dem Status gemerkt in ER.np, danach direkt am Eintrag (a.np).
+function spRow(sid,a){const r=ER.run[sid],id=r&&r!=="abw"?r["@st"]:null,on=!!(id&&db.asv.some(x=>x.id===id)),np=a?!!a.np:!!ER.np[sid],off=a?.st==="abw";
+  return `<div class="seqrow two"><button class="btn block abw stb${on?" cur":""}" aria-pressed="${on}" onclick="seqStoer(${ja(sid)})">${on?"⚠ Störung vermerkt":"⚠ Massive Störung"}</button><button class="btn block stb plb${np?" cur":""}" aria-pressed="${np}" ${off?"disabled":""} onclick="plToggle(${ja(sid)})">${np?"✓ Ohne Schulplaner":"Ohne Schulplaner"}</button></div>`}
+function plToggle(sid){const g=groupById(ER.gid);if(!g||g.arch||!g.members.includes(sid))return;const d=ER.d||today(),a=db.att.find(x=>x.gid===g.id&&x.sid===sid&&x.d===d);
+  if(a){if(a.st==="abw")return;if(a.np)delete a.np;else a.np=true;touch(a);save()}else{if(ER.np[sid])delete ER.np[sid];else ER.np[sid]=true}render()}
 function setAtt(st){const g=groupById(ER.gid);if(!g||!Object.hasOwn(ST,st))return;const s=msOf(g)[ER.i];if(!s)return;const d=ER.d||today();
-  const a=db.att.find(x=>x.gid===g.id&&x.sid===s.id&&x.d===d);if(a){a.st=st;touch(a)}else db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st,...(g.demo?{demo:true}:{})}));
+  const a=db.att.find(x=>x.gid===g.id&&x.sid===s.id&&x.d===d),np=st!=="abw"&&(a?!!a.np:!!ER.np[s.id]);delete ER.np[s.id];
+  if(a){a.st=st;if(np)a.np=true;else delete a.np;touch(a)}else db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st,...(np?{np:true}:{}),...(g.demo?{demo:true}:{})}));
   ER.i++;save();render()}
 function attRest(){const g=groupById(ER.gid);if(!g)return;const d=ER.d||today(),ms=msOf(g);let n=0;
-  for(const s of ms.slice(ER.i))if(!db.att.some(x=>x.gid===g.id&&x.sid===s.id&&x.d===d)){db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st:"akt",...(g.demo?{demo:true}:{})}));n++}
+  for(const s of ms.slice(ER.i))if(!db.att.some(x=>x.gid===g.id&&x.sid===s.id&&x.d===d)){db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st:"akt",...(ER.np[s.id]?{np:true}:{}),...(g.demo?{demo:true}:{})}));delete ER.np[s.id];n++}
   ER.i=ms.length;save();render();toast(`${n} als aktiv gespeichert`)}
 function attOvV(g){const from=OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00",all=db.att.filter(a=>a.gid===g.id&&a.d>=from),ms=msOf(g);
   const nT=new Set(all.map(a=>a.d)).size;
-  const rows=ms.map(s=>{const m=all.filter(a=>a.sid===s.id);return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span> ${profTag(s)}${nm(s)}</th>${Object.keys(ST).map(k=>{const n=m.filter(a=>a.st===k).length;return `<td class="num${k!=="akt"&&n>=3?" old":""}">${n||"–"}</td>`}).join("")}<td class="num">${(n=>n?hid(String(n)):"–")(stOf(g.id,s.id,from).length)}</td></tr>`}).join("");
+  const rows=ms.map(s=>{const m=all.filter(a=>a.sid===s.id);return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span> ${profTag(s)}${nm(s)}</th>${Object.keys(ST).map(k=>{const n=m.filter(a=>a.st===k).length;return `<td class="num${k!=="akt"&&n>=3?" old":""}">${n||"–"}</td>`}).join("")}${(n=>`<td class="num${n>=3?" old":""}">${n||"–"}</td>`)(m.filter(a=>a.np).length)}<td class="num">${(n=>n?hid(String(n)):"–")(stOf(g.id,s.id,from).length)}</td></tr>`}).join("");
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button><div class="between"><h1 style="margin-bottom:4px">Übersicht</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · Stundenstatus · ${nT} ${nT===1?"Stunde":"Stunden"} erfasst</p>
   <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
-  ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">aktiv</th><th class="num">ohne Sachen</th><th class="num">sport&shy;unfähig</th><th class="num">nicht da</th><th class="num" title="massive Unterrichtsstörungen">Stör.</th></tr></thead><tbody>${rows}</tbody></table></div>
-  <p class="small muted">Ab 3 Stunden ohne Sachen, sportunfähig oder nicht da ist die Zahl markiert.</p>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
+  ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">aktiv</th><th class="num">ohne Sachen</th><th class="num">sport&shy;unfähig</th><th class="num">nicht da</th><th class="num" title="ohne Schulplaner">ohne Planer</th><th class="num" title="massive Unterrichtsstörungen">Stör.</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <p class="small muted">Ab 3 Stunden ohne Sachen, sportunfähig, nicht da oder ohne Schulplaner ist die Zahl markiert. Schulplaner und Störungen zählen nicht zur Note.</p>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   ${g.arch?"":`<p><button class="btn pri block" onclick="erStart(${ja(g.id)},'s')">Stundenstatus erfassen</button></p>`}`}
 
 let OVP="hj";
@@ -1171,7 +1179,7 @@ async function susPdf(sid,gid){const s=susById(sid),g=groupById(gid);if(!s||!g||
   // Sport: Stundenstatus
   if(SP){const at=db.att.filter(a=>a.gid===g.id&&a.sid===s.id&&a.d>=from);sec("Stundenstatus");
     if(!at.length)d.wrap("Kein Stundenstatus in diesem Zeitraum.",L,W,{size:10,color:"muted"});
-    else Object.entries(ST).forEach(([k,t])=>row([[0,200,t],[210,80,String(at.filter(a=>a.st===k).length)]]))}
+    else{Object.entries(ST).forEach(([k,t])=>row([[0,200,t],[210,80,String(at.filter(a=>a.st===k).length)]]));row([[0,200,"ohne Schulplaner"],[210,80,String(at.filter(a=>a.np).length)]])}}
   // Störungen
   const st=stOf(g.id,s.id,from).sort((a,b)=>a.d.localeCompare(b.d));
   if(st.length){sec("Massive Unterrichtsstörungen");d.wrap("Zählen nicht zur Note.",L,W,{size:9,color:"muted"});st.forEach(a=>row([[0,62,dDEy(a.d)],[66,W-66,a.t||""]]))}

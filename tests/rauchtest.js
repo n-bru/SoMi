@@ -147,12 +147,21 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   const sa0=await p.evaluate(()=>db.asv.length);
   await p.click("button.stb");await dlgIn("Fiktiv: Ball weggeschossen");ok(await p.evaluate(n=>db.asv.length===n+1&&db.asv.at(-1).t==="Fiktiv: Ball weggeschossen"&&ER.i===0,sa0),"Sport: Störung im Stundenstatus, bleibt beim Kind");
   await p.click("button.stb");ok(await p.evaluate(n=>db.asv.length===n,sa0),"Sport: Störung zurückgenommen");
+  // 0.5.6 Schulplaner: Tippen merkt „fehlt“, wird mit dem Status gespeichert, Tippen nimmt zurück
+  await p.click("button.plb");ok(await p.evaluate(()=>ER.np[msOf(groupById(ER.gid))[0].id]===true&&ER.i===0)&&await p.locator("button.plb.cur").count()===1,"Sport: Schulplaner fehlt vorgemerkt");
+  await p.click("button.plb");ok(await p.locator("button.plb.cur").count()===0,"Sport: Schulplaner zurückgenommen");await p.click("button.plb");
+  {const vp=p.viewportSize();for(const [w,h] of [[375,548],[390,664],[430,740]]){await p.setViewportSize({width:w,height:h});
+  ok(await p.evaluate(()=>document.documentElement.scrollHeight<=innerHeight&&[...document.querySelectorAll(".seqc button")].every(b=>b.getBoundingClientRect().bottom<=innerHeight)),`${w}×${h}: Stundenstatus mit Schulplaner ohne Scrollen`)}
+  await p.setViewportSize(vp)}
   await p.click(".stgrid button:has-text('aktiv')");await p.click(".stgrid button:has-text('ohne Sportsachen')");await p.click(".stgrid button:has-text('sportunfähig')");
   await p.click("button:has-text('Alle übrigen: aktiv')");ok(await p.locator(".seqdone:has-text('4 aktiv')").count()===1,"Sport: alle übrigen aktiv");
   ok(await p.evaluate(()=>db.att.length===6&&db.att.every(okAtt)),"Sport: 6 Status gespeichert");
+  ok(await p.evaluate(()=>db.att.filter(a=>a.np).length===1&&db.att.find(a=>a.np).st==="akt"&&!Object.keys(ER.np).length),"Sport: ohne Schulplaner mit Status gespeichert");
+  ok(await p.evaluate(()=>!okAtt({id:"a",gid:"b",sid:"c",st:"abw",np:true,d:"2026-01-01",upd:1})&&!okAtt({id:"a",gid:"b",sid:"c",st:"akt",np:"ja",d:"2026-01-01",upd:1})&&okAtt({id:"a",gid:"b",sid:"c",st:"akt",np:true,d:"2026-01-01",upd:1})),"Prüfhelfer okAtt mit Schulplaner");
   await p.click("button:has-text('Letzte ansehen')");await p.click(".stgrid button:has-text('nicht anwesend')");
   ok(await p.evaluate(()=>db.att.length===6&&db.att.filter(a=>a.st==="abw").length===1),"Sport: Status ersetzt, nicht doppelt");
   await p.click("button:has-text('Zur Übersicht')");ok(await p.locator(".tbl tr:has-text('DEMO-02') td").nth(1).innerText().then(t=>t==="1"),"Sport-Übersicht zählt ohne Sachen");
+  ok(await p.locator(".tbl tr:has-text('DEMO-01') td").nth(4).innerText().then(t=>t==="1"),"Sport-Übersicht zählt ohne Schulplaner");
   ok(await p.evaluate(()=>!okAtt({id:"a",gid:"b",sid:"c",st:"x",d:"2026-01-01",upd:1})),"Prüfhelfer okAtt");
   // 0.4.6 Sport: Kriterien nach SILP Sport, Runde als Matrix, Fragezeichen zeigt Ankertexte
   await nav("Heute");await p.click(".hrow:has-text('DEMO Sport') >> button:has-text('Runde')");
@@ -321,13 +330,13 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.evaluate(()=>{OVP="all";render()});
   {const [dl]=await Promise.all([p.waitForEvent("download"),p.click("button:has-text('PDF erstellen')")]);const pf=path.join(require("os").tmpdir(),"somi-test.pdf");await dl.saveAs(pf);
   const t=fs.readFileSync(pf,"latin1");ok(t.startsWith("%PDF-1.4")&&t.includes("%%EOF")&&t.includes("(DEMO-01)")&&t.includes("Leistungs\xfcbersicht Sport")&&t.includes("Handstand")&&t.includes("Stundenstatus")&&!t.includes("Fiktiv Testname"),"PDF pro Kürzel mit Sport-Einträgen, ohne Namen");
-  fs.copyFileSync(pf,"/tmp/claude-0/sp/somi-test.pdf")}
+  }
   await p.click("label.swr:has-text('Name ins PDF') input");
   {const [dl]=await Promise.all([p.waitForEvent("download"),p.click("button:has-text('PDF erstellen')")]);const pf=path.join(require("os").tmpdir(),"somi-test2.pdf");await dl.saveAs(pf);
   ok(fs.readFileSync(pf,"latin1").includes("Fiktiv Testname"),"Name nur, wenn eingeschaltet")}
   await p.evaluate(()=>{PDFNM=false;const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");go({tab:"gruppen",group:g.id,sus:g.members[2]})});
   {const [dl]=await Promise.all([p.waitForEvent("download"),p.click("button:has-text('PDF erstellen')")]);const pf=path.join(require("os").tmpdir(),"somi-test3.pdf");await dl.saveAs(pf);
-  const t=fs.readFileSync(pf,"latin1");ok(t.includes("Klassenarbeiten")&&t.includes("KA 1")&&t.includes("NA gew")&&t.includes("Nachteilsausgleich"),"Mathe-PDF mit Klassenarbeit und NA-Vermerk");fs.copyFileSync(pf,"/tmp/claude-0/sp/somi-test3.pdf")}
+  const t=fs.readFileSync(pf,"latin1");ok(t.includes("Klassenarbeiten")&&t.includes("KA 1")&&t.includes("NA gew")&&t.includes("Nachteilsausgleich"),"Mathe-PDF mit Klassenarbeit und NA-Vermerk")}
   // XSS: Kürzel mit HTML wird maskiert
   await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
   await p.click("text=+ Schüler:in");await p.fill("#scode",'7<img src=x onerror=alert(1)>');await p.click("button:has-text('Hinzufügen')");
