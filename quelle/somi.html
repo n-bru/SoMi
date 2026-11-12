@@ -181,7 +181,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.8",SOMI_STAND="12.11.2026";
+const SOMI_VERSION="0.5.9",SOMI_STAND="12.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -850,8 +850,10 @@ let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,!!
 function go(v){const i=HIST.findIndex(h=>vkey(h)===vkey(v));if(i>=0)HIST.length=i;else if(view&&vkey(view)!==vkey(v))HIST.push(view);view=v;render();window.scrollTo(0,0)}
 function back(){view=HIST.pop()||{tab:view.tab};render();window.scrollTo(0,0)}
 function navTo(k){HIST=[];go({tab:k})}
+// Innere Listen (Kürzel bei „Einzeln“) behalten ihre Scrollposition, wenn dieselbe Ansicht neu gezeichnet wird
+let SKEY=null;
 function render(){
-  renderNav();const a=$("#app");document.body.classList.toggle("erf",!!(view.erf||view.kae&&view.kad));
+  renderNav();const a=$("#app"),sk=vkey(view)+"|"+ER.mode,sp=SKEY===sk?[...a.querySelectorAll(".tilew")].map(e=>e.scrollTop):[];SKEY=sk;document.body.classList.toggle("erf",!!(view.erf||view.kae&&view.kad));
   if(view.imp)a.innerHTML=importV();
   else if(view.names||view.nkl)a.innerHTML=namesV();
   else if(view.erf)a.innerHTML=erfV();
@@ -865,6 +867,7 @@ function render(){
   else if(view.kl)a.innerHTML=klV();
   else if(view.group)a.innerHTML=groupV();
   else a.innerHTML={heute:heuteV,gruppen:gruppenV,profil:profilV}[view.tab]();
+  if(sp.length)a.querySelectorAll(".tilew").forEach((e,i)=>{if(sp[i])e.scrollTop=sp[i]});
   if(view.mark)requestAnimationFrame(()=>$("#app .mark")?.scrollIntoView({block:"center",behavior:"smooth"}));
 }
 
