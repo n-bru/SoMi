@@ -166,7 +166,9 @@ body.erf .rgbar{margin:0 0 6px}body.erf .kan .seqsus{margin:4px 0}body.erf .kan 
 .ein .tile{min-height:44px;padding:4px;gap:4px}.ein .tile .kic{width:24px;height:24px;font-size:.9rem}.ein .tile .code{font-size:.8rem}
 .ein .pad.st button{min-height:46px;padding:3px 2px;grid-template-rows:auto auto;gap:0;align-content:center}.ein .pad.st b{display:none}.ein .pad.st span:first-of-type{color:var(--ink);font-size:.74rem;white-space:nowrap}
 .ein .stb{min-height:40px;padding:6px 10px;font-size:.95rem}.ein .btn.ic{width:40px;height:40px;padding:0;display:grid;place-items:center;flex:none}
-.seqc .stb{min-height:40px;padding:6px 10px;font-size:.95rem}
+.seqc .stb{min-height:40px;padding:6px 10px;font-size:.95rem}.seqc .three .stb{padding:4px 2px;font-size:.88rem}
+body.erf .seqc.sp .padwrap .btn{min-height:40px}.seqc.sp .seqhd{margin:-6px 0 -4px}.seqc.sp .mxw{gap:3px}.seqc.sp .mxw .mxh{margin:2px 0 0}.seqc .stp{margin:2px 0 0;grid-template-columns:repeat(4,1fr)}.seqc .stp button{padding:4px 2px;font-size:.85rem}.stp button.abw{border-style:dashed}.stp button.abw.on{background:var(--news);border:2px solid var(--sig);color:var(--sig-ink)}
+.seqc .seqhd .ic{width:40px;height:40px;min-height:40px;padding:0;display:grid;place-items:center;flex:none;font-size:1.3rem}
 body.erf .padwrap{bottom:env(safe-area-inset-bottom);margin-top:8px;padding:6px 8px}body.erf .padwrap .btn{min-height:44px}
 body.erf .stgrid .btn{min-height:52px}
 @media print{nav,.noprint,body::before{display:none!important}main{padding:0}#lock{display:none!important}}
@@ -179,7 +181,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.6",SOMI_STAND="12.11.2026";
+const SOMI_VERSION="0.5.8",SOMI_STAND="12.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -409,16 +411,16 @@ function seqCard(g,ms){if(!ms.length)return `<div class="card"><p class="muted">
   const sum=`${nB} bewertet${nA?` · ${nA} nicht anwesend`:""}`;
   if(ER.i>=ms.length)return `<div class="card seqdone fill"><b style="font-size:1.2rem">Fertig</b><p>${nB} bewertet${nA?`, ${nA} nicht anwesend`:""}.</p>
     <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="ER.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.run={};ER.ks=null;render()">Neue Runde</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
-  const s=ms[ER.i],r=ER.run[s.id],abw=r==="abw",lz=lezOf(s,fOf(g)),rk=lz.length?lz.map(z=>"z:"+z.id):ks;
+  const SP=fOf(g)==="Sport",s=ms[ER.i],r=ER.run[s.id],at=SP?attOf(g.id,s.id,ER.d||today()):null,abw=r==="abw"||at?.st==="abw",lz=lezOf(s,fOf(g)),rk=lz.length?lz.map(z=>"z:"+z.id):ks;
   const rows=rk.map(k=>{const z=lz.find(x=>"z:"+x.id===k),K=KMAP[k],id=r&&!abw?r[k]:null,o=id?db.obs.find(x=>x.id===id):null;
     if(z)return `<div class="pad mx mxz" role="group" aria-label="Förderplanziel: ${esc(z.t)}"><button class="seqk" onclick="lezInfo(${ja(z.t)})" aria-label="Förderplanziel: ${esc(z.t)}"><b>${esc(z.t)}</b></button>${padRow(k,o?.s,"Ziel "+z.t)}</div>`;
     return `<div class="pad mx" role="group" aria-label="${esc(K.t)}"><button class="seqk" onclick="krInfo('${k}')" aria-label="${esc(K.t)}: Hinweis und Ankertexte"><b>${esc(K.kz||K.t)}</b><span class="q" aria-hidden="true">?</span></button>${padRow(k,o?.s)}</div>`}).join("");
   const mxh=`<div class="mx mxh" aria-hidden="true"><span></span>${Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<span>${x.l.replace("über","über\u00ad")}</span>`).join("")}</div>`;
-  return `<div class="card seqc fill"><div class="seqhd">${bigSus(s)}<span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
+  return `<div class="card seqc fill${SP?" sp":""}"><div class="seqhd">${bigSus(s)}${SP?`<button class="btn ghost ic" ${ER.i?"":"disabled"} onclick="seqPrev()" aria-label="Zurück zum vorigen Kürzel">‹</button>`:""}<span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
-  ${abw?`<p class="small" style="margin:4px 0 0">Nicht anwesend. Stufe tippen hebt das auf.</p>`:""}
-  ${lz.length?`<p class="small" style="margin:2px 0 0"><b>Förderplanziele</b> statt Kriterien</p>`:""}<div class="mxw" style="grid-template-rows:auto repeat(${rk.length},minmax(0,64px))">${mxh}${rows}</div>${stRow(s.id)}
-  <div class="padwrap"><div class="three"><button class="btn" ${ER.i?"":"disabled"} onclick="seqPrev()">‹ Zurück</button><button class="btn abw" onclick="seqAbw()" aria-label="nicht anwesend">abwesend</button><button class="btn pri" onclick="seqNext()">Weiter ›</button></div></div>
+  ${SP?stPick(at):""}${abw?`<p class="small" style="margin:4px 0 0">Nicht anwesend. Stufe tippen hebt das auf.</p>`:""}
+  ${lz.length?`<p class="small" style="margin:2px 0 0"><b>Förderplanziele</b> statt Kriterien</p>`:""}<div class="mxw" style="grid-template-rows:auto repeat(${rk.length},minmax(0,64px))">${mxh}${rows}</div>${SP?"":stRow(s.id)}
+  <div class="padwrap"><div class="three">${SP?spBtns(s.id,at,true):`<button class="btn" ${ER.i?"":"disabled"} onclick="seqPrev()">‹ Zurück</button><button class="btn abw" onclick="seqAbw()" aria-label="nicht anwesend">abwesend</button>`}<button class="btn pri" onclick="seqNext()">Weiter ›</button></div></div>
   ${erExtras()}</div>`}
 const padRow=(k,cur,lab)=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" data-k="${esc(k)}" class="${cur===v?"cur":""}" aria-pressed="${cur===v}" onclick="seqSet(${ja(k)},'${v}')" aria-label="${esc(lab||KMAP[k].t)}: ${x.l}, Notenwert ${fmtW(stw()[v])}">${fmtW(stw()[v])}</button>`).join("");
 // Massive Unterrichtsstörung in der Runde (Mathe) und im Stundenstatus (Sport); gespeichert sofort, in ER.run unter "@st"
@@ -429,6 +431,7 @@ function lezInfo(t){dlg(`<p style="font-weight:700;font-size:1.05rem;margin:0 0 
   <p class="small muted" style="margin:0 0 12px">Bewerte, wie sicher das Ziel heute erreicht ist: übertroffen, erfüllt, teilweise, kaum. Daraus entstehen der Notenvorschlag (wenn „Note im Zeugnis“ an ist) und die Textbausteine fürs Zeugnis.</p><button class="btn pri block" data-a="1">Schließen</button>`,(el,done)=>{el.querySelector('[data-a="1"]').onclick=()=>done(null)})}
 function seqSet(k,v){const g=groupById(ER.gid),s=seqCur();if(!g||!s||!Object.hasOwn(STUF,v))return;
   const lz=String(k).startsWith("z:")?lezOf(s,fOf(g)).find(z=>"z:"+z.id===k):null;if(!lz&&(!Object.hasOwn(KMAP,k)||k==="lez"))return;
+  if(fOf(g)==="Sport"&&attOf(g.id,s.id,ER.d||today())?.st==="abw")attPut(g,s.id,"akt");
   const r=seqRun(s.id),old=r[k]?db.obs.find(o=>o.id===r[k]):null;
   if(old){db.obs=db.obs.filter(o=>o.id!==old.id);delete r[k];if(old.s===v){save();return render()}}
   const t=ER.t.trim().slice(0,300);if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
@@ -442,7 +445,8 @@ function seqStoer(sid){const g=groupById(ER.gid);if(!g||g.arch||!g.members.inclu
 async function stNote(fn){const v=await askText("Was ist passiert?","z. B. ruft dauerhaft rein, wirft Material");if(v==null)return;
   const t=v.trim().slice(0,300);if(!t)return toast("Ohne Notiz wird keine Störung gespeichert.");
   if(looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Notizen schreiben.");fn(t)}
-function seqNext(){const s=seqCur();if(!s)return;const t=ER.t.trim().slice(0,300),r=ER.run[s.id];
+function seqNext(){const s=seqCur();if(!s)return;const t=ER.t.trim().slice(0,300),r=ER.run[s.id],g=groupById(ER.gid);
+  if(fOf(g)==="Sport"&&!g.arch&&!attOf(g.id,s.id,ER.d||today()))attPut(g,s.id,r==="abw"?"abw":"akt");
   if(t&&r&&r!=="abw")for(const id of Object.values(r)){const o=db.obs.find(x=>x.id===id)||db.asv.find(x=>x.id===id);if(o&&!o.t){o.t=t;touch(o)}}
   ER.t="";ER.i++;save();render();window.scrollTo(0,0)}
 function seqPrev(){if(ER.i>0)ER.i--;render();window.scrollTo(0,0)}
@@ -476,14 +480,23 @@ function sportV(g){const ms=msOf(g),d=ER.d||today(),day=new Map(db.att.filter(a=
   ${dat}</div>`}
 // Stundenstatus: Störung und Schulplaner nebeneinander. Schulplaner: Standard „dabei“, Tippen vermerkt „fehlt“.
 // Vor dem Status gemerkt in ER.np, danach direkt am Eintrag (a.np).
-function spRow(sid,a){const r=ER.run[sid],id=r&&r!=="abw"?r["@st"]:null,on=!!(id&&db.asv.some(x=>x.id===id)),np=a?!!a.np:!!ER.np[sid],off=a?.st==="abw";
-  return `<div class="seqrow two"><button class="btn block abw stb${on?" cur":""}" aria-pressed="${on}" onclick="seqStoer(${ja(sid)})">${on?"⚠ Störung vermerkt":"⚠ Massive Störung"}</button><button class="btn block stb plb${np?" cur":""}" aria-pressed="${np}" ${off?"disabled":""} onclick="plToggle(${ja(sid)})">${np?"✓ Ohne Schulplaner":"Ohne Schulplaner"}</button></div>`}
+const spRow=(sid,a)=>`<div class="seqrow two">${spBtns(sid,a)}</div>`;
+// kurz: in der Sport-Runde stehen beide Knöpfe mit „Weiter“ in einer Zeile
+function spBtns(sid,a,kurz){const r=ER.run[sid],id=r&&r!=="abw"?r["@st"]:null,on=!!(id&&db.asv.some(x=>x.id===id)),np=a?!!a.np:!!ER.np[sid],off=a?.st==="abw"||r==="abw";
+  return `<button class="btn block abw stb${on?" cur":""}" aria-pressed="${on}" aria-label="Massive Störung${on?", vermerkt":""}" onclick="seqStoer(${ja(sid)})">${on?(kurz?"⚠ vermerkt":"⚠ Störung vermerkt"):(kurz?"⚠ Störung":"⚠ Massive Störung")}</button><button class="btn block stb plb${np?" cur":""}" aria-pressed="${np}" aria-label="Ohne Schulplaner" ${off?"disabled":""} onclick="plToggle(${ja(sid)})">${np?(kurz?"✓ o. Planer":"✓ Ohne Schulplaner"):(kurz?"o. Planer":"Ohne Schulplaner")}</button>`}
+// 0.5.8: Sport-Runde mit Stundenstatus (Nicks Wunsch 12.11.2026). Ohne Tippen gilt „aktiv“, gespeichert bei „Weiter“.
+const attOf=(gid,sid,d)=>db.att.find(x=>x.gid===gid&&x.sid===sid&&x.d===d);
+const STK={akt:"aktiv",ohne:"o. Sachen",unf:"unfähig",abw:"nicht da"};
+const stPick=a=>{const cur=a?a.st:"akt";return `<div class="pick sm stp" role="group" aria-label="Stundenstatus">${Object.entries(STK).map(([k,t])=>`<button class="${cur===k?"on":""}${k==="abw"?" abw":""}" aria-pressed="${cur===k}" aria-label="${ST[k]}" onclick="seqAtt('${k}')">${t}</button>`).join("")}</div>`};
+function attPut(g,sid,st){const d=ER.d||today(),a=attOf(g.id,sid,d),np=st!=="abw"&&(a?!!a.np:!!ER.np[sid]);delete ER.np[sid];
+  if(a){a.st=st;if(np)a.np=true;else delete a.np;touch(a)}else db.att.push(touch({id:uid(),gid:g.id,sid,d,st,...(np?{np:true}:{}),...(g.demo?{demo:true}:{})}))}
+function seqAtt(st){const g=groupById(ER.gid),s=seqCur();if(!g||g.arch||!s||!Object.hasOwn(ST,st))return;
+  if(st==="abw"){seqDropAll(s.id);ER.run[s.id]="abw";attPut(g,s.id,st);ER.t="";ER.i++;save();render();return window.scrollTo(0,0)}
+  if(ER.run[s.id]==="abw")delete ER.run[s.id];attPut(g,s.id,st);save();render()}
 function plToggle(sid){const g=groupById(ER.gid);if(!g||g.arch||!g.members.includes(sid))return;const d=ER.d||today(),a=db.att.find(x=>x.gid===g.id&&x.sid===sid&&x.d===d);
   if(a){if(a.st==="abw")return;if(a.np)delete a.np;else a.np=true;touch(a);save()}else{if(ER.np[sid])delete ER.np[sid];else ER.np[sid]=true}render()}
-function setAtt(st){const g=groupById(ER.gid);if(!g||!Object.hasOwn(ST,st))return;const s=msOf(g)[ER.i];if(!s)return;const d=ER.d||today();
-  const a=db.att.find(x=>x.gid===g.id&&x.sid===s.id&&x.d===d),np=st!=="abw"&&(a?!!a.np:!!ER.np[s.id]);delete ER.np[s.id];
-  if(a){a.st=st;if(np)a.np=true;else delete a.np;touch(a)}else db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st,...(np?{np:true}:{}),...(g.demo?{demo:true}:{})}));
-  ER.i++;save();render()}
+function setAtt(st){const g=groupById(ER.gid);if(!g||!Object.hasOwn(ST,st))return;const s=msOf(g)[ER.i];if(!s)return;
+  attPut(g,s.id,st);ER.i++;save();render()}
 function attRest(){const g=groupById(ER.gid);if(!g)return;const d=ER.d||today(),ms=msOf(g);let n=0;
   for(const s of ms.slice(ER.i))if(!db.att.some(x=>x.gid===g.id&&x.sid===s.id&&x.d===d)){db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st:"akt",...(ER.np[s.id]?{np:true}:{}),...(g.demo?{demo:true}:{})}));delete ER.np[s.id];n++}
   ER.i=ms.length;save();render();toast(`${n} als aktiv gespeichert`)}

@@ -170,6 +170,19 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(n=>db.obs.length===n+1&&db.obs.at(-1).k==="mot"&&groupById(db.obs.at(-1).gid).fach==="Sport",so0),"Sport: Motorik gespeichert");
   await p.click(".seqk:has-text('Motorik')");ok(await p.locator(".cele:has-text('Kondition')").count()===1,"Fragezeichen zeigt Hinweis und Ankertexte");await dlgBtn("Schließen");
   ok(await p.evaluate(()=>{const z=[{k:"mot",s:"4"},{k:"kog",s:"1"}];return Math.abs(noteMean(z)-(5*1+1*5)/6)<1e-9}),"Sport: Gewicht Motorik 5, Wissen 1");
+  // 0.5.8 Sport-Runde mit Stundenstatus: ohne Tippen „aktiv“, „nicht da“ geht weiter, Stufe hebt „nicht da“ auf
+  await p.evaluate(()=>{ER.d=daysAgo(1);ER.i=0;ER.run={};render()});const sa1=await p.evaluate(()=>db.att.length);
+  ok(await p.locator(".stp button.on",{hasText:"aktiv"}).count()===1,"Sport-Runde: Status aktiv vorausgewählt");
+  {const vp=p.viewportSize();for(const [w,h] of [[375,548],[390,664],[430,740]]){await p.setViewportSize({width:w,height:h});
+    ok(await p.evaluate(()=>document.documentElement.scrollHeight<=innerHeight&&[...document.querySelectorAll(".mxw .mx:not(.mxh) button,.stp button,.seqc .three button")].every(b=>b.getBoundingClientRect().height>=40)),`${w}×${h}: Sport-Runde mit Status ohne Scrollen, Tippziele ab 40 px`)}await p.setViewportSize(vp)}
+  await p.click(".stp button:has-text('o. Sachen')");ok(await p.evaluate(n=>db.att.length===n+1&&db.att.at(-1).st==="ohne"&&db.att.at(-1).d===daysAgo(1)&&ER.i===0,sa1),"Sport-Runde: Status gespeichert, bleibt beim Kind");
+  await p.click(".pad button[data-k='kog'][data-s='4']");await p.click("button:has-text('Weiter')");
+  ok(await p.evaluate(n=>db.att.length===n+1&&ER.i===1,sa1),"Sport-Runde: Weiter ändert gesetzten Status nicht");
+  await p.click("button:has-text('Weiter')");ok(await p.evaluate(n=>{const g=groupById(ER.gid),a=attOf(g.id,msOf(g)[1].id,daysAgo(1));return db.att.length===n+2&&a&&a.st==="akt"},sa1),"Sport-Runde: ohne Tippen als aktiv gespeichert");
+  await p.click(".stp button:has-text('nicht da')");ok(await p.evaluate(()=>{const g=groupById(ER.gid);return ER.i===3&&attOf(g.id,msOf(g)[2].id,daysAgo(1))?.st==="abw"}),"Sport-Runde: nicht da geht weiter");
+  await p.click(".seqhd button[aria-label^='Zurück']");ok(await p.locator("text=Nicht anwesend. Stufe tippen").count()===1,"Sport-Runde: nicht da angezeigt");
+  await p.click(".pad button[data-k='mot'][data-s='3']");ok(await p.evaluate(()=>{const g=groupById(ER.gid);return attOf(g.id,msOf(g)[2].id,daysAgo(1))?.st==="akt"&&db.att.every(okAtt)}),"Sport-Runde: Stufe hebt nicht da auf");
+  await p.evaluate(()=>{ER.d=today()});
   await p.click(".pick.sm button:has-text('Status')");ok(await p.locator("h1",{hasText:"Stundenstatus"}).count()===1,"Sport: Umschalten auf Stundenstatus");
   // 0.3 Klassenarbeiten: anlegen, Punkte eintragen, Notenschlüssel, Notenspiegel, Gesamtvorschlag
   await p.evaluate(()=>{SHOW=false});await nav("Lerngruppen");await p.locator(".card.tap",{hasText:"DEMO Mathe"}).click();
