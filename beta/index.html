@@ -182,7 +182,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.8 Beta",SOMI_STAND="12.11.2026";
+const SOMI_VERSION="0.5.9 Beta",SOMI_STAND="13.11.2026";
 const KEY="somi-beta";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -198,8 +198,10 @@ function load(){try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];if(!Array.isArray(db.obs))db.obs=[];if(!Array.isArray(db.att))db.att=[];if(!Array.isArray(db.ka))db.ka=[];if(!Array.isArray(db.asv))db.asv=[];if(!Array.isArray(db.rl))db.rl=[];
   const n=db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length+db.rl.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);db.obs=db.obs.filter(okObs);db.att=db.att.filter(okAtt);db.ka=db.ka.filter(okKa);db.asv=db.asv.filter(okAsv);db.rl=db.rl.filter(okRl);
   if(db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length+db.rl.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
+// 0.5.9: Erfassen-Seiten immer in normaler Schrift, sonst passen die Knöpfe nicht mehr
+function applyFs(){const r=document.documentElement;if((db?.fs==="l"||db?.fs==="xl")&&!document.body.classList.contains("erf"))r.dataset.fs=db.fs;else delete r.dataset.fs}
 function applyTheme(){const t=db?.theme,r=document.documentElement;if(t==="light"||t==="dark")r.dataset.theme=t;else delete r.dataset.theme;
-  if(db?.fs==="l"||db?.fs==="xl")r.dataset.fs=db.fs;else delete r.dataset.fs;
+  applyFs();
   const dark=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.querySelector('meta[name=theme-color]')?.setAttribute("content",dark?"#14201b":"#f5f6f1")}
 let SAVEQ=Promise.resolve(),SAVEN=0;
 function save(){if(ENCWAIT)return; // gesperrt und noch nicht entschlüsselt: nichts überschreiben
@@ -228,6 +230,9 @@ const susById=id=>db.sus.find(s=>s.id===id);
 const groupById=id=>db.groups.find(g=>g.id===id);
 const gName=g=>`${g.cls} ${g.fach}${g.kurs&&g.kurs!=="-"?" "+g.kurs:""}`;
 const looksLikeName=s=>/^[A-ZÄÖÜ][a-zäöüß]{2,}([ -][A-ZÄÖÜ][a-zäöüß]+)*$/.test(s.trim());
+// 0.5.9: In Freitexten nur warnen, wenn ein Wort aus der eigenen Namensliste vorkommt (Substantive sind keine Namen)
+const nameIn=t=>{const w=new Set(String(t||"").toLowerCase().split(/[^a-zäöüß]+/).filter(x=>x.length>=3));if(!w.size)return false;for(const n of Object.values(NAMES))for(const x of n.toLowerCase().split(/[^a-zäöüß]+/))if(x.length>=3&&w.has(x))return true;return false};
+const nmWarn=t=>{if(nameIn(t))toast("Bitte keine Namen eintragen. Das Wort steht in deiner Namensliste.")};
 const syNow=()=>{const d=new Date(),y=d.getFullYear()-(d.getMonth()<7?1:0);return `${y}/${String(y+1).slice(2)}`};
 function toast(t){document.querySelectorAll(".toast").forEach(x=>x.remove());const el=document.createElement("div");el.className="toast";el.setAttribute("role","status");el.textContent=t;document.body.appendChild(el);setTimeout(()=>el.remove(),Math.max(1800,t.length*45))}
 let UNDO_T;
@@ -435,7 +440,7 @@ function seqSet(k,v){const g=groupById(ER.gid),s=seqCur();if(!g||!s||!Object.has
   if(fOf(g)==="Sport"&&attOf(g.id,s.id,ER.d||today())?.st==="abw")attPut(g,s.id,"akt");
   const r=seqRun(s.id),old=r[k]?db.obs.find(o=>o.id===r[k]):null;
   if(old){db.obs=db.obs.filter(o=>o.id!==old.id);delete r[k];if(old.s===v){save();return render()}}
-  const t=ER.t.trim().slice(0,300);if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
+  const t=ER.t.trim().slice(0,300);nmWarn(t);
   const o=touch({id:uid(),gid:g.id,sid:s.id,k:lz?"lez":k,...(lz?{z:lz.id}:{}),s:v,fb:false,d:ER.d||today(),t,...(g.demo?{demo:true}:{})});db.obs.push(o);r[k]=o.id;if(!lz)g.lastK=k;save();render()}
 function seqStoer(sid){const g=groupById(ER.gid);if(!g||g.arch||!g.members.includes(sid))return;
   const r=seqRun(sid),old=r["@st"]?db.asv.find(a=>a.id===r["@st"]):null;
@@ -445,7 +450,7 @@ function seqStoer(sid){const g=groupById(ER.gid);if(!g||g.arch||!g.members.inclu
 // Störung nur mit Notiz: fragt, was passiert ist. Leer oder Abbrechen speichert nichts.
 async function stNote(fn){const v=await askText("Was ist passiert?","z. B. ruft dauerhaft rein, wirft Material");if(v==null)return;
   const t=v.trim().slice(0,300);if(!t)return toast("Ohne Notiz wird keine Störung gespeichert.");
-  if(looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Notizen schreiben.");fn(t)}
+  nmWarn(t);fn(t)}
 function seqNext(){const s=seqCur();if(!s)return;const t=ER.t.trim().slice(0,300),r=ER.run[s.id],g=groupById(ER.gid);
   if(fOf(g)==="Sport"&&!g.arch&&!attOf(g.id,s.id,ER.d||today()))attPut(g,s.id,r==="abw"?"abw":"akt");
   if(t&&r&&r!=="abw")for(const id of Object.values(r)){const o=db.obs.find(x=>x.id===id)||db.asv.find(x=>x.id===id);if(o&&!o.t){o.t=t;touch(o)}}
@@ -454,11 +459,14 @@ function seqPrev(){if(ER.i>0)ER.i--;render();window.scrollTo(0,0)}
 function seqDropAll(sid){const r=ER.run[sid];if(r&&r!=="abw"){const ids=new Set(Object.values(r));db.obs=db.obs.filter(o=>!ids.has(o.id));db.asv=db.asv.filter(a=>!ids.has(a.id))}delete ER.run[sid]}
 function seqCur(){const g=groupById(ER.gid);return g&&ER.ks?msOf(g)[ER.i]:null}
 function seqAbw(){const s=seqCur();if(!s)return;seqDropAll(s.id);ER.run[s.id]="abw";ER.t="";ER.i++;save();render();window.scrollTo(0,0)}
-function erSel(id){const i=ER.sel.indexOf(id);if(i>=0)ER.sel.splice(i,1);else ER.sel.push(id);render()}
+function erSel(id){const g=groupById(ER.gid),s=susById(id);
+  // 0.5.9: Für LE-Kürzel mit Förderplanzielen zählen nur die Ziele. Deshalb direkt dorthin statt stummer Kriterien-Einträge.
+  if(g&&s&&lezOf(s,fOf(g)).length){ER={...erNeu(g.id,"k"),i:Math.max(0,msOf(g).findIndex(x=>x.id===id))};render();return toast(`${s.code}: Hier zählen die Förderplanziele.`)}
+  const i=ER.sel.indexOf(id);if(i>=0)ER.sel.splice(i,1);else ER.sel.push(id);render()}
 function addObs(v){const g=groupById(ER.gid);if(!g||!Object.hasOwn(STUF,v))return;const st=STUF[v].t;
   if(!ER.sel.length)return toast("Tippe zuerst ein oder mehrere Kürzel an.");
   const ks=kritList(fOf(g)),k=ks.some(x=>x.k===(ER.k||g.lastK))?(ER.k||g.lastK):ks[0].k,t=ER.t.trim().slice(0,300);
-  if(t&&looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen in Stichworte schreiben.");
+  nmWarn(t);
   const neu=ER.sel.filter(id=>g.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,k,s:v,fb:false,d:ER.d||today(),t,...(g.demo?{demo:true}:{})}));
   db.obs.push(...neu);g.lastK=k;ER.k=k;ER.sel=[];ER.t="";save();render();
   const ids=new Set(neu.map(o=>o.id));
@@ -525,7 +533,7 @@ function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.o
   <div class="between"><h1 style="margin-bottom:4px">Übersicht</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · ${hasKa?"Sonstige Mitarbeit und Klassenarbeiten":"Sonstige Mitarbeit"}</p>
   <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
   ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">Einträge</th><th class="num">${hasKa?"SoMi":"Note"}</th>${hasKa?`<th class="num">KA</th><th class="num">Gesamt</th>`:""}<th class="num" title="massive Unterrichtsstörungen">Stör.</th><th>Verlauf</th><th>zuletzt</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
-  <p class="muted small">Verlauf: neueste Stufe rechts (++ + o −). „+2“ heißt: 2 weitere Einträge als „nur Rückmeldung“, die nicht zählen. Rot: seit 2 Wochen kein Eintrag. „Note“ ist ein rechnerischer Vorschlag aus den Stufen (Umrechnung unter Einstellungen). ${hasKa?" „KA“: Schnitt der Klassenarbeitsnoten. „Gesamt“: ${wTxt(g)}, nur wenn beides da ist. Ins Zeugnis kommt eine ganze Note.":""} „Stör.“: massive Unterrichtsstörungen, zählen nicht zur Note. Laut SILP zählt die Gesamtentwicklung: Du entscheidest die Note.</p>
+  <p class="muted small">Verlauf: neueste Stufe rechts (++ + o −). „+2“ heißt: 2 weitere Einträge, die nicht zählen (alte Rückmeldungen oder Kriterien bei Förderplanzielen). Rot: seit 2 Wochen kein Eintrag. „Note“ ist ein rechnerischer Vorschlag aus den Stufen (Umrechnung unter Einstellungen). ${hasKa?` „KA“: Schnitt der ${esc(kaL(g)[1])}. „Gesamt“: ${wTxt(g)}, nur wenn beides da ist. Ins Zeugnis kommt eine ganze Note.`:""} „Stör.“: massive Unterrichtsstörungen, zählen nicht zur Note. Laut SILP zählt die Gesamtentwicklung: Du entscheidest die Note.</p>
   ${g.arch?"":`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="erStart(${ja(g.id)})">Erfassen</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">${kaL(g)[1]}</button>${g.fach==="Sport"?`<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)},att:true})">Stundenstatus</button>`:""}</p>`}`}
 
 // Auf der Seite einer Schülerin, eines Schülers: Einträge dieser Lerngruppe
@@ -627,7 +635,7 @@ function addKa(gid){const g=groupById(gid);if(!g||g.arch)return;const PL=!!view.
   if(PL&&!plk(g).some(x=>x.k===k))return toast("Bitte die Art wählen.");const note=PL&&KMAP[k].pl==="n";
   const art=k==="pue"&&PUEART.includes(KD.art)?KD.art:null,t=KD.t.trim()||art||(PL?KMAP[k].t:""),max=note?null:parseP(KD.max);
   const pue=k==="pue"?{b:PUEB.includes(KD.b)?KD.b:"mot",...(art?{art}:{}),...(lastRg(g)?{rg:lastRg(g)}:{})}:{};
-  if(!t)return toast("Bitte einen Titel eintragen.");if(looksLikeName(t))toast("Bitte keine Namen in den Titel schreiben.");
+  if(!t)return toast("Bitte einen Titel eintragen.");nmWarn(t);
   if(!note&&!(max>0&&max<=1000))return toast("Bitte die Höchstpunktzahl eintragen, z. B. 40.");if(!okDate(KD.d))return toast("Bitte ein Datum wählen.");
   const a=touch({id:uid(),gid,t,d:KD.d,...(note?{}:{max,sk:Object.hasOwn(KASCHL,KD.sk)?KD.sk:"-"}),...(k?{k}:{}),...pue,r:{},...(g.demo?{demo:true}:{})});db.ka.push(a);KD=null;KE={kid:a.id,i:0,rg:0};save();
   go({tab:view.tab,group:gid,ka:gid,plm:PL,kad:a.id});if(note)go({...view,kae:true})}
@@ -677,7 +685,7 @@ function kaeV(){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g||g.arch
   if(KE.kid!==a.id)KE={kid:a.id,i:0,rg:0};KE.ein=false;
   return `<h1 class="sr">${esc(a.t)}</h1><div class="erhd"><button class="btn ghost" onclick="back()" aria-label="Zurück">‹</button><b>${esc(a.t)}</b>${hasNames()?`<button class="btn ss${NSHOW?"":" on"}" onclick="NSHOW=!NSHOW;render()" aria-pressed="${!NSHOW}">${NSHOW?"Namen aus":"Namen an"}</button>`:""}<button class="btn ss ic${SHOW?" on":""}" onclick="SHOW=!SHOW;render()" aria-pressed="${SHOW}" aria-label="${SHOW?"Noten verbergen":"Noten zeigen"}">${EYE}</button></div>
   ${a.k==="pue"&&rgUsed(a).length?rgBar(a,g,true):""}${kaCard(a,kaMs(a,g))}`}
-function kaCard(a,ms){if(KE.i>=ms.length){const nx=a.k==="pue"&&KE.rg?rgUsed(a).find(n=>n>KE.rg):null;return `<div class="card seqdone"><b style="font-size:1.2rem">${KE.rg?`Gruppe ${KE.rg} fertig`:"Alle durch"}</b>${plNote(a)?`<p style="margin:8px 0 0"><button class="btn block" onclick="back()">Zur Übersicht</button></p>`:""}<p>${plNote(a)?`${ms.filter(s=>kaNote(a,s.id)).length} von ${ms.length} bewertet`:`${kaSt(a).p} von ${ms.length} mit Punkten`}.</p>
+function kaCard(a,ms){if(KE.i>=ms.length){const nx=a.k==="pue"&&KE.rg?rgUsed(a).find(n=>n>KE.rg):null;return `<div class="card seqdone"><b style="font-size:1.2rem">${KE.rg?`Gruppe ${KE.rg} fertig`:"Alle durch"}</b><p>${plNote(a)?`${ms.filter(s=>kaNote(a,s.id)).length} von ${ms.length} bewertet`:`${kaSt(a).p} von ${ms.length} mit Punkten`}.</p>${plNote(a)?`<p style="margin:8px 0"><button class="btn block" onclick="back()">Zur Übersicht</button></p>`:""}
   ${nx?`<p><button class="btn pri block" onclick="KE.rg=${nx};KE.i=0;render()">Weiter mit Gruppe ${nx} ›</button></p>`:""}
   <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="KE.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="KE.i=0;render()">Von vorn</button></p></div>`;}
   const s=ms[KE.i],x=a.r[s.id]||{},zd=(s.profil||"r")==="zd",na=s.profil==="na",max=x.mx||a.max;
@@ -715,7 +723,7 @@ function kaMx(t){const {a,s}=kaCur();if(!s)return;const v=parseP(t),x={...(a.r[s
   if(v!=null&&x.p!=null&&x.p>v)return render(),toast("Es sind schon mehr Punkte eingetragen.");
   if(v==null)delete x.mx;else x.mx=v;a.r[s.id]=x;touch(a);save();render();kaFocus()}
 function kaNa(on){const {a,s}=kaCur();if(!s)return;a.r[s.id]={...(a.r[s.id]||{}),na:!!on};touch(a);save()}
-function kaNat(t){const {a,s}=kaCur();if(!s)return;const v=String(t).trim().slice(0,300);if(v&&looksLikeName(v.split(/\s+/)[0]))toast("Bitte keine Namen eintragen.");
+function kaNat(t){const {a,s}=kaCur();if(!s)return;const v=String(t).trim().slice(0,300);nmWarn(v);
   const x={...(a.r[s.id]||{})};if(v)x.nat=v;else delete x.nat;a.r[s.id]=x;touch(a);save()}
 function kaEdit(f,v){const a=kaById(view.kad),g=a&&groupById(a.gid);if(!a||!g||g.arch)return;
   if(f==="t"){const t=String(v).trim().slice(0,80);if(!t)return render(),toast("Der Titel darf nicht leer sein.");a.t=t}
@@ -847,12 +855,12 @@ gruppen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width
 profil:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1"/></svg>'};
 function renderNav(){$("#nav").innerHTML=[["heute","Heute"],["gruppen","Lerngruppen"],["profil","Einstellungen"]].map(([k,t])=>`<button class="${view.tab===k?"on":""}" ${view.tab===k?'aria-current="page"':""} onclick="navTo('${k}')">${ICON[k].replace("<svg ",'<svg aria-hidden="true" ')}${t}</button>`).join("")}
 // Verlauf der Ansichten: „Zurück“ führt dorthin, wo man herkam
-let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,!!v.plm,v.kad,!!v.kae,v.names,v.rl,v.rld,!!v.imp,v.kl,v.nkl]);
+let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,!!v.plm,v.kad,!!v.kae,v.names,v.rl,v.rld,!!v.imp,v.kl,v.nkl,!!v.att]);
 function go(v){const i=HIST.findIndex(h=>vkey(h)===vkey(v));if(i>=0)HIST.length=i;else if(view&&vkey(view)!==vkey(v))HIST.push(view);view=v;render();window.scrollTo(0,0)}
 function back(){view=HIST.pop()||{tab:view.tab};render();window.scrollTo(0,0)}
 function navTo(k){HIST=[];go({tab:k})}
 function render(){
-  renderNav();const a=$("#app");document.body.classList.toggle("erf",!!(view.erf||view.kae&&view.kad));
+  renderNav();const a=$("#app");document.body.classList.toggle("erf",!!(view.erf||view.kae&&view.kad));applyFs();
   if(view.imp)a.innerHTML=importV();
   else if(view.names||view.nkl)a.innerHTML=namesV();
   else if(view.erf)a.innerHTML=erfV();
@@ -1106,7 +1114,7 @@ function susV(){const s=susById(view.sus),g=groupById(view.group);if(!s||!g){vie
   ${ro?"":`<p><button class="btn ghost danger" onclick="removeFromGroup(${ja(g.id)},${ja(s.id)})">Aus ${esc(gName(g))} entfernen</button></p>`}`}
 async function setIcon(id){const s=susById(id),i=await pickIcon(s.icon,s.cls);if(!i)return;s.icon=i;touch(s);save();render()}
 function setProfil(id,p){const s=susById(id);s.profil=p;touch(s);save();render()}
-function setNA(id,v){const s=susById(id);if(looksLikeName(v.split(/\s+/)[0]||""))toast("Bitte keine Namen eintragen.");s.na=v.trim();touch(s);save();toast("Gespeichert")}
+function setNA(id,v){const s=susById(id);nmWarn(v);s.na=v.trim();touch(s);save();toast("Gespeichert")}
 function lezEd(s,g,dis){const f=fOf(g),lz=lezRoh(s,f),aus=!!s.lezAus?.includes(f);
   return `<label class="swr" style="margin-top:12px"><span class="grow">Nach Förderplanzielen bewerten (${f})<span class="sub">Aus: ${esc(s.code)} wird in ${f} wie alle anderen nach den Kriterien bewertet. Die Ziele bleiben gespeichert.</span></span><input type="checkbox" class="sw" ${aus?"":"checked"} ${dis} onchange="setLezAus(${ja(s.id)},${ja(f)},!this.checked)"></label>
   ${aus?"":`<label style="margin-top:12px">Förderplanziele ${f}</label><div class="sub">2 bis 4 Ziele aus dem Förderplan, kurz formuliert, ohne Diagnosen. In der Runde bewertest du für ${esc(s.code)} dann diese Ziele statt der Kriterien.</div>
@@ -1116,7 +1124,7 @@ function setLezAus(id,f,on){const s=susById(id);if(!s||!FAECHER.includes(f))retu
   touch(s);save();render();toast(on?`${s.code} wird in ${f} wie alle anderen bewertet`:`${s.code} wird in ${f} nach den Förderplanzielen bewertet`)}
 function lezSet(s,f,list){const o={...(s.lez||{})};if(list.length)o[f]=list;else delete o[f];if(Object.keys(o).length)s.lez=o;else delete s.lez;touch(s);save();render()}
 function lezAdd(id,f){const s=susById(id);if(!s||!FAECHER.includes(f))return;const t=String($("#lezNeu")?.value||"").trim().slice(0,120),l=s.lez?.[f]||[];
-  if(!t)return toast("Bitte ein Ziel eintragen.");if(l.length>=4)return toast("Höchstens 4 Ziele.");if(looksLikeName(t.split(/\s+/)[0]))toast("Bitte keine Namen eintragen.");
+  if(!t)return toast("Bitte ein Ziel eintragen.");if(l.length>=4)return toast("Höchstens 4 Ziele.");nmWarn(t);
   lezSet(s,f,[...l,{id:uid(),t}]);requestAnimationFrame(()=>$("#lezNeu")?.focus())}
 function lezEdit(id,f,zid,v){const s=susById(id);if(!s||!FAECHER.includes(f))return;const t=String(v).trim().slice(0,120);if(!t)return render(),toast("Das Ziel darf nicht leer sein. Zum Entfernen ✕ tippen.");
   lezSet(s,f,(s.lez?.[f]||[]).map(z=>z.id===zid?{...z,t}:z));toast("Gespeichert")}
@@ -1212,7 +1220,7 @@ function profilV(){
   <div class="card"><b>Erscheinungsbild</b><div class="pick" style="margin-top:10px">${[["system","Wie Gerät"],["light","Hell"],["dark","Dunkel"]].map(([k,t])=>`<button class="${(db.theme||"system")===k?"on":""}" onclick="db.theme='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div>
   <div class="sub" style="margin:14px 0 6px;font-weight:700">Schriftgröße</div><div class="pick">${[["m","Normal"],["l","Groß"],["xl","Sehr groß"]].map(([k,t])=>`<button class="${(db.fs||"m")===k?"on":""}" onclick="db.fs='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div></div>
   ${lockV()}
-  <div class="card"><h2 style="margin-top:0">Kriterien Mathe</h2><p class="small muted" style="margin:0">Nach SILP Mathe 4.2. Ankertexte siehst du beim Erfassen.</p>
+  <div class="card"><h2 style="margin-top:0">Kriterien und Gewichte</h2><p class="small muted" style="margin:0">Mathe nach SILP Mathe 4.2, Sport nach SILP Sport Kap. 3. Ankertexte siehst du beim Erfassen über das Fragezeichen.</p>
   <label class="swr"><span class="grow">Hausaufgaben (LZ-Aufgaben) bewerten<span class="sub">Aus, solange es an der Schule keine Hausaufgaben gibt.</span></span><input type="checkbox" class="sw" ${db.hausa?"checked":""} onchange="db.hausa=this.checked;save();render()"></label>
   <label class="swr"><span class="grow">Werkzeuge bewerten<span class="sub">Dann steht „Werkzeuge“ mit in der Runde.</span></span><input type="checkbox" class="sw" ${db.werkz?"checked":""} onchange="db.werkz=this.checked;save();render()"></label>
   <div class="sub" style="margin:14px 0 4px;font-weight:700">Gewicht im Notenvorschlag</div><p class="small muted" style="margin:0 0 6px">Jedes Kriterium zählt einmal, egal wie oft du es erfasst. Qualität zählt standardmäßig doppelt, damit Qualität vor Beteiligung geht. Hier kannst du das ändern.</p>
@@ -1222,10 +1230,10 @@ function profilV(){
   ${Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<div class="row" style="margin:6px 0"><label for="stw${v}" class="grow" style="margin:0"><b>${x.t}</b> ${x.l}</label><input id="stw${v}" inputmode="decimal" style="width:6em;text-align:right" value="${String(stw()[v]).replace(".",",")}" onchange="setStw('${v}',this.value)"></div>`).join("")}
   <p class="small muted" style="margin:6px 0 0">Der Notenwert steht klein auf jedem Knopf. Einen Notenvorschlag gibt es ab 3 Beobachtungen in mindestens 2 Kriterien. Bezug zum SILP: „erfüllt“ heißt Anker „gut“ erreicht, „kaum erfüllt“ heißt Anker „ausreichend“ nicht erreicht.${db.stw?` <button class="btn ghost small" onclick="delete db.stw;save();render()">Zurücksetzen</button>`:""}</p></div>
   <div class="card"><h2 style="margin-top:0">Schriftliche Leistungen</h2><p class="small muted" style="margin:0">Klassenarbeiten in Mathe, schriftliche Überprüfungen in Sport. Notenschlüssel nach SILP Mathe 4.3 (Mindestprozent für 1 bis 5): ohne Kursdifferenzierung 85/70/55/40/20, E- und G-Kurs 87/73/59/45/18. Den Schlüssel wählst du pro Arbeit.</p>
-  <div class="sub" style="margin:14px 0 4px;font-weight:700">Anteil am Gesamtvorschlag</div><p class="small muted" style="margin:0 0 6px">Der Rest ist die Sonstige Mitarbeit. Mathe laut SILP: 60 %. Sport zählt erst ab Version 0.5.</p>
+  <div class="sub" style="margin:14px 0 4px;font-weight:700">Anteil am Gesamtvorschlag</div><p class="small muted" style="margin:0 0 6px">Der Rest ist die Sonstige Mitarbeit. Mathe laut SILP: 60 %.</p>
   ${FAECHER.map(f=>`<div style="margin:8px 0"><div class="small" style="font-weight:700;margin-bottom:4px">${f}</div><div class="pick" style="grid-template-columns:repeat(6,1fr)" role="group" aria-label="Anteil schriftlich ${f}">${[20,30,40,50,60,70].map(n=>`<button class="${kaw(f)===n?"on":""}" aria-pressed="${kaw(f)===n}" onclick="setKaw('${f}',${n})">${n} %</button>`).join("")}</div></div>`).join("")}
   <label class="swr"><span class="grow">Noten mit + und −<span class="sub">Jede Note wird in drei gleich große Punktbereiche geteilt. Das steht nicht im SILP, es ist deine Festlegung.</span></span><input type="checkbox" class="sw" ${kaTend()?"checked":""} onchange="db.kaTend=this.checked;save();render()"></label></div>
-  <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length+db.asv.length} Einträge · ${db.ka.length} Klassenarbeiten · ${db.rl.length} Rücklauf-Listen auf diesem Gerät</p>
+  <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length+db.asv.length} Einträge · ${db.ka.filter(a=>!a.k).length} Klassenarbeiten und Überprüfungen · ${db.ka.filter(a=>a.k).length} gesonderte Leistungen · ${db.rl.length} Rücklauf-Listen auf diesem Gerät</p>
   ${mtip("backup")}<p class="row" style="flex-wrap:wrap"><button class="btn pri${mk("backup")}" onclick="exportJSON()">Sicherung speichern</button><button class="btn" onclick="$('#imp').click()">Sicherung laden</button></p>
   <input type="file" id="imp" accept=".json,application/json" hidden onchange="importJSON(this)">
   ${db.lock&&LKEY?`<p class="row" style="flex-wrap:wrap"><button class="btn" ${hasNames()?"":"disabled"} onclick="exportNames()">Namensliste sichern</button><button class="btn" onclick="$('#imp').click()">Namensliste laden</button></p><p class="muted small">${Object.keys(NAMES).length} Namen auf diesem Gerät. Die Namensliste ist eine eigene Datei mit demselben Passwort. Bewahre sie getrennt von der Sicherung auf.</p>`:""}
@@ -1233,7 +1241,7 @@ function profilV(){
   ${db.bsalt?`<p class="small">Sicherungs-Passwort ist auf diesem Gerät gemerkt. <button class="btn ghost small" onclick="forgetBackupPw()">Vergessen</button></p>`:""}
   ${mtip("demo")}<p class="row" style="flex-wrap:wrap">${db.groups.some(g=>g.demo)?`<button class="btn" onclick="delDemo()">Beispielklasse entfernen</button>`:`<button class="btn${mk("demo")}" onclick="demo()">Fiktive Beispielklasse laden</button>`}</p>
   <p><button class="btn ghost danger" onclick="wipe()">Alle Daten auf diesem Gerät löschen</button></p></div>
-  <div class="card"><h2 style="margin-top:0">Aufbewahrung</h2><p class="small">Noten und Beobachtungen bewahrst du ${FRIST_JAHRE} Jahre auf, gerechnet ab Ende des Kalenderjahres, in dem die Lerngruppe archiviert wurde (VO-DV I § 9 Abs. 1). SoMi erinnert dich, wenn die Frist abgelaufen ist. Gelöscht wird nur nach deiner Bestätigung.</p><p class="muted small">Die Frist bitte mit der:dem Datenschutzbeauftragten bestätigen.</p></div>
+  <div class="card"><h2 style="margin-top:0">Aufbewahrung</h2><p class="small">Noten und Beobachtungen bewahrst du ${FRIST_JAHRE} Jahre auf, gerechnet ab Ende des Kalenderjahres, in dem die Lerngruppe archiviert wurde (VO-DV I § 9 Abs. 1). SoMi erinnert dich, wenn die Frist abgelaufen ist. Gelöscht wird nur nach deiner Bestätigung.</p></div>
   <div class="card"><h2 style="margin-top:0">Datenschutz</h2>
   <p>Die Daten liegen nur auf diesem Gerät. Sie verlassen es nur als verschlüsselte Sicherungsdatei.</p>
   <p>Schüler:innen haben ein Kürzel (z. B. 7B-01). Namen kannst du getrennt eintragen: nur mit App-Sperre, verschlüsselt, nicht in der normalen Sicherung.</p>

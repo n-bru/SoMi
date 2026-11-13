@@ -361,6 +361,19 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   {const vp=p.viewportSize();await p.setViewportSize({width:375,height:548});
   ok(await p.evaluate(()=>[...document.querySelectorAll("#app > *")].pop().getBoundingClientRect().bottom<=document.querySelector("nav").getBoundingClientRect().top),"375×548: Heute mit 6 Gruppen und Rücklauf ohne Scrollen");await p.setViewportSize(vp)}
   await p.evaluate(()=>{db.groups=db.groups.filter(g=>!g.id.startsWith("t"));db.rl=db.rl.filter(a=>a.id!=="trl");save()});
+  // 0.5.9 Fehlerpaket
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");SHOW=true;go({tab:"gruppen",group:g.id,ov:g.id})});
+  ok(await p.locator("text=${").count()===0&&await p.locator("text=Klassenarbeiten 60 %").count()>0,"Übersicht: Gewichtung lesbar, kein Platzhalter");
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Sport");HIST=[];go({tab:"gruppen",group:g.id});go({tab:"gruppen",group:g.id,ov:g.id});go({tab:"gruppen",group:g.id,ov:g.id,att:true});back()});
+  ok(await p.evaluate(()=>!!view.ov&&!view.att),"Zurück aus Stundenstatus-Übersicht führt zur Übersicht");
+  ok(await p.evaluate(()=>!nameIn("Tafel super erklärt")&&!nameIn("Handstand")&&nameIn("hilft testname beim Aufbau")),"Namens-Warnung nur bei Wörtern aus der Namensliste");
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");ER=erNeu(g.id,"e");go({tab:"gruppen",group:g.id,erf:g.id})});
+  await p.locator(".tile",{hasText:"DEMO-05"}).click();
+  ok(await p.locator(".mxz").count()>0&&await p.locator(".seqsus:has-text('DEMO-05')").count()===1,"Einzeln: LE mit Zielen führt zur Zielbewertung");
+  await p.evaluate(()=>{db.fs="xl";applyTheme();render()});
+  ok(await p.evaluate(()=>!document.documentElement.dataset.fs&&[...document.querySelectorAll(".mx button[data-s]")].every(b=>b.getBoundingClientRect().height>=40)),"Erfassen bleibt bei sehr großer Schrift bedienbar");
+  await p.evaluate(()=>{back();render()});ok(await p.evaluate(()=>document.documentElement.dataset.fs==="xl"),"sonst gilt die große Schrift");
+  await p.evaluate(()=>{db.fs="m";applyTheme();render()});
   ok(!errs.length,"keine Fehler in der Konsole"+(errs.length?": "+errs.join(" | "):""));
   for(const w of [390,820,1280]){await p.setViewportSize({width:w,height:900});await nav("Heute");await p.screenshot({path:path.join(require("os").tmpdir(),`somi-${w}.png`),fullPage:true})}
   await b.close();srv.close();console.log("Alle Prüfungen bestanden.")})().catch(e=>{console.error(e.message);process.exit(1)});
