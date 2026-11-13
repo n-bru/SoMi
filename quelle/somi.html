@@ -181,7 +181,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.9",SOMI_STAND="13.11.2026";
+const SOMI_VERSION="0.5.10",SOMI_STAND="13.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -191,22 +191,43 @@ let db;
 // Mit App-Sperre liegt im Speicher nur ein verschlüsselter Umschlag {somiEnc,salt,iv,ct}; db bleibt bis zum Entsperren leer
 let ENCWAIT=null,LKEY=null;
 const leer=()=>({v:1,sus:[],groups:[],obs:[],att:[],ka:[],asv:[],rl:[],del:[]});
-function load(){try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-  if(db?.somiEnc){ENCWAIT=db;db={...leer(),lock:{salt:ENCWAIT.salt,after:ENCWAIT.after??1,len:ENCWAIT.len||4}}}
+/* 0.5.10: Die Daten liegen in IndexedDB statt im Browserspeicher (localStorage hat nur etwa 5 MB, und Beta und Hauptversion teilen ihn).
+   Gespeichert wird derselbe Text wie vorher (verschlüsselter Umschlag oder JSON). Alte Daten zieht SoMi beim ersten Start einmal um
+   und löscht die alte Kopie erst, wenn die neue nachweislich gelesen werden kann. Geht IndexedDB nicht, bleibt alles im localStorage. */
+let STORE="ls",SIZE=0;
+async function rawRead(){if(STORE==="idb"){const v=await idbGet(KEY);if(typeof v==="string")return v}return localStorage.getItem(KEY)}
+async function rawWrite(t){if(STORE==="idb"){await idbSet(KEY,t);SIZE=t.length;return}localStorage.setItem(KEY,t);SIZE=t.length}
+async function rawDel(){try{if(STORE==="idb")await idbSet(KEY,null)}catch(e){}try{localStorage.removeItem(KEY)}catch(e){}}
+async function load(){let t=null;
+  try{t=await idbGet(KEY);if(typeof t!=="string"){t=null;const old=localStorage.getItem(KEY);
+      if(old){await idbSet(KEY,old);if(await idbGet(KEY)===old){localStorage.removeItem(KEY);t=old}else throw 0}}
+    STORE="idb"}
+  catch(e){STORE="ls";t=localStorage.getItem(KEY)}
+  SIZE=t?t.length:0;db=null;try{db=JSON.parse(t)}catch(e){}
+  if(db?.somiEnc){ENCWAIT=db;db={...leer(),lock:{salt:ENCWAIT.salt,after:ENCWAIT.after??1,len:ENCWAIT.len||4},lastBackup:ENCWAIT.lb||0}}
   migrate()}
-function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db=leer();db.del??=[];if(!Array.isArray(db.obs))db.obs=[];if(!Array.isArray(db.att))db.att=[];if(!Array.isArray(db.ka))db.ka=[];if(!Array.isArray(db.asv))db.asv=[];if(!Array.isArray(db.rl))db.rl=[];
-  const n=db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length+db.rl.length;db.sus=db.sus.filter(okSus);db.groups=db.groups.filter(okGroup);db.obs=db.obs.filter(okObs);db.att=db.att.filter(okAtt);db.ka=db.ka.filter(okKa);db.asv=db.asv.filter(okAsv);db.rl=db.rl.filter(okRl);
-  if(db.sus.length+db.groups.length+db.obs.length+db.att.length+db.ka.length+db.asv.length+db.rl.length<n)setTimeout(()=>toast("Beschädigte Einträge wurden beiseitegelegt."),600)}
+/* 0.5.10: Einträge, die die Prüfung nicht bestehen, werden nicht mehr gelöscht, sondern in db.quar zurückgelegt (mit Sicherung).
+   Bei jedem Start werden sie erneut geprüft und kommen zurück, sobald sie wieder gültig sind (z. B. nach einer Korrektur in SoMi). */
+const LISTEN={sus:okSus,groups:okGroup,obs:okObs,att:okAtt,ka:okKa,asv:okAsv,rl:okRl};
+function migrate(){if(!db||!Array.isArray(db.sus)||!Array.isArray(db.groups))db={...leer(),...(db&&typeof db==="object"&&!Array.isArray(db)?db:{}),sus:Array.isArray(db?.sus)?db.sus:[],groups:Array.isArray(db?.groups)?db.groups:[]};
+  db.del??=[];for(const k in LISTEN)if(!Array.isArray(db[k]))db[k]=[];
+  const q=(Array.isArray(db.quar)?db.quar:[]).filter(x=>x&&Object.hasOwn(LISTEN,x.a));let neu=0;
+  for(const x of q.splice(0))if(x.x&&LISTEN[x.a](x.x)&&!db[x.a].some(y=>y?.id===x.x.id))db[x.a].push(x.x);else q.push(x);
+  for(const k in LISTEN){const ok=[];for(const x of db[k])if(LISTEN[k](x))ok.push(x);else{q.push({a:k,x});neu++}db[k]=ok}
+  if(q.length)db.quar=q.slice(-5000);else delete db.quar;
+  if(neu)setTimeout(()=>toast(`${neu} beschädigte ${neu===1?"Eintrag wurde":"Einträge wurden"} zurückgelegt. Sie bleiben gespeichert (Einstellungen → Daten).`),600)}
 // 0.5.9: Erfassen-Seiten immer in normaler Schrift, sonst passen die Knöpfe nicht mehr
 function applyFs(){const r=document.documentElement;if((db?.fs==="l"||db?.fs==="xl")&&!document.body.classList.contains("erf"))r.dataset.fs=db.fs;else delete r.dataset.fs}
 function applyTheme(){const t=db?.theme,r=document.documentElement;if(t==="light"||t==="dark")r.dataset.theme=t;else delete r.dataset.theme;
   applyFs();
   const dark=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme:dark)").matches);document.querySelector('meta[name=theme-color]')?.setAttribute("content",dark?"#14201b":"#f5f6f1")}
 let SAVEQ=Promise.resolve(),SAVEN=0;
-function save(){if(ENCWAIT)return; // gesperrt und noch nicht entschlüsselt: nichts überschreiben
-  if(db.lock&&LKEY){const n=++SAVEN,key=LKEY,json=JSON.stringify(db),meta={somiEnc:1,salt:db.lock.salt,after:db.lock.after,len:db.lock.len};
-    SAVEQ=SAVEQ.then(async()=>{const body=await gcm(key,enc(json));if(n===SAVEN)localStorage.setItem(KEY,JSON.stringify({...meta,...body}))}).catch(()=>toast("Speichern nicht möglich. Bitte sichern."))}
-  else try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast("Speichern nicht möglich. Bitte sichern.")}}
+let WIPED=false; // 0.5.10: gesperrt, Daten und Schlüssel aus dem Arbeitsspeicher entfernt
+function save(){if(ENCWAIT||WIPED)return; // gesperrt und noch nicht entschlüsselt: nichts überschreiben
+  const n=++SAVEN,fail=()=>toast("Speichern nicht möglich. Bitte sofort eine Sicherung speichern.");
+  if(db.lock&&LKEY){const key=LKEY,json=JSON.stringify(db),meta={somiEnc:1,salt:db.lock.salt,after:db.lock.after,len:db.lock.len,lb:db.lastBackup||0};
+    SAVEQ=SAVEQ.then(async()=>{const body=await gcm(key,enc(json));if(n===SAVEN)await rawWrite(JSON.stringify({...meta,...body}))}).catch(fail)}
+  else{const json=JSON.stringify(db);SAVEQ=SAVEQ.then(()=>n===SAVEN?rawWrite(json):0).catch(fail)}}
 
 /* ===== Helfer ===== */
 const $=s=>document.querySelector(s);
@@ -368,6 +389,7 @@ const fmtW=x=>String(x).replace(".",",");
 const genug=a=>a.length>=3&&new Set(a.map(okey)).size>=2;
 const vorschlag=a=>genug(a)?noteTxt(noteMean(a)):"–";
 function noteMean(a){let s=0,w=0;for(const k of new Set(a.map(okey))){const g=kgw(k);s+=g*mean(a.filter(o=>okey(o)===k));w+=g}return w?s/w:null}
+const fmtMB=n=>(n/1e6<.1?"unter 0,1":(n/1e6).toFixed(1).replace(".",","))+" MB";
 const fmt1=x=>x==null?"–":x.toFixed(1).replace(".",",");
 // Sichtschutz: Noten sind nach jedem Start verborgen, bis du sie zeigst
 let SHOW=false;
@@ -858,7 +880,7 @@ let HIST=[];const vkey=v=>JSON.stringify([v.tab,v.group,v.sus,v.erf,v.ov,v.ka,!!
 function go(v){const i=HIST.findIndex(h=>vkey(h)===vkey(v));if(i>=0)HIST.length=i;else if(view&&vkey(view)!==vkey(v))HIST.push(view);view=v;render();window.scrollTo(0,0)}
 function back(){view=HIST.pop()||{tab:view.tab};render();window.scrollTo(0,0)}
 function navTo(k){HIST=[];go({tab:k})}
-function render(){
+function render(){if(WIPED)return; // gesperrt: Ansicht bleibt stehen, bis entsperrt ist
   renderNav();const a=$("#app");document.body.classList.toggle("erf",!!(view.erf||view.kae&&view.kad));applyFs();
   if(view.imp)a.innerHTML=importV();
   else if(view.names||view.nkl)a.innerHTML=namesV();
@@ -883,7 +905,7 @@ function dlg(html,onMount){return new Promise(res=>{const el=document.createElem
 async function ask(msg,o={}){const r=await dlg(`<p style="font-weight:700;font-size:1.05rem;margin:0 0 ${o.sub?6:16}px">${esc(msg)}</p>${o.sub?`<p class="small muted" style="margin:0 0 16px">${esc(o.sub)}</p>`:""}
   <div class="duo"><button class="btn" data-a="0">${esc(o.cancel||"Abbrechen")}</button><button class="btn pri" data-a="1" style="${o.danger?"background:var(--down);border-color:var(--down)":""}">${esc(o.ok||"OK")}</button></div>`,
   (el,done)=>{el.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>done(b.dataset.a==="1"));el.querySelector('[data-a="1"]').focus()});return r===true}
-async function askText(msg,ph,type){return dlg(`<p style="font-weight:700;margin:0 0 10px">${esc(msg)}</p><input id="dlgIn" type="${type||"text"}" autocomplete="${type==="password"?"current-password":"off"}" placeholder="${esc(ph||"")}">
+async function askText(msg,ph,type,sub){return dlg(`<p style="font-weight:700;margin:0 0 10px">${esc(msg)}</p>${sub?`<p class="small muted" style="margin:-4px 0 10px">${sub}</p>`:""}<input id="dlgIn" type="${type||"text"}" autocomplete="${type==="password"?"current-password":"off"}" placeholder="${esc(ph||"")}">
   <div class="duo" style="margin-top:14px"><button class="btn" data-a="0">Abbrechen</button><button class="btn pri" data-a="1">OK</button></div>`,
   (el,done)=>{const i=el.querySelector("#dlgIn");i.focus();i.onkeydown=e=>{if(e.key==="Enter")done(i.value)};el.querySelector('[data-a="0"]').onclick=()=>done(null);el.querySelector('[data-a="1"]').onclick=()=>done(i.value)})}
 
@@ -1233,6 +1255,8 @@ function profilV(){
   ${FAECHER.map(f=>`<div style="margin:8px 0"><div class="small" style="font-weight:700;margin-bottom:4px">${f}</div><div class="pick" style="grid-template-columns:repeat(6,1fr)" role="group" aria-label="Anteil schriftlich ${f}">${[20,30,40,50,60,70].map(n=>`<button class="${kaw(f)===n?"on":""}" aria-pressed="${kaw(f)===n}" onclick="setKaw('${f}',${n})">${n} %</button>`).join("")}</div></div>`).join("")}
   <label class="swr"><span class="grow">Noten mit + und −<span class="sub">Jede Note wird in drei gleich große Punktbereiche geteilt. Das steht nicht im SILP, es ist deine Festlegung.</span></span><input type="checkbox" class="sw" ${kaTend()?"checked":""} onchange="db.kaTend=this.checked;save();render()"></label></div>
   <div class="card"><h2 style="margin-top:0">Daten</h2><p class="muted">${db.groups.length} Lerngruppen · ${db.sus.length} Schüler:innen · ${db.obs.length+db.asv.length} Einträge · ${db.ka.filter(a=>!a.k).length} Klassenarbeiten und Überprüfungen · ${db.ka.filter(a=>a.k).length} gesonderte Leistungen · ${db.rl.length} Rücklauf-Listen auf diesem Gerät</p>
+  <p class="small muted" style="margin-top:-2px">Datenmenge ${fmtMB(SIZE)} · ${STORE==="idb"?"Speicher der App (IndexedDB)":`Browserspeicher, Platz für etwa 5 MB${SIZE>3e6?" – <b style=\"color:var(--down)\">fast voll, bitte sichern</b>":""}`}</p>
+  ${db.quar?.length?`<p class="small" style="color:var(--sigt);font-weight:700">${db.quar.length} beschädigte ${db.quar.length===1?"Eintrag ist":"Einträge sind"} zurückgelegt. ${db.quar.length===1?"Er bleibt":"Sie bleiben"} gespeichert und ${db.quar.length===1?"steht":"stehen"} in der Sicherung.</p>`:""}
   ${mtip("backup")}<p class="row" style="flex-wrap:wrap"><button class="btn pri${mk("backup")}" onclick="exportJSON()">Sicherung speichern</button><button class="btn" onclick="$('#imp').click()">Sicherung laden</button></p>
   <input type="file" id="imp" accept=".json,application/json" hidden onchange="importJSON(this)">
   ${db.lock&&LKEY?`<p class="row" style="flex-wrap:wrap"><button class="btn" ${hasNames()?"":"disabled"} onclick="exportNames()">Namensliste sichern</button><button class="btn" onclick="$('#imp').click()">Namensliste laden</button></p><p class="muted small">${Object.keys(NAMES).length} Namen auf diesem Gerät. Die Namensliste ist eine eigene Datei mit demselben Passwort. Bewahre sie getrennt von der Sicherung auf.</p>`:""}
@@ -1260,9 +1284,10 @@ async function pwKey(pw,salt){const base=await crypto.subtle.importKey("raw",enc
   return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:310000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
 async function gcm(key,data){const iv=rnd(12);return {iv:b64(iv),ct:b64(await crypto.subtle.encrypt({name:"AES-GCM",iv},key,data))}}
 const ungcm=(key,o)=>crypto.subtle.decrypt({name:"AES-GCM",iv:unb64(o.iv)},key,unb64(o.ct));
-async function idb(){return new Promise((ok,no)=>{const r=indexedDB.open("somi",1);r.onupgradeneeded=()=>r.result.createObjectStore("h");r.onsuccess=()=>ok(r.result);r.onerror=no})}
-async function idbGet(k){const d=await idb();return new Promise(ok=>{const r=d.transaction("h").objectStore("h").get(k);r.onsuccess=()=>ok(r.result);r.onerror=()=>ok(null)})}
-async function idbSet(k,v){const d=await idb();return new Promise(ok=>{const t=d.transaction("h","readwrite");v==null?t.objectStore("h").delete(k):t.objectStore("h").put(v,k);t.oncomplete=ok})}
+let IDBC=null;
+function idb(){return IDBC||=new Promise((ok,no)=>{const r=indexedDB.open("somi",1);r.onupgradeneeded=()=>r.result.createObjectStore("h");r.onsuccess=()=>{const d=r.result;d.onclose=()=>{IDBC=null};ok(d)};r.onerror=()=>{IDBC=null;no(r.error)};r.onblocked=()=>{IDBC=null;no(new Error("blocked"))}})}
+async function idbGet(k){const d=await idb();return new Promise((ok,no)=>{const r=d.transaction("h").objectStore("h").get(k);r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function idbSet(k,v){const d=await idb();return new Promise((ok,no)=>{const t=d.transaction("h","readwrite");v==null?t.objectStore("h").delete(k):t.objectStore("h").put(v,k);t.oncomplete=()=>ok();t.onerror=t.onabort=()=>no(t.error)})}
 async function askNewPw(msg){const pw=await askText(msg,"Passwort (mind. 8 Zeichen)","password");if(!pw)return null;if(pw.length<8){toast("Mindestens 8 Zeichen");return null}
   if(await askText("Passwort wiederholen","Passwort","password")!==pw){toast("Passwörter sind verschieden");return null}return pw}
 // Passwort einmal festlegen; der daraus abgeleitete Schlüssel bleibt nicht auslesbar auf dem Gerät
@@ -1347,7 +1372,7 @@ const FAILKEY=KEY+"-sperre";try{({n:LOCKFAIL=0,bis:LOCKWAIT=0}=JSON.parse(localS
 const saveFail=()=>{try{LOCKFAIL?localStorage.setItem(FAILKEY,JSON.stringify({n:LOCKFAIL,bis:LOCKWAIT})):localStorage.removeItem(FAILKEY)}catch(e){}};
 async function codeKey(code,salt){const base=await crypto.subtle.importKey("raw",enc(code),"PBKDF2",false,["deriveKey"]);
   return crypto.subtle.deriveKey({name:"PBKDF2",salt:unb64(salt),iterations:600000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
-async function tryCode(c){const raw=ENCWAIT||JSON.parse(localStorage.getItem(KEY)||"null");if(!raw?.somiEnc)return null;
+async function tryCode(c){await SAVEQ.catch(()=>{});let raw=ENCWAIT;if(!raw)try{raw=JSON.parse(await rawRead()||"null")}catch(e){}if(!raw?.somiEnc)return null;
   try{const key=await codeKey(c,raw.salt);return {key,data:JSON.parse(dec(await ungcm(key,raw)))}}catch(e){return null}}
 function askCode(msg,sub){return dlg(`<p style="font-weight:700;margin:0 0 6px">${esc(msg)}</p>${sub?`<p class="small muted" style="margin:0 0 10px">${sub}</p>`:""}<input id="dlgIn" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="4 bis 6 Ziffern">
   <div class="duo" style="margin-top:14px"><button class="btn" data-a="0">Abbrechen</button><button class="btn pri" data-a="1">OK</button></div>`,
@@ -1368,7 +1393,10 @@ async function setLock(change){if(!crypto.subtle){toast("In dieser Ansicht nicht
 async function offLock(){if(!await ask("App-Sperre wirklich ausschalten?",{ok:"Ausschalten",danger:true,sub:"Danach liegen Noten und Beobachtungen unverschlüsselt im Speicher dieses Geräts. Eingetragene Namen werden gelöscht."}))return render();
   const c=await askCode("Zum Ausschalten Code eingeben");
   if(c!=null&&await tryCode(c)){delete db.lock;LKEY=null;dropNames();save();render();toast("App-Sperre ist aus")}else{render();if(c)toast("Code falsch")}}
-function lockNow(){if(!db.lock)return;LOCKED=true;LOCKIN="";document.body.classList.add("locked");document.activeElement?.blur?.();renderLock()}
+// 0.5.10: Beim Sperren verschwinden Schlüssel, Noten und Namen aus dem Arbeitsspeicher. Die Sperre ist dann mehr als ein Vorhang.
+function lockNow(){if(!db.lock)return;
+  if(LKEY&&!ENCWAIT&&!WIPED){save();WIPED=true;LKEY=null;NAMES={};db={...leer(),lock:{...db.lock},theme:db.theme,fs:db.fs,lastBackup:db.lastBackup}}
+  LOCKED=true;LOCKIN="";document.body.classList.add("locked");document.activeElement?.blur?.();renderLock()}
 function renderLock(msg,busy){let el=$("#lock");if(!LOCKED){el?.remove();return}
   if(!el){el=document.createElement("div");el.id="lock";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","SoMi ist gesperrt");document.body.appendChild(el)}
   const wait=Math.ceil((LOCKWAIT-Date.now())/1000),len=db.lock.len||4;
@@ -1380,17 +1408,20 @@ function renderLock(msg,busy){let el=$("#lock");if(!LOCKED){el?.remove();return}
 let LOCKBUSY=false;
 async function lockPress(d){if(LOCKWAIT>Date.now()||LOCKBUSY)return;const len=db.lock.len||4;if(LOCKIN.length>=len)return;LOCKIN+=d;renderLock();if(LOCKIN.length<len)return;
   LOCKBUSY=true;renderLock("",true);const r=await tryCode(LOCKIN);LOCKBUSY=false;LOCKIN="";
-  if(r){LOCKFAIL=0;LOCKWAIT=0;saveFail();LKEY=r.key;if(ENCWAIT){ENCWAIT=null;db=r.data;migrate();applyTheme();await loadNames(r.key)}LOCKED=false;document.body.classList.remove("locked");renderLock();render();return}
+  if(r){LOCKFAIL=0;LOCKWAIT=0;saveFail();LKEY=r.key;if(ENCWAIT||WIPED){ENCWAIT=null;WIPED=false;db=r.data;migrate();applyTheme();await loadNames(r.key)}LOCKED=false;document.body.classList.remove("locked");renderLock();render();return}
   LOCKFAIL++;if(LOCKFAIL>=5)LOCKWAIT=Date.now()+30000*2**Math.min(LOCKFAIL-5,10);saveFail();try{navigator.vibrate?.(80)}catch(e){}renderLock("Falscher Code. Versuch es noch einmal.")}
-async function lockForgot(){if(!await ask("Code vergessen?",{ok:"Alles löschen",danger:true,sub:"Ohne Code lassen sich die Daten nicht entschlüsseln. Du kannst alles auf diesem Gerät löschen und danach deine letzte Sicherung laden."}))return;
-  const keep=ENCWAIT?{}:db;ENCWAIT=null;LKEY=null;
+// 0.5.10: Löschen nur, wenn LÖSCHEN eingetippt wird. Sonst könnte jemand am fremden iPad mit zwei Tipps alle Noten löschen.
+async function lockForgot(){const lb=db.lastBackup;
+  const v=await askText("Code vergessen? Dann lassen sich die Daten nicht mehr entschlüsseln.",'LÖSCHEN eintippen',null,`Du kannst alles auf diesem Gerät löschen und danach deine letzte Sicherung laden. ${lb?`Letzte Sicherung: ${dDEy(iso(new Date(lb)))}.`:"Eine Sicherung ist nicht bekannt."} Zum Löschen tippe <b>LÖSCHEN</b> ein.`);
+  if(v==null)return;if(v.trim().toUpperCase()!=="LÖSCHEN")return toast("Nichts gelöscht.");
+  const keep=ENCWAIT||WIPED?{theme:db.theme,fs:db.fs}:db;ENCWAIT=null;WIPED=false;LKEY=null;
   db={...leer(),theme:keep.theme,fs:keep.fs,bsalt:keep.bsalt,setupDone:keep.setupDone};migrate();
-  localStorage.removeItem(KEY);dropNames();save();LOCKED=false;document.body.classList.remove("locked");renderLock();applyTheme();go({tab:"profil"});toast("Alles gelöscht. Lade jetzt deine letzte Sicherung und schalte die Sperre wieder ein.")}
+  await rawDel();dropNames();save();LOCKED=false;document.body.classList.remove("locked");renderLock();applyTheme();go({tab:"profil"});toast("Alles gelöscht. Lade jetzt deine letzte Sicherung und schalte die Sperre wieder ein.")}
 document.addEventListener("visibilitychange",()=>{if(!db?.lock)return;if(document.hidden){HIDDEN_AT=Date.now();if(!db.lock.after)lockNow()}
   else if(!LOCKED&&HIDDEN_AT&&Date.now()-HIDDEN_AT>=db.lock.after*6e4)lockNow()});
 document.addEventListener("keydown",e=>{if(!LOCKED||e.target.closest?.(".cele"))return;if(/^\d$/.test(e.key))lockPress(e.key);else if(e.key==="Backspace"){LOCKIN=LOCKIN.slice(0,-1);renderLock()}});
 
-load();applyTheme();matchMedia("(prefers-color-scheme:dark)").addEventListener?.("change",applyTheme);if(db.lock)lockNow();render();
+(async()=>{await load();applyTheme();matchMedia("(prefers-color-scheme:dark)").addEventListener?.("change",applyTheme);if(db.lock)lockNow();render()})();
 </script>
 </body>
 </html>

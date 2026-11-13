@@ -12,7 +12,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   // Beim Erfassen ist die Menüleiste ausgeblendet (ab 0.4.5): erst zurück, dann Menü
   const nav=async x=>{while(await p.evaluate(()=>document.body.classList.contains("erf")))await p.click(".erhd button[aria-label='Zurück']");await p.click("nav >> text="+x)};
   const dlgIn=async v=>{await p.fill("#dlgIn",v);await p.press("#dlgIn","Enter")};
-  await p.goto("http://localhost:8765/beta/");
+  await p.goto("http://localhost:8765/beta/");await p.waitForSelector("h1");
   ok(await p.locator("h1",{hasText:"Heute"}).count()===1,"Startseite Heute");
   ok(await p.locator("text=Einrichtung: noch 3 von 3").count()===1,"Einrichtung mit 3 Schritten");
   // 1. App-Sperre
@@ -20,7 +20,8 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.locator('input.sw').first().check();
   await dlgIn("2468");await dlgIn("2468");
   await p.waitForSelector("text=SoMi ist jetzt gesperrt und verschlüsselt");
-  const raw=await p.evaluate(()=>localStorage.getItem("somi-beta"));
+  await p.waitForTimeout(200);const raw=await p.evaluate(async()=>await idbGet(KEY));
+  ok(await p.evaluate(()=>STORE==="idb"&&localStorage.getItem("somi-beta")===null),"Daten liegen in IndexedDB, nicht im localStorage");
   ok(raw.includes('"somiEnc":1')&&!raw.includes("groups"),"Speicher verschlüsselt");
   // 2. Beispielklasse
   await p.click("button:has-text('Fiktive Beispielklasse laden')");
@@ -58,7 +59,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.locator(".card.tap",{hasText:"7B Mathe E"}).count()===0,"Gruppe gelöscht");
   // Laden: Löschung bleibt (neuere Löschung gilt), also in frischem Kontext laden
   const c2=await b.newContext(),p2=await c2.newPage();p2.on("pageerror",e=>errs.push(e.message));
-  await p2.goto("http://localhost:8765/beta/");await p2.click("nav >> text=Einstellungen");
+  await p2.goto("http://localhost:8765/beta/");await p2.waitForSelector("h1");await p2.click("nav >> text=Einstellungen");
   await p2.setInputFiles("#imp",file);await p2.fill("#dlgIn","falsch123");await p2.press("#dlgIn","Enter");
   await p2.waitForSelector(".toast:has-text('Passwort falsch')");await p2.fill("#dlgIn","geheim123");await p2.press("#dlgIn","Enter");
   await p2.click("button:has-text('Übernehmen')");
@@ -283,7 +284,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.click("button:has-text('Namen eintragen')");await p.locator("input[aria-label='Name zu DEMO-01']").fill("Fiktiv Testname");
   await p.click("button:has-text('Namen speichern')");ok(await p.locator(".nm:has-text('Fiktiv Testname')").count()===1,"Name wird beim Kürzel angezeigt");
   await p.waitForTimeout(300);
-  ok(await p.evaluate(()=>{const n=localStorage.getItem("somi-beta-namen"),m=localStorage.getItem("somi-beta");return !!n&&n.includes('"somiEnc":1')&&!n.includes("Testname")&&!m.includes("Testname")&&!JSON.stringify(db).includes("Testname")}),"Namen getrennt und verschlüsselt gespeichert");
+  ok(await p.evaluate(async()=>{const n=localStorage.getItem("somi-beta-namen"),m=await idbGet(KEY);return !!n&&n.includes('"somiEnc":1')&&!n.includes("Testname")&&!m.includes("Testname")&&!JSON.stringify(db).includes("Testname")}),"Namen getrennt und verschlüsselt gespeichert");
   await nav("Heute");await p.click(".hrow:has-text('DEMO Mathe') >> button:has-text('Runde')");
   await p.click(".erhd button:has-text('Namen aus')");ok(await p.locator(".nm").count()===0,"Namen verbergen");await p.click(".erhd button:has-text('Namen an')");
   await p.reload();for(const d of "2468")await p.click(`#lock .keys button:text-is("${d}")`);await p.waitForSelector("#lock",{state:"detached"});
@@ -374,6 +375,21 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.evaluate(()=>!document.documentElement.dataset.fs&&[...document.querySelectorAll(".mx button[data-s]")].every(b=>b.getBoundingClientRect().height>=40)),"Erfassen bleibt bei sehr großer Schrift bedienbar");
   await p.evaluate(()=>{back();render()});ok(await p.evaluate(()=>document.documentElement.dataset.fs==="xl"),"sonst gilt die große Schrift");
   await p.evaluate(()=>{db.fs="m";applyTheme();render()});
+  // 0.5.10 Speicher, Quarantäne, Sperre
+  await p.evaluate(()=>{db.obs.push({id:"kaputt1",gid:"x",sid:"y",k:"gibtsnicht",s:"3",d:"2026-11-13",upd:1});migrate();save()});
+  ok(await p.evaluate(()=>db.quar?.length===1&&!db.obs.some(o=>o.id==="kaputt1")),"Beschädigter Eintrag wird zurückgelegt, nicht gelöscht");
+  await nav("Einstellungen");ok(await p.locator("text=zurückgelegt").count()>0&&await p.locator("text=Datenmenge").count()===1,"Einstellungen zeigen Datenmenge und Zurückgelegtes");
+  await p.evaluate(()=>{db.quar=[];delete db.quar;save()});
+  await p.evaluate(()=>lockNow());
+  ok(await p.evaluate(()=>LKEY===null&&WIPED&&db.groups.length===0&&!Object.keys(NAMES).length),"Gesperrt: Schlüssel, Noten und Namen nicht im Arbeitsspeicher");
+  await p.click("#lock button:has-text('Vergessen?')");await dlgIn("nein");
+  ok(await p.evaluate(()=>WIPED)&&await p.locator(".toast",{hasText:"Nichts gelöscht"}).count()===1,"Vergessen? löscht nur mit LÖSCHEN");
+  for(const d of "2468")await p.click(`#lock .keys button:text-is("${d}")`);await p.waitForSelector("#lock",{state:"detached"});
+  ok(await p.evaluate(()=>!WIPED&&db.groups.length>0&&Object.keys(NAMES).length>0),"Nach Entsperren alles wieder da");
+  {const c3=await b.newContext(),p3=await c3.newPage();await p3.goto("http://localhost:8765/beta/");await p3.waitForSelector("h1");
+  await p3.evaluate(()=>{localStorage.setItem("somi-beta",JSON.stringify({v:1,sus:[],groups:[{id:"altg1",fach:"Mathe",cls:"5A",kurs:"-",sy:syNow(),members:[],arch:null,upd:1}],obs:[],att:[],ka:[],asv:[],rl:[],del:[]}))});
+  await p3.evaluate(()=>idbSet(KEY,null));await p3.reload();await p3.waitForSelector("h1");
+  ok(await p3.evaluate(async()=>db.groups.some(g=>g.id==="altg1")&&localStorage.getItem("somi-beta")===null&&(await idbGet(KEY)).includes("altg1")),"Alte Daten aus localStorage werden umgezogen");await c3.close()}
   ok(!errs.length,"keine Fehler in der Konsole"+(errs.length?": "+errs.join(" | "):""));
   for(const w of [390,820,1280]){await p.setViewportSize({width:w,height:900});await nav("Heute");await p.screenshot({path:path.join(require("os").tmpdir(),`somi-${w}.png`),fullPage:true})}
   await b.close();srv.close();console.log("Alle Prüfungen bestanden.")})().catch(e=>{console.error(e.message);process.exit(1)});
