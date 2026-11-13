@@ -1,4 +1,16 @@
-# SoMi – Funktionen (Version 0.4.10, Stand 06.11.2026)
+# SoMi – Funktionen (Version 0.5.11, Stand 13.11.2026)
+
+Hinweis: Die Abschnitte unten beschreiben den Stand ab 0.4.10. Neuere Änderungen stehen im folgenden Abschnitt und in `AENDERUNGEN.md`. Weicht der Code ab, gilt der Code.
+
+## Neu in 0.5.9 bis 0.5.11 (Durchsicht 13.11.2026)
+- **Speicher:** Daten in IndexedDB (Schlüssel `somi-v1` bzw. `somi-beta` im Objektspeicher `h`), nicht mehr im localStorage. Alte Daten werden beim ersten Start umgezogen. Einstellungen → Sperre und Daten zeigen die Datenmenge.
+- **Zurücklegen statt Löschen:** Einträge, die die Prüfung nicht bestehen, landen in `db.quar` und kommen zurück, sobald sie wieder gültig sind.
+- **Sperre:** Beim Sperren verlassen Schlüssel, Noten und Namen den Arbeitsspeicher. „Vergessen?“ löscht nur nach Eintippen von LÖSCHEN.
+- **Namens-Warnung** nur, wenn ein Wort aus der eigenen Namensliste vorkommt.
+- **Erfassen** immer in normaler Schriftgröße. Einzeln bewerten mit Nummern-Kacheln; LE-Kürzel mit Förderplanzielen führen zur Zielbewertung. Sichtschutz zeigt auf den Knöpfen ++ + o − statt Notenwerten. iPad: größere Knöpfe und Sprungleiste.
+- **Punkte eintragen** als Vollbild mit eigenem Ziffernfeld.
+- **Lerngruppe** in Abschnitten; **Einstellungen** mit Unterseiten „Sperre und Daten“ und „Noten berechnen“; **PDF der Lerngruppe** in der Übersicht.
+- **Tests:** `tests/rauchtest.js` und `tests/bildschirmtest.js` (Bilder in `tests/bilder/`, nicht im Repo).
 
 Quelldatei: `quelle/somi.html`. Eine einzelne Datei, offline im Browser, für iPad, Handy und PC.
 
