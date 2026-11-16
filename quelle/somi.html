@@ -35,12 +35,12 @@ h1::before{content:"";width:14px;height:14px;border-radius:5px;background:var(--
 h2{font-size:1.1rem;margin:18px 0 8px}
 p{margin:6px 0}
 .muted{color:var(--muted);font-size:.92rem}.small{font-size:.85rem}
-.card{background:var(--card);border:1.5px solid var(--line);border-radius:24px;padding:16px;margin-bottom:10px}
+.card{background:var(--card);border:1.5px solid transparent;box-shadow:var(--shd);border-radius:24px;padding:16px;margin-bottom:10px}
 .card.tap{cursor:pointer;width:100%;text-align:left;font:inherit;color:inherit}
 .row{display:flex;gap:10px;align-items:center}.grow{flex:1;min-width:0}
 .between{display:flex;justify-content:space-between;align-items:center;gap:10px}
 button{font:inherit;color:inherit;cursor:pointer}
-.btn{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:10px 14px;font-weight:600;min-height:40px}
+.btn{border:1.5px solid transparent;background:var(--btn);border-radius:999px;padding:10px 14px;font-weight:600;min-height:40px}
 .btn.pri{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
 .btn.block{width:100%;padding:14px;border-radius:18px}
 .btn.ghost{background:none;border:none;color:var(--acc);padding:8px 4px;min-width:40px}
@@ -73,8 +73,8 @@ input.sw:checked{background:var(--acc)}input.sw:checked::after{left:23px}
 .rlbox{margin-top:12px}
 .rlrow{display:flex;align-items:center;gap:8px;padding:10px 14px;margin-bottom:6px;min-height:44px}.rlrow .grow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}.rlrow .late{color:var(--down);font-weight:700;font-size:.92rem}
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-.stat div{background:var(--card);border:1.5px solid var(--line);border-radius:20px;padding:10px}.stat b{display:block;font-size:1.6rem;color:var(--acc);font-variant-numeric:tabular-nums}
-nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:0 6px max(6px,env(safe-area-inset-bottom));z-index:5}
+.stat div{background:var(--card);border:1.5px solid transparent;box-shadow:var(--shd);border-radius:20px;padding:10px}.stat b{display:block;font-size:1.6rem;color:var(--acc);font-variant-numeric:tabular-nums}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid transparent;box-shadow:var(--shn);display:flex;justify-content:space-around;padding:0 6px max(6px,env(safe-area-inset-bottom));z-index:5}
 nav button{flex:1;min-width:0;background:none;border:none;padding:8px 0 6px;color:var(--muted);font-size:.74rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:4px}
 nav button svg{width:54px;height:30px;padding:3px 15px;border-radius:15px;transition:background .15s}
 nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
@@ -89,11 +89,11 @@ nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
 .chk{list-style:none;padding:0;margin:8px 0 12px;display:grid;gap:4px}.chk li.ok{color:var(--muted);text-decoration:line-through}
 .logo{width:34px;height:34px;flex:none}
 /* Erfassen */
-.chips{display:flex;flex-wrap:wrap;gap:6px}.chips button{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 12px;font-weight:700;font-size:.88rem;min-height:40px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips button{border:1.5px solid transparent;background:var(--btn);border-radius:999px;padding:8px 12px;font-weight:700;font-size:.88rem;min-height:40px}
 .chips .on{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
 .anc{margin:4px 0 0;padding-left:18px}.anc li{margin:3px 0}
 .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin:10px 0 4px}
-.tile{position:relative;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:var(--card);border-radius:16px;padding:8px;min-height:56px;text-align:left}
+.tile{position:relative;display:flex;align-items:center;gap:8px;border:1.5px solid transparent;background:var(--btn);border-radius:16px;padding:8px;min-height:56px;text-align:left}
 .tile .code{font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tile .tag{position:absolute;right:6px;bottom:4px;font-size:.66rem;padding:0 5px}
 .tile.on{border:2.5px solid var(--acc);background:var(--accs)}
 .tiles:has(.nm){grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.tile .done{position:absolute;top:4px;right:8px;color:var(--acc);font-weight:900}
@@ -101,7 +101,7 @@ nav button.on{color:var(--acc)}nav button.on svg{background:var(--accs)}
 .pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.pad.st{grid-template-columns:repeat(4,1fr)}.pad.st .nt{opacity:.7;font-weight:600}.pad.st button{min-height:58px;display:grid;grid-template-rows:auto auto auto;align-content:start;justify-items:center;align-items:center;gap:2px;padding:6px 2px}.pad.st b{font-size:1.5rem;line-height:1}.pad.st.av{grid-template-columns:repeat(3,1fr)}.pad button.cur{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}.pad button.cur span{color:var(--acc-ink)}.seqrow{margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}.asvrow>div+div{margin-top:8px}.seqrow .seqk{margin:0 0 6px}.btn.stb.cur{background:var(--news);border:2px solid var(--sig);color:var(--sig-ink)}.pad.st span{font-size:.75rem;font-weight:600;color:var(--muted);line-height:1.2;text-align:center}
 .bar{height:6px;border-radius:3px;background:var(--soft);margin:8px 0 4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--acc)}
 .seqsus{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 8px}.seqsus .code{font-size:2rem}.kic.big{width:60px;height:60px;font-size:2rem}
-.btn.abw{border-style:dashed}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.three .btn{padding-left:4px;padding-right:4px}
+.btn.abw{border-style:dashed;border-color:var(--fld);background:none}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.three .btn{padding-left:4px;padding-right:4px}
 .spg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;text-align:center}.spg div{background:var(--soft,rgba(0,0,0,.04));border-radius:10px;padding:6px 0}.spg b{display:block;font-size:1.2rem}
 .kp{font-size:1.8rem!important;text-align:center;font-weight:800;max-width:220px;margin:0 auto;display:block}
 .nm{display:block;font-size:.8rem;font-weight:600;color:var(--muted);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}h1 .nm{font-size:1rem}.seqsus .nm{font-size:1.1rem}
@@ -126,7 +126,7 @@ body:has(.padwrap) .toast{bottom:auto;top:max(12px,env(safe-area-inset-top))} /*
 #lock .pins i{width:14px;height:14px;border-radius:50%;border:2px solid var(--ink)}#lock .pins i.on{background:var(--ink)}
 #lock .pins.bad{animation:shake .35s}@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 #lock .keys{display:grid;grid-template-columns:repeat(3,70px);justify-content:center;gap:14px 22px;margin:12px auto 0}
-#lock .keys button{width:70px;height:70px;padding:0;border-radius:50%;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:1.5rem;font-weight:700}
+#lock .keys button{width:70px;height:70px;padding:0;border-radius:50%;border:1.5px solid transparent;background:var(--btn);color:var(--ink);font-size:1.5rem;font-weight:700}
 #lock .keys button.nb{border:none;background:none;font-size:.8rem;font-weight:600;color:var(--muted)}#lock .keys button.nb:last-child{font-size:1.3rem;color:var(--ink)}
 body.locked #app,body.locked #nav,body.locked .cele:not(.lockdlg),body.locked .toast{visibility:hidden}
 @media (prefers-reduced-motion:reduce){#lock .pins.bad{animation:none}}
@@ -188,6 +188,17 @@ body.erf .stgrid .btn{min-height:52px}
 .kpw{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}.kpw>span>span{display:block;line-height:1.3}.kpw .kp{max-width:160px;margin:0}.kpad{grid-template-columns:repeat(3,1fr)!important}body.erf .kan .padn.kpad{grid-template-rows:repeat(4,minmax(0,60px))}
 .kan .two .btn,.kan .four .btn,.kan .three .btn{min-height:44px}.kpk .seqsus{margin:2px 0}.kpk .kp{font-size:1.5rem!important;padding:4px 8px}.kpk .btn.ic{width:40px;height:40px;padding:0;display:grid;place-items:center}.kpk .three .btn{font-size:.9rem;padding-left:2px;padding-right:2px}
 @media print{nav,.noprint,body::before{display:none!important}main{padding:0}#lock{display:none!important}}
+/* 0.6.0: neues Aussehen. Knöpfe und Karten mit ruhiger Fläche statt Rahmen, Umschalter oben als Leiste (.seg),
+   Rückfragen ohne Textfeld kommen auf dem Handy von unten (.sheet). Auswahl beim Erfassen bleibt kräftig gefüllt. */
+:root{--btn:#e4eae2;--segon:#fffffe;--shd:0 1px 2px rgba(30,50,40,.05),0 6px 18px -12px rgba(30,50,40,.2);--shn:0 -6px 18px -14px rgba(30,50,40,.28)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--btn:#2a3b33;--segon:#41564b;--shd:none;--shn:none}}
+:root[data-theme=dark]{--btn:#2a3b33;--segon:#41564b;--shd:none;--shn:none}
+@media (max-width:600px){.cele.sheet{place-items:end center;background:rgba(0,0,0,.3)}.cele.sheet .box{width:100%;max-width:none;max-height:88vh;overflow:auto;border-radius:28px 28px 0 0;padding-bottom:calc(22px + env(safe-area-inset-bottom,0px));animation:sheet .22s ease-out}}
+@keyframes sheet{from{transform:translateY(48px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.cele.sheet .box{animation:none}}
+.pick.seg{background:var(--btn);padding:4px;border-radius:16px;gap:2px}
+.pick.seg button{border-color:transparent;background:transparent;color:var(--ink);font-weight:600}
+.pick.seg button.on{background:var(--segon);color:var(--ink);font-weight:800;box-shadow:0 1px 3px rgba(40,30,20,.18)}
 </style>
 </head>
 <body>
@@ -197,7 +208,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.13",SOMI_STAND="16.11.2026";
+const SOMI_VERSION="0.6.0",SOMI_STAND="16.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -824,7 +835,7 @@ const ovFrom=()=>OVP==="hj"?hjStart():OVP==="sj"?sjStart():OVP==="ab"&&OVD?OVD:"
 // 0.5.13: ein Zeitraum für Übersicht, Kürzel-Seite und PDF; „Ab …“ = frei gewählter Stichtag (Quartal, Elternsprechtag)
 const PERT={hj:"Halbjahr",sj:"Schuljahr",all:"Alles",ab:"Ab …"};
 const perTxt=()=>OVP==="ab"?`ab ${dDEy(OVD)}`:({hj:"dieses Halbjahr",sj:"dieses Schuljahr",all:"alle Einträge"})[OVP]||"";
-const perPick=(mb=10)=>`<div class="pick p4" style="margin-bottom:${mb}px" role="group" aria-label="Zeitraum">${Object.entries(PERT).map(([k,t])=>`<button class="${OVP===k?"on":""}" aria-pressed="${OVP===k}" onclick="perSet('${k}')">${t}</button>`).join("")}</div>${OVP==="ab"?`<div class="row" style="margin:-2px 0 10px"><label class="small grow" for="ovd" style="margin:0">Einträge ab</label><input id="ovd" type="date" style="width:auto" max="${today()}" value="${OVD}" onchange="if(okDate(this.value)){OVD=this.value;render()}"></div>`:""}`;
+const perPick=(mb=10)=>`<div class="pick p4 seg" style="margin-bottom:${mb}px" role="group" aria-label="Zeitraum">${Object.entries(PERT).map(([k,t])=>`<button class="${OVP===k?"on":""}" aria-pressed="${OVP===k}" onclick="perSet('${k}')">${t}</button>`).join("")}</div>${OVP==="ab"?`<div class="row" style="margin:-2px 0 10px"><label class="small grow" for="ovd" style="margin:0">Einträge ab</label><input id="ovd" type="date" style="width:auto" max="${today()}" value="${OVD}" onchange="if(okDate(this.value)){OVD=this.value;render()}"></div>`:""}`;
 function perSet(k){if(!Object.hasOwn(PERT,k))return;if(k==="ab"&&!OVD)OVD=hjStart();OVP=k;render()}
 const stBtnTxt=on=>`⚠ ${on?"Störung vermerkt (tippen nimmt zurück)":"Massive Unterrichtsstörung"}`;
 function asvDel(id){const a=db.asv.find(x=>x.id===id);if(!a)return;db.asv=db.asv.filter(x=>x.id!==id);db.del.push(id);save();render();
@@ -950,7 +961,7 @@ document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.tar
 
 /* ===== Eigene Dialoge (funktionieren auch dort, wo confirm/prompt blockiert sind) ===== */
 function dlg(html,onMount){return new Promise(res=>{const el=document.createElement("div");el.className="cele"+(LOCKED?" lockdlg":"");el.style.zIndex=LOCKED?120:40;
-  el.innerHTML=`<div class="box" role="dialog" aria-modal="true">${html}</div>`;document.body.appendChild(el);
+  el.innerHTML=`<div class="box" role="dialog" aria-modal="true">${html}</div>`;if(!el.querySelector("input,textarea,select"))el.classList.add("sheet");document.body.appendChild(el);
   // 0.5.13: Escape bricht ab, Tab bleibt im Dialog. Tipp daneben schließt nur, wenn nichts eingetippt werden kann (sonst wäre der Text weg).
   const key=e=>{if(!el.isConnected)return document.removeEventListener("keydown",key,true);if(document.querySelector(".cele:last-of-type")!==el)return;
     if(e.key==="Escape"){e.preventDefault();done(null)}
@@ -1321,8 +1332,8 @@ function profilV(){const sub=view.sub||(view.mark?"sich":null);
   if(sub==="sich")return head("Sperre und Daten")+sichSet();
   const tap=(k,t,d)=>`<button class="card tap row" onclick="go({tab:'profil',sub:'${k}'})"><div class="grow"><div class="code">${t}</div><div class="muted small">${d}</div></div><span aria-hidden="true" class="muted">›</span></button>`;
   return `<h1>Einstellungen</h1>
-  <div class="card"><b>Erscheinungsbild</b><div class="pick" style="margin-top:10px">${[["system","Wie Gerät"],["light","Hell"],["dark","Dunkel"]].map(([k,t])=>`<button class="${(db.theme||"system")===k?"on":""}" onclick="db.theme='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div>
-  <div class="sub" style="margin:14px 0 6px;font-weight:700">Schriftgröße</div><div class="pick">${[["m","Normal"],["l","Groß"],["xl","Sehr groß"]].map(([k,t])=>`<button class="${(db.fs||"m")===k?"on":""}" onclick="db.fs='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div></div>
+  <div class="card"><b>Erscheinungsbild</b><div class="pick seg" style="margin-top:10px">${[["system","Wie Gerät"],["light","Hell"],["dark","Dunkel"]].map(([k,t])=>`<button class="${(db.theme||"system")===k?"on":""}" onclick="db.theme='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div>
+  <div class="sub" style="margin:14px 0 6px;font-weight:700">Schriftgröße</div><div class="pick seg">${[["m","Normal"],["l","Groß"],["xl","Sehr groß"]].map(([k,t])=>`<button class="${(db.fs||"m")===k?"on":""}" onclick="db.fs='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div></div>
   ${tap("sich","Sperre und Daten",`${db.lock?"Sperre an":"Sperre aus"} · ${db.lastBackup?"letzte Sicherung "+dDEy(iso(new Date(db.lastBackup))):"noch keine Sicherung"}${db.lock&&LKEY&&namesDue()?" · Namensliste nicht gesichert":""}`)}
   ${tap("noten","Noten berechnen","Kriterien, Gewichte, Umrechnung, schriftliche Leistungen")}
   <p class="muted small" style="text-align:center">SoMi ${SOMI_VERSION} · Stand ${SOMI_STAND} · nur für den eigenen Unterricht</p>`}
@@ -1467,7 +1478,7 @@ function askCode(msg,sub){return dlg(`<p style="font-weight:700;margin:0 0 6px">
 function lockV(){const L=db.lock;
   return `<div class="card"><h2 style="margin-top:0">App-Sperre und Verschlüsselung</h2>${mtip("lock")}
   <label class="swr${mk("lock")}"><span class="grow">SoMi mit Code sperren und verschlüsseln<span class="sub">Zusätzlich zur Gerätesperre. Empfohlen: an.</span></span><input type="checkbox" class="sw" ${L?"checked":""} onchange="this.checked?setLock():offLock()"></label>
-  ${L?`<div class="sub" style="margin:10px 0 6px;font-weight:700">Sperren, wenn SoMi im Hintergrund war</div><div class="pick">${[[0,"Sofort"],[1,"Nach 1 Min."],[5,"Nach 5 Min."]].map(([m,t])=>`<button class="${L.after===m?"on":""}" onclick="db.lock.after=${m};save();render()">${t}</button>`).join("")}</div>
+  ${L?`<div class="sub" style="margin:10px 0 6px;font-weight:700">Sperren, wenn SoMi im Hintergrund war</div><div class="pick seg">${[[0,"Sofort"],[1,"Nach 1 Min."],[5,"Nach 5 Min."]].map(([m,t])=>`<button class="${L.after===m?"on":""}" onclick="db.lock.after=${m};save();render()">${t}</button>`).join("")}</div>
   <p class="row" style="flex-wrap:wrap;margin-top:10px"><button class="btn" onclick="setLock(true)">Code ändern</button><button class="btn" onclick="lockNow()">Jetzt sperren</button></p>`
   :`<p class="small" style="color:var(--down);font-weight:700">Die Sperre ist aus. Noten liegen dann unverschlüsselt auf dem Gerät.</p>`}
   <p class="muted small" style="margin-bottom:0">Ist die Sperre an, liegen die Daten auf diesem Gerät nur verschlüsselt im Speicher. Ein Ziffern-Code schützt vor einem Blick und vor einfachem Auslesen, mit viel Aufwand ließe er sich durchprobieren. Der Gerätecode bleibt deshalb Pflicht. Wer den Code vergisst, kommt nicht mehr an die Daten und muss die letzte Sicherung laden.</p></div>`}

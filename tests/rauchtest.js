@@ -435,6 +435,11 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.evaluate(()=>{const a=db.ka.find(a=>a.demo&&!a.k),g=groupById(a.gid),i=kaMs(a,g).findIndex(s=>a.r[s.id]?.p!=null);SHOW=false;KE={kid:a.id,i,rg:0};go({tab:"gruppen",group:a.gid,ka:a.gid,kad:a.id,kae:true})});
   ok(await p.locator("#kp.msk").count()===1,"Punkte sind bei Sichtschutz verdeckt");await p.click(".kpad button:text-is('7')");ok(await p.evaluate(()=>document.querySelector("#kp").value==="7"&&!document.querySelector("#kp").classList.contains("msk")),"Tippen ersetzt verdeckte Punkte");
   await p.evaluate(()=>back());
+  // 0.6.0: neues Aussehen
+  ok(await p.evaluate(()=>{const c=document.createElement("div");c.className="card";document.body.appendChild(c);const b=document.createElement("button");b.className="btn";c.appendChild(b);const r=getComputedStyle(c).borderTopColor==="rgba(0, 0, 0, 0)"&&getComputedStyle(b).borderTopColor==="rgba(0, 0, 0, 0)";c.remove();return r}),"Karten und Knöpfe ohne Rahmen");
+  {await p.setViewportSize({width:390,height:700});const q=p.evaluate(()=>ask("Test?"));await p.waitForSelector(".cele.sheet");
+   ok(await p.evaluate(()=>{const x=document.querySelector(".cele.sheet .box").getBoundingClientRect();return x.bottom>=innerHeight-1&&x.width>=innerWidth-1}),"Rückfrage ohne Textfeld kommt auf dem Handy von unten");await p.keyboard.press("Escape");await q;
+   const q2=p.evaluate(()=>askText("Test","x"));await p.waitForSelector(".cele input");ok(await p.locator(".cele.sheet").count()===0,"Fenster mit Textfeld bleibt in der Mitte");await p.keyboard.press("Escape");await q2}
   ok(!errs.length,"keine Fehler in der Konsole"+(errs.length?": "+errs.join(" | "):""));
   for(const w of [390,820,1280]){await p.setViewportSize({width:w,height:900});await nav("Heute");await p.screenshot({path:path.join(require("os").tmpdir(),`somi-${w}.png`),fullPage:true})}
   await b.close();srv.close();console.log("Alle Prüfungen bestanden.")})().catch(e=>{console.error(e.message);process.exit(1)});
