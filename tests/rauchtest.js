@@ -98,7 +98,7 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   await p.click("button:has-text('Weiter ›')");ok(await p.locator(".seqsus:has-text('DEMO-02')").count()===1,"Weiter: nächstes Kind");
   await p.click("button:has-text('abwesend')");ok(await p.locator(".seqsus:has-text('DEMO-03')").count()===1,"nicht anwesend: ganzes Kürzel übersprungen");
   ok(await p.evaluate(([n,m])=>db.obs.length===n+1&&db.asv.length===m+1,[s0,a0]),"nur Getipptes gespeichert");
-  await p.click(".three button[aria-label='Zurück']");await p.click(".three button[aria-label='Zurück']");
+  await p.click(".seqhd button[aria-label^='Zurück']");await p.click(".seqhd button[aria-label^='Zurück']");
   ok(await p.locator(".pad button.cur[data-k='qual'][data-s='3']").count()===1&&await p.locator("button.stb.cur").count()===1,"Zurück zeigt die Auswahl");
   await p.evaluate(()=>{ER.i=99;render()});
   ok(await p.locator(".seqdone:has-text('1 bewertet')").count()===1,"Fertig-Anzeige");
@@ -415,6 +415,26 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   {const [dl]=await Promise.all([p.waitForEvent("download"),p.click("button:has-text('PDF der Lerngruppe erstellen')")]);const pf=path.join(require("os").tmpdir(),"somi-gruppe.pdf");await dl.saveAs(pf);
   const t=fs.readFileSync(pf,"latin1");ok(t.startsWith("%PDF-1.4")&&t.includes("Notenliste DEMO Mathe")&&t.includes("(DEMO-08)")&&!t.includes("Fiktiv Testname"),"PDF der Lerngruppe ohne Namen")}
   await nav("Einstellungen");ok(await p.locator(".card.tap",{hasText:"Sperre und Daten"}).count()===1&&await p.locator("text=Sicherung speichern").count()===0,"Einstellungen mit Unterseiten");
+  // 0.5.13: Runde nach „Neustart“ fortsetzen, ein Zeitraum überall, Sperre leert die Ansicht, Dialoge, Punkte verdeckt
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");ER=erNeu(g.id,"k");ER.fresh=1;go({tab:"heute",group:g.id,erf:g.id})});
+  {const r=await p.evaluate(()=>{const b=document.querySelector(".mxw .pad button[data-s='3']");const sid=seqCur().id,k=b.dataset.k;b.click();return {sid,k,i:ER.i}});
+  await p.click("button:has-text('Weiter ›')");const n0=await p.evaluate(()=>db.obs.length);
+  const x=await p.evaluate(({sid,k})=>{const g=groupById(ER.gid);ER=erNeu(g.id,"k");render();return {i:ER.i,hat:!!ER.run[sid]?.[k]}},r);
+  ok(x.hat&&x.i>r.i,"Runde wird nach Neustart mit den heutigen Einträgen fortgesetzt");
+  await p.evaluate(({i})=>{ER.i=i;render()},r);ok(await p.locator(`.mxw .pad button.cur[data-k='${r.k}'][data-s='3']`).count()===1,"Fortgesetzte Runde zeigt die getippte Stufe");
+  await p.click(`.mxw .pad button[data-k='${r.k}'][data-s='2']`);ok(await p.evaluate(()=>db.obs.length)===n0,"Erneutes Tippen ersetzt statt zu verdoppeln")}
+  await p.evaluate(()=>{const g=db.groups.find(g=>g.demo&&g.fach==="Mathe");OVP="ab";OVD="2999-01-01";go({tab:"gruppen",group:g.id,sus:g.members[0]})});
+  ok(await p.locator("text=Keine Einträge in diesem Zeitraum").count()===1&&await p.locator(".pick.p4 button.on",{hasText:"Ab"}).count()>=1,"Kürzel-Seite rechnet mit dem gewählten Zeitraum");
+  await p.evaluate(()=>{OVP="hj";render()});ok(await p.locator("text=Keine Einträge in diesem Zeitraum").count()===0,"Zeitraum Halbjahr zeigt Einträge");
+  {const q=p.evaluate(()=>askText("Test","x"));await p.waitForSelector(".cele #dlgIn");await p.fill("#dlgIn","abc");await p.mouse.click(3,3);ok(await p.locator(".cele #dlgIn").count()===1,"Dialog mit Textfeld bleibt bei Tipp daneben offen");
+  await p.keyboard.press("Escape");ok(await q===null&&await p.locator(".cele").count()===0,"Escape schließt den Dialog")}
+  if(await p.evaluate(()=>!!db.lock&&!!LKEY)){await p.evaluate(()=>{SHOW=true;render();lockNow()});
+    ok(await p.evaluate(()=>document.querySelector("#app").innerHTML===""&&SHOW===false),"Sperre leert die Ansicht und schaltet den Sichtschutz ein");
+    for(const d of "2468")await p.click(`#lock .keys button:text-is("${d}")`);await p.waitForSelector("#lock",{state:"detached"});ok(await p.evaluate(()=>document.querySelector("#app").innerHTML.length>50),"Nach dem Entsperren ist die Ansicht wieder da")}
+  else ok(false,"Sperre für den Test nicht aktiv");
+  await p.evaluate(()=>{const a=db.ka.find(a=>a.demo&&!a.k),g=groupById(a.gid),i=kaMs(a,g).findIndex(s=>a.r[s.id]?.p!=null);SHOW=false;KE={kid:a.id,i,rg:0};go({tab:"gruppen",group:a.gid,ka:a.gid,kad:a.id,kae:true})});
+  ok(await p.locator("#kp.msk").count()===1,"Punkte sind bei Sichtschutz verdeckt");await p.click(".kpad button:text-is('7')");ok(await p.evaluate(()=>document.querySelector("#kp").value==="7"&&!document.querySelector("#kp").classList.contains("msk")),"Tippen ersetzt verdeckte Punkte");
+  await p.evaluate(()=>back());
   ok(!errs.length,"keine Fehler in der Konsole"+(errs.length?": "+errs.join(" | "):""));
   for(const w of [390,820,1280]){await p.setViewportSize({width:w,height:900});await nav("Heute");await p.screenshot({path:path.join(require("os").tmpdir(),`somi-${w}.png`),fullPage:true})}
   await b.close();srv.close();console.log("Alle Prüfungen bestanden.")})().catch(e=>{console.error(e.message);process.exit(1)});

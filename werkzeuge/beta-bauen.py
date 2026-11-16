@@ -5,6 +5,9 @@ Die Beta speichert unter einem eigenen Schlüssel, echte Daten der Hauptversion 
 import sys, re, shutil, pathlib
 repo = pathlib.Path(__file__).resolve().parent.parent; cache = sys.argv[1]
 assert cache.startswith("somi-beta"), "Cache-Name muss mit somi-beta beginnen"
+# Der Cache-Name muss zur Version in der Quelldatei passen, sonst laden Geräte die neue Fassung nicht
+_v = re.search(r'const SOMI_VERSION="([^"]+)"', (repo / "quelle" / "somi.html").read_text()).group(1)
+assert cache == "somi-beta-" + _v, f"Cache-Name {cache} passt nicht zur Version {_v} in quelle/somi.html (erwartet: somi-beta-{_v})"
 s = (repo / "quelle" / "somi.html").read_text()
 def rep(old, new):
     global s
