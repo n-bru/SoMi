@@ -107,6 +107,10 @@ const ok=(c,m)=>{if(!c)throw new Error("FEHLER: "+m);console.log("✓ "+m)};
   ok(await p.locator(".pad.st button[data-s='3']",{hasText:"erfüllt"}).count()===1&&await p.locator(".pad.st .nt").count()===(await p.evaluate(()=>SHOW)?4:0),"Stufenknöpfe: Notenwert nur ohne Sichtschutz");
   await p.evaluate(()=>{SHOW=true;render()});ok(await p.locator(".pad.st .nt").count()===4,"Noten zeigen: Notenwert unter den Stufen");await p.evaluate(()=>{SHOW=false;render()});
   if(process.env.SHOT2)await p.locator(".padwrap").first().screenshot({path:process.env.SHOT2});
+  {const vp=p.viewportSize();await p.setViewportSize({width:320,height:360}); // klein, damit die Kürzel-Liste scrollt (wie große Klassen)
+  const sc=await p.evaluate(()=>{const w=document.querySelector(".tilew");w.scrollTop=w.scrollHeight;return w.scrollTop});ok(sc>0,"Einzeln: Kürzel-Liste scrollt");
+  ok(await p.evaluate(()=>{const w=document.querySelector(".tilew"),s=w.scrollTop;[...w.querySelectorAll(".tile:not(:has(.tag.zd))")].pop().click();return s>0&&Math.abs(document.querySelector(".tilew").scrollTop-s)<2}),"Einzeln: Antippen springt nicht nach oben (0.5.12)");
+  await p.click(".erf button:has-text('Auswahl aufheben')");await p.setViewportSize(vp)}
   const n0=await p.evaluate(()=>db.obs.length);ok(n0>0,"Beispielklasse hat fiktive Einträge");
   await p.click(".pad button[data-s='3']");ok(await p.locator(".toast",{hasText:"Tippe zuerst"}).count()===1,"ohne Auswahl keine Note");
   await p.click(".chips button:has-text('Kooperation')");
