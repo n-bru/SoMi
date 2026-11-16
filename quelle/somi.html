@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f5f6f1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -15,14 +15,14 @@
 <title>SoMi</title>
 <style>
 /* SoMi-Farben „Tafelgrün“ (eigene Farbgebung, nicht Sopäd-Team-Design) */
-:root{--bg:#f5f6f1;--card:#fffffe;--ink:#1f2622;--muted:#5e6a63;--line:#dfe5dd;--soft:#ebf0e9;
+:root{--fld:#7f9087;--bg:#f5f6f1;--card:#fffffe;--ink:#1f2622;--muted:#5e6a63;--line:#dfe5dd;--soft:#ebf0e9;
 --acc:#2e6b57;--acc-ink:#fff;--accs:#dcede4;--up:#3b6e47;--ups:#e4f1e3;--down:#a63a2e;--downs:#f9e1dc;--new:#8a640c;--news:#f8edcf;--sig:#e3a008;--sigt:#8a6200;--sig-ink:#1f2622}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#14201b;--card:#1c2a24;--ink:#e8efea;--muted:#a3b3aa;--line:#2c3d35;--soft:#22312a;
 --acc:#7fc4a6;--acc-ink:#10201a;--accs:#24392f;--up:#8ccb98;--ups:#20301f;--down:#f28d7f;--downs:#3b2320;--new:#e8c15f;--news:#382d16;--sig:#f5c542;--sigt:#f5c542;--sig-ink:#14201b}}
 :root[data-theme=dark]{color-scheme:dark;--bg:#14201b;--card:#1c2a24;--ink:#e8efea;--muted:#a3b3aa;--line:#2c3d35;--soft:#22312a;
 --acc:#7fc4a6;--acc-ink:#10201a;--accs:#24392f;--up:#8ccb98;--ups:#20301f;--down:#f28d7f;--downs:#3b2320;--new:#e8c15f;--news:#382d16;--sig:#f5c542;--sigt:#f5c542;--sig-ink:#14201b}
 :root{font-size:16px}:root[data-fs=l]{font-size:18px}:root[data-fs=xl]{font-size:20px}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{touch-action:manipulation}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.45 ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:640px;margin:0 auto;padding:16px 16px 96px}
 /* Home-Bildschirm-App: Inhalt beginnt unter Uhrzeit-Leiste und iOS-Unschärfe. Kein fester Streifen oben, sonst verschwindet Inhalt dahinter (wie Pfad 1.2.6) */
@@ -43,18 +43,18 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:10px 14px;font-weight:600;min-height:40px}
 .btn.pri{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
 .btn.block{width:100%;padding:14px;border-radius:18px}
-.btn.ghost{background:none;border:none;color:var(--acc);padding:8px 4px}
+.btn.ghost{background:none;border:none;color:var(--acc);padding:8px 4px;min-width:40px}
 .btn.danger{color:var(--down)}.btn:disabled{opacity:.45;cursor:default}
 .code{font-weight:800;letter-spacing:.02em;font-size:1.05rem}
 .tag{display:inline-block;background:var(--accs);color:var(--acc);border-radius:6px;padding:1px 7px;font-size:.8rem;font-weight:600}
 .tag.na{background:var(--news);color:var(--new)}.tag.zd{background:var(--ups);color:var(--up)}
 label{display:block;font-weight:600;margin:14px 0 6px}
 .sub{font-weight:400;color:var(--muted);font-size:.86rem;margin:-2px 0 6px}
-input,select,textarea{font:inherit;font-size:max(16px,1rem);color:var(--ink);background:var(--card);border:1.5px solid #b7c3bb;border-radius:12px;padding:11px 12px;width:100%}
+input,select,textarea{font:inherit;font-size:max(16px,1rem);color:var(--ink);background:var(--card);border:1.5px solid var(--fld);border-radius:12px;padding:11px 12px;width:100%}
 input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--sig);outline-offset:1px}
 textarea{min-height:76px;resize:vertical}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pick{display:grid;gap:6px;grid-template-columns:repeat(3,minmax(0,1fr))}.pick button{min-width:0;hyphens:manual}
+.pick{display:grid;gap:6px;grid-template-columns:repeat(3,minmax(0,1fr))}.pick.p4{grid-template-columns:repeat(4,minmax(0,1fr))}.pick button{min-width:0;hyphens:manual}
 .pick button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:9px 4px;font-weight:700;font-size:.9rem;min-height:40px}
 .pick .on{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
 .swr{display:flex;align-items:center;gap:12px;margin:10px 0;font-weight:600;cursor:pointer}.swr .sub{display:block;font-weight:400;margin-top:2px}
@@ -176,12 +176,15 @@ body.erf .stgrid .btn{min-height:52px}
 .pad.st.sto{grid-template-columns:repeat(4,1fr) .8fr}.pad.st.sto .stx{border-style:dashed;background:var(--card);font-weight:700}.ein .pad.st.sto .stx span{color:var(--ink)}
 .chips.one.k4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.chips.one.k4 button{padding:2px 2px;font-size:.74rem;line-height:1.1;min-height:40px;hyphens:manual}
 .jump{display:none}.three.m4{grid-template-columns:.55fr 1fr 1fr 1.15fr}
-@media (min-width:700px) and (min-height:800px){.mxw{--mxr:104px}.mx button[data-s]{font-size:1.35rem}.mx .seqk{font-size:.95rem}.mxh span{font-size:.8rem}
+@media (min-width:700px) and (min-height:800px){.mxw{--mxr:136px}.mx button[data-s]{font-size:1.35rem}.mx .seqk{font-size:.95rem}.mxh span{font-size:.8rem}
   .jump{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}.jump button{min-width:52px;min-height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font-weight:700;font-size:.85rem}.jump .ok{background:var(--accs)}.jump .ab{border-style:dashed;color:var(--muted)}.jump .cu{outline:3px solid var(--sig);outline-offset:1px}}
 .gsec h2{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:16px 0 6px}.gbtn{display:flex;flex-wrap:wrap;gap:8px}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:8px}.kgrid .card{margin:0;padding:10px 12px;border-radius:18px}.kgrid .tag{font-size:.7rem}
 .tbl th[scope=row],.tbl thead th:first-child{position:sticky;left:0;background:var(--card);z-index:1}
 @media (max-width:520px){.tbl .nar{display:none}.tbl th,.tbl td{padding:9px 6px}}
+@media (max-width:420px){.tbl th,.tbl td{padding:9px 4px}.tbl thead th{font-size:.72rem}}
+.leg{margin:10px 0}.leg summary{font-weight:700;cursor:pointer;min-height:40px;display:flex;align-items:center;gap:6px}.leg summary::before{content:"?";display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;border:1.5px solid currentColor;font-size:.8rem}.leg summary::-webkit-details-marker{display:none}
+.kp.msk{-webkit-text-security:disc}
 .kpw{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}.kpw>span>span{display:block;line-height:1.3}.kpw .kp{max-width:160px;margin:0}.kpad{grid-template-columns:repeat(3,1fr)!important}body.erf .kan .padn.kpad{grid-template-rows:repeat(4,minmax(0,60px))}
 .kan .two .btn,.kan .four .btn,.kan .three .btn{min-height:44px}.kpk .seqsus{margin:2px 0}.kpk .kp{font-size:1.5rem!important;padding:4px 8px}.kpk .btn.ic{width:40px;height:40px;padding:0;display:grid;place-items:center}.kpk .three .btn{font-size:.9rem;padding-left:2px;padding-right:2px}
 @media print{nav,.noprint,body::before{display:none!important}main{padding:0}#lock{display:none!important}}
@@ -194,7 +197,7 @@ body.erf .stgrid .btn{min-height:52px}
 "use strict";
 /* ===== Speicher =====
    Technik-Kern übernommen aus Pfad 1.1.3 (hbg-pfad/pfad, quelle/pfad.html). Liste der Bausteine: docs/technik-aus-pfad.md */
-const SOMI_VERSION="0.5.12",SOMI_STAND="16.11.2026";
+const SOMI_VERSION="0.5.13",SOMI_STAND="16.11.2026";
 const KEY="somi-v1";
 const FAECHER=["Mathe","Sport"];
 const KURSE={"-":"ohne Kurs","E":"E-Kurs","G":"G-Kurs"};
@@ -244,7 +247,7 @@ function save(){if(ENCWAIT||WIPED)return; // gesperrt und noch nicht entschlüss
 
 /* ===== Helfer ===== */
 const $=s=>document.querySelector(s);
-const uid=()=>Math.random().toString(36).slice(2,10);
+const uid=()=>{const b=crypto.getRandomValues(new Uint8Array(8));let r="";for(const x of b)r+=(x%36).toString(36);return r}; // 0.5.13: sicherer Zufall statt Math.random
 const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
 const today=()=>iso(new Date());
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -383,11 +386,14 @@ const okNames=o=>!!o&&typeof o==="object"&&!Array.isArray(o)&&Object.keys(o).len
 const nm=s=>NSHOW&&NAMES[s.id]?`<span class="nm">${esc(NAMES[s.id])}</span>`:"";
 const hasNames=()=>Object.keys(NAMES).length>0;
 const nmBtn=()=>hasNames()?`<button class="btn ss${NSHOW?"":" on"}" onclick="NSHOW=!NSHOW;render()" aria-pressed="${!NSHOW}">${NSHOW?"Namen verbergen":"Namen zeigen"}</button>`:"";
-let NSAVEQ=Promise.resolve();
-function saveNames(){if(!db.lock||!LKEY)return;const key=LKEY,o={...NAMES};for(const k in o)if(!db.sus.some(x=>x.id===k))delete o[k];
+let NSAVEQ=Promise.resolve(),NBAD=false; // NBAD: gespeicherte Namen ließen sich nicht lesen, dann nicht überschreiben (0.5.13)
+function saveNames(){if(!db.lock||!LKEY)return;if(NBAD)return toast("Die gespeicherte Namensliste ließ sich nicht lesen. Lade deine Datei „Namensliste“, dann wird wieder gespeichert.");const key=LKEY,o={...NAMES};for(const k in o)if(!db.sus.some(x=>x.id===k))delete o[k];
   NSAVEQ=NSAVEQ.then(async()=>{if(!Object.keys(o).length)return localStorage.removeItem(NKEY);localStorage.setItem(NKEY,JSON.stringify({somiEnc:1,...await gcm(key,enc(JSON.stringify(o)))}))}).catch(()=>toast("Namen konnten nicht gespeichert werden."))}
-async function loadNames(key){NAMES={};try{const raw=JSON.parse(localStorage.getItem(NKEY)||"null");if(!raw?.somiEnc)return;const o=JSON.parse(dec(await ungcm(key,raw)));if(okNames(o))NAMES=o}catch(e){}}
-function dropNames(){NAMES={};try{localStorage.removeItem(NKEY)}catch(e){}}
+async function loadNames(key){NAMES={};NBAD=false;let raw=null;try{raw=JSON.parse(localStorage.getItem(NKEY)||"null")}catch(e){}if(!raw?.somiEnc)return;
+  try{const o=JSON.parse(dec(await ungcm(key,raw)));if(okNames(o))NAMES=o;else NBAD=true}catch(e){NBAD=true}
+  if(NBAD)setTimeout(()=>toast("Die Namensliste ließ sich nicht lesen. Lade deine Datei „Namensliste“ unter Einstellungen."),700)}
+const namesDue=()=>hasNames()&&(db.nmUpd||1)>(db.nmBak||0);
+function dropNames(){NAMES={};NBAD=false;try{localStorage.removeItem(NKEY)}catch(e){}}
 // Halbjahre: 1. HJ ab 1. August, 2. HJ ab 1. Februar
 const hjStart=()=>{const d=new Date(),y=d.getFullYear(),m=d.getMonth();return m>=7?`${y}-08-01`:m>=1?`${y}-02-01`:`${y-1}-08-01`};
 const sjStart=()=>`${syNow().slice(0,4)}-08-01`;
@@ -448,21 +454,21 @@ const ancBox=K=>`${K.hint?`<p class="small" style="margin:6px 0 0;color:var(--si
   <div class="two small" style="margin-top:6px"><div><b>gut</b><ul class="anc">${K.gut.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div><b>ausreichend</b><ul class="anc">${K.aus.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div></details>`;
 // Runde (ab 0.4.2/0.4.3): pro Kürzel alle Kriterien plus Knopf „massive Unterrichtsstörung“ auf einem Bildschirm, dann „Weiter“
 function seqCard(g,ms){if(!ms.length)return `<div class="card"><p class="muted">Noch niemand in dieser Gruppe.</p></div>`;
-  if(!ER.ks)ER.ks=kritList(fOf(g)).map(x=>x.k);
+  if(!ER.ks){ER.ks=kritList(fOf(g)).map(x=>x.k);if(!ER.fresh&&!Object.keys(ER.run).length&&!ER.i)seqResume(g,ms)}
   const ks=ER.ks,runs=Object.values(ER.run),nA=runs.filter(v=>v==="abw").length,nB=runs.filter(v=>v!=="abw"&&Object.keys(v).length).length;
   const sum=`${nB} bewertet${nA?` · ${nA} nicht anwesend`:""}`;
   if(ER.i>=ms.length)return `<div class="card seqdone fill"><b style="font-size:1.2rem">Fertig</b><p>${nB} bewertet${nA?`, ${nA} nicht anwesend`:""}.</p>
-    <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="ER.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.run={};ER.ks=null;render()">Neue Runde</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
+    <p class="row" style="flex-wrap:wrap;margin-bottom:0"><button class="btn" onclick="ER.i=${ms.length-1};render()">‹ Letzte ansehen</button><button class="btn" onclick="ER.i=0;ER.run={};ER.ks=null;ER.fresh=1;render()">Neue Runde</button><button class="btn pri" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)}})">Zur Übersicht</button></p></div>`;
   const SP=fOf(g)==="Sport",s=ms[ER.i],r=ER.run[s.id],at=SP?attOf(g.id,s.id,ER.d||today()):null,abw=r==="abw"||at?.st==="abw",lz=lezOf(s,fOf(g)),rk=lz.length?lz.map(z=>"z:"+z.id):ks;
   const rows=rk.map(k=>{const z=lz.find(x=>"z:"+x.id===k),K=KMAP[k],id=r&&!abw?r[k]:null,o=id?db.obs.find(x=>x.id===id):null;
     if(z)return `<div class="pad mx mxz" role="group" aria-label="Förderplanziel: ${esc(z.t)}"><button class="seqk" onclick="lezInfo(${ja(z.t)})" aria-label="Förderplanziel: ${esc(z.t)}"><b>${esc(z.t)}</b></button>${padRow(k,o?.s,"Ziel "+z.t)}</div>`;
     return `<div class="pad mx" role="group" aria-label="${esc(K.t)}"><button class="seqk" onclick="krInfo('${k}')" aria-label="${esc(K.t)}: Hinweis und Ankertexte"><b>${esc(K.kz||K.t)}</b><span class="q" aria-hidden="true">?</span></button>${padRow(k,o?.s)}</div>`}).join("");
   const mxh=`<div class="mx mxh" aria-hidden="true"><span></span>${Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<span>${x.l.replace("über","über\u00ad")}</span>`).join("")}</div>`;
-  return `<div class="card seqc fill${SP?" sp":""}"><div class="seqhd">${bigSus(s)}${SP?`<button class="btn ghost ic" ${ER.i?"":"disabled"} onclick="seqPrev()" aria-label="Zurück zum vorigen Kürzel">‹</button>`:""}<span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
+  return `<div class="card seqc fill${SP?" sp":""}"><div class="seqhd">${bigSus(s)}<button class="btn ghost ic" ${ER.i?"":"disabled"} onclick="seqPrev()" aria-label="Zurück zum vorigen Kürzel">‹</button><span class="muted small" title="${esc(sum)}">${ER.i+1}/${ms.length}</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(ER.i/ms.length*100)}%"></i></div>
   ${SP?stPick(at):""}${abw?`<p class="small" style="margin:4px 0 0">Nicht anwesend. Stufe tippen hebt das auf.</p>`:""}
   ${lz.length?`<p class="small" style="margin:2px 0 0"><b>Förderplanziele</b> statt Kriterien</p>`:""}<div class="mxw" style="grid-template-rows:auto repeat(${rk.length},minmax(0,var(--mxr,64px)))">${mxh}${rows}</div>${jumpBar(ms)}
-  <div class="padwrap"><div class="three${SP?"":" m4"}">${SP?spBtns(s.id,at,true):`<button class="btn" ${ER.i?"":"disabled"} onclick="seqPrev()" aria-label="Zurück">‹</button><button class="btn abw" onclick="seqAbw()" aria-label="nicht anwesend">abwesend</button>${stBtn(s.id)}`}<button class="btn pri" onclick="seqNext()">Weiter ›</button></div></div>
+  <div class="padwrap"><div class="three">${SP?spBtns(s.id,at,true):`<button class="btn abw" onclick="seqAbw()" aria-label="nicht anwesend">abwesend</button>${stBtn(s.id)}`}<button class="btn pri" onclick="seqNext()">Weiter ›</button></div></div>
   ${erExtras()}</div>`}
 const padRow=(k,cur,lab)=>Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<button data-s="${v}" data-k="${esc(k)}" class="${cur===v?"cur":""}" aria-pressed="${cur===v}" onclick="seqSet(${ja(k)},'${v}')" aria-label="${esc(lab||KMAP[k].t)}: ${x.l}${SHOW?`, Notenwert ${fmtW(stw()[v])}`:""}">${SHOW?fmtW(stw()[v]):x.t}</button>`).join("");
 // Massive Unterrichtsstörung in der Runde (Mathe) und im Stundenstatus (Sport); gespeichert sofort, in ER.run unter "@st"
@@ -472,6 +478,13 @@ function stRow(sid){const r=ER.run[sid],id=r&&r!=="abw"?r["@st"]:null,on=!!(id&&
 function jumpBar(ms){return `<div class="jump" role="group" aria-label="Zu Kürzel springen">${ms.map((x,i)=>{const r=ER.run[x.id],c=r==="abw"?"ab":r&&Object.keys(r).length?"ok":"";return `<button class="${c}${i===ER.i?" cu":""}" aria-label="${esc(x.code)}${c==="ok"?", bewertet":c==="ab"?", abwesend":""}" onclick="ER.i=${i};render()">${esc(kurz(x,ms))}</button>`}).join("")}</div>`}
 function stBtn(sid){const r=ER.run[sid],id=r&&r!=="abw"?r["@st"]:null,on=!!(id&&db.asv.some(a=>a.id===id));
   return `<button class="btn abw stb${on?" cur":""}" aria-pressed="${on}" aria-label="Massive Störung${on?", vermerkt":""}" onclick="seqStoer(${ja(sid)})">${on?"⚠ vermerkt":"⚠ Störung"}</button>`}
+// 0.5.13: Wurde SoMi mitten in der Runde beendet, sind die heutigen Einträge schon gespeichert. Die Runde übernimmt sie
+// (Knöpfe markiert, erneutes Tippen ändert statt zu verdoppeln) und macht hinter dem letzten bewerteten Kürzel weiter.
+function seqResume(g,ms){const d=ER.d||today(),ids=new Set(ms.map(s=>s.id)),by={};
+  for(const o of db.obs)if(o.gid===g.id&&o.d===d&&!o.fb&&!o.pl&&ids.has(o.sid)){const k=o.k==="lez"?"z:"+o.z:o.k,r=by[o.sid]??={},p=r[k];if(!p||(o.upd||0)>=(p.upd||0))r[k]=o}
+  for(const a of db.asv)if(a.gid===g.id&&a.d===d&&a.m==="stoer"&&ids.has(a.sid))(by[a.sid]??={})["@st"]=a;
+  let last=-1;const run={};ms.forEach((s,i)=>{const r=by[s.id];if(!r)return;run[s.id]=Object.fromEntries(Object.entries(r).map(([k,o])=>[k,o.id]));last=i});
+  if(last<0)return;ER.run=run;ER.i=last+1;setTimeout(()=>toast(last+1>=ms.length?"Heute schon alle bewertet.":"Runde von heute fortgesetzt."),50)}
 function seqRun(sid){let r=ER.run[sid];if(!r||r==="abw")r=ER.run[sid]={};return r}
 function lezInfo(t){dlg(`<p style="font-weight:700;font-size:1.05rem;margin:0 0 6px">Förderplanziel</p><p style="margin:0 0 8px">${esc(t)}</p>
   <p class="small muted" style="margin:0 0 12px">Bewerte, wie sicher das Ziel heute erreicht ist: übertroffen, erfüllt, teilweise, kaum. Daraus entstehen der Notenvorschlag (wenn „Note im Zeugnis“ an ist) und die Textbausteine fürs Zeugnis.</p><button class="btn pri block" data-a="1">Schließen</button>`,(el,done)=>{el.querySelector('[data-a="1"]').onclick=()=>done(null)})}
@@ -549,19 +562,19 @@ function setAtt(st){const g=groupById(ER.gid);if(!g||!Object.hasOwn(ST,st))retur
 function attRest(){const g=groupById(ER.gid);if(!g)return;const d=ER.d||today(),ms=msOf(g);let n=0;
   for(const s of ms.slice(ER.i))if(!db.att.some(x=>x.gid===g.id&&x.sid===s.id&&x.d===d)){db.att.push(touch({id:uid(),gid:g.id,sid:s.id,d,st:"akt",...(ER.np[s.id]?{np:true}:{}),...(g.demo?{demo:true}:{})}));delete ER.np[s.id];n++}
   ER.i=ms.length;save();render();toast(`${n} als aktiv gespeichert`)}
-function attOvV(g){const from=OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00",all=db.att.filter(a=>a.gid===g.id&&a.d>=from),ms=msOf(g);
+function attOvV(g){const from=ovFrom(),all=db.att.filter(a=>a.gid===g.id&&a.d>=from),ms=msOf(g);
   const nT=new Set(all.map(a=>a.d)).size;
   const rows=ms.map(s=>{const m=all.filter(a=>a.sid===s.id);return `<tr onclick="go({tab:view.tab,group:${ja(g.id)},sus:${ja(s.id)}})"><th scope="row"><span class="code">${esc(s.code)}</span> ${profTag(s)}${nm(s)}</th>${Object.keys(ST).map(k=>{const n=m.filter(a=>a.st===k).length;return `<td class="num${k!=="akt"&&n>=3?" old":""}">${n||"–"}</td>`}).join("")}${(n=>`<td class="num${n>=3?" old":""}">${n||"–"}</td>`)(m.filter(a=>a.np).length)}<td class="num">${(n=>n?hid(String(n)):"–")(stOf(g.id,s.id,from).length)}</td></tr>`}).join("");
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button><div class="between"><h1 style="margin-bottom:4px">Übersicht</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · Stundenstatus · ${nT} ${nT===1?"Stunde":"Stunden"} erfasst</p>
-  <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
+  ${perPick()}
   ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">aktiv</th><th class="num">ohne Sachen</th><th class="num">sport&shy;unfähig</th><th class="num">nicht da</th><th class="num" title="ohne Schulplaner">ohne Planer</th><th class="num" title="massive Unterrichtsstörungen">Stör.</th></tr></thead><tbody>${rows}</tbody></table></div>
   <p class="small muted">Ab 3 Stunden ohne Sachen, sportunfähig, nicht da oder ohne Schulplaner ist die Zahl markiert. Schulplaner und Störungen zählen nicht zur Note.</p>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
   ${g.arch?"":`<p><button class="btn pri block" onclick="erStart(${ja(g.id)},'s')">Stundenstatus erfassen</button></p>`}`}
 
-let OVP="hj";
+let OVP="hj",OVD="";
 function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.ov};return groupV()}
   if(g.fach==="Sport"&&view.att)return attOvV(g);
-  const from=OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00";
+  const from=ovFrom();
   const all=[...obsOf(g.id).filter(o=>o.d>=from),...plObs(g.id,null,from)];
   const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code)),lim=daysAgo(14),hasKa=kaOf(g.id,from).length>0;
   const rows=ms.map(s=>{const os=all.filter(o=>o.sid===s.id).sort((a,b)=>a.d.localeCompare(b.d)||a.upd-b.upd),z=zaehl(s,g,os.filter(o=>!o.fb)),zb=zdBer(s,g);
@@ -571,27 +584,28 @@ function ovV(){const g=groupById(view.ov);if(!g){view={tab:view.tab,group:view.o
     <td class="num">${(n=>n?hid(String(n)):"–")(stOf(g.id,s.id,from).length)}</td><td class="verl nar">${z.slice(-6).map(o=>hid(oTxt(o))).join(" ")||"–"}</td><td class="small nar${old?" old":""}">${last?dDEy(last).slice(0,6):"–"}</td></tr>`}).join("");
   return `<button class="btn ghost" onclick="back()">‹ Zurück</button>
   <div class="between"><h1 style="margin-bottom:4px">Übersicht</h1><span class="row" style="gap:6px;flex-wrap:wrap;justify-content:flex-end">${nmBtn()}${ssBtn()}</span></div><p class="muted" style="margin-top:0">${esc(gName(g))} · ${hasKa?"Sonstige Mitarbeit und Klassenarbeiten":"Sonstige Mitarbeit"}</p>
-  <div class="pick" style="margin-bottom:10px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
+  ${perPick()}
   ${ms.length?`<div class="card" style="padding:6px 4px;overflow-x:auto"><table class="tbl"><thead><tr><th>Kürzel</th><th class="num">Einträge</th><th class="num">${hasKa?"SoMi":"Note"}</th>${hasKa?`<th class="num">KA</th><th class="num">Gesamt</th>`:""}<th class="num" title="massive Unterrichtsstörungen">Stör.</th><th class="nar">Verlauf</th><th class="nar">zuletzt</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p class="muted">Noch niemand in dieser Gruppe.</p>`}
-  <p class="muted small">Verlauf: neueste Stufe rechts (++ + o −). „+2“ heißt: 2 weitere Einträge, die nicht zählen (alte Rückmeldungen oder Kriterien bei Förderplanzielen). Rot: seit 2 Wochen kein Eintrag. „Note“ ist ein rechnerischer Vorschlag aus den Stufen (Umrechnung unter Einstellungen). ${hasKa?` „KA“: Schnitt der ${esc(kaL(g)[1])}. „Gesamt“: ${wTxt(g)}, nur wenn beides da ist. Ins Zeugnis kommt eine ganze Note.`:""} „Stör.“: massive Unterrichtsstörungen, zählen nicht zur Note. Laut SILP zählt die Gesamtentwicklung: Du entscheidest die Note.</p>
+  <details class="small muted leg"><summary>Erklärung zur Tabelle</summary><p style="margin:6px 0 0">Verlauf: neueste Stufe rechts (++ + o −). „+2“ heißt: 2 weitere Einträge, die nicht zählen (alte Rückmeldungen oder Kriterien bei Förderplanzielen). Rot: seit 2 Wochen kein Eintrag. „Note“ ist ein rechnerischer Vorschlag aus den Stufen (Umrechnung unter Einstellungen). ${hasKa?` „KA“: Schnitt der ${esc(kaL(g)[1])}. „Gesamt“: ${wTxt(g)}, nur wenn beides da ist. Ins Zeugnis kommt eine ganze Note.`:""} „Stör.“: massive Unterrichtsstörungen, zählen nicht zur Note. Laut SILP zählt die Gesamtentwicklung: Du entscheidest die Note.</p></details>
   ${grpPdfCard(g)}
   ${g.arch?"":`<p class="row" style="flex-wrap:wrap"><button class="btn pri" onclick="erStart(${ja(g.id)})">Erfassen</button><button class="btn" onclick="KD=null;go({tab:view.tab,group:${ja(g.id)},ka:${ja(g.id)}})">${kaL(g)[1]}</button>${g.fach==="Sport"?`<button class="btn" onclick="go({tab:view.tab,group:${ja(g.id)},ov:${ja(g.id)},att:true})">Stundenstatus</button>`:""}</p>`}`}
 
 // Auf der Seite einer Schülerin, eines Schülers: Einträge dieser Lerngruppe
-function susObsV(s,g){const os=[...obsOf(g.id,s.id),...plObs(g.id,s.id)].sort((a,b)=>b.d.localeCompare(a.d)||b.upd-a.upd),z=zaehl(s,g,os.filter(o=>!o.fb)),ro=!!g.arch,lz=lezOf(s,fOf(g)),zb=zdBer(s,g);
+function susObsV(s,g){const from=ovFrom(),os=[...obsOf(g.id,s.id).filter(o=>o.d>=from),...plObs(g.id,s.id,from)].sort((a,b)=>b.d.localeCompare(a.d)||b.upd-a.upd),z=zaehl(s,g,os.filter(o=>!o.fb)),ro=!!g.arch,lz=lezOf(s,fOf(g)),zb=zdBer(s,g);
   const per=lz.length?"":KRIT.map(K=>{const a=z.filter(o=>o.k===K.k);return a.length?`<span class="tag">${esc(K.t)}: ${hid(noteTxt(mean(a)))} (${a.length})</span>`:""}).join(" ");
   const sz=lz.map(q=>[q,z.filter(o=>o.z===q.id)]),tb=sz.map(([q,a])=>lezSatz(q,a)).filter(Boolean);
   const lzBox=lz.length?`<div style="margin:6px 0 10px"><b class="small">Förderplanziele</b>${sz.map(([q,a])=>`<div class="small" style="margin:4px 0">${esc(q.t)} <span class="muted">(${a.length} ${a.length===1?"Eintrag":"Einträge"}${a.length?`, ${hid(lezStand(a))}`:""})</span></div>`).join("")}
     ${tb.length?`<div class="small" style="margin-top:8px"><b>Textbausteine fürs Zeugnis</b>${tb.map(t=>`<div style="margin:3px 0">${hid(esc(t))}</div>`).join("")}</div>`:""}</div>`:"";
   return `<div class="card"><div class="between"><b>Sonstige Mitarbeit in ${esc(gName(g))}</b>${ssBtn()}</div>
+  <p class="small muted" style="margin:8px 0 4px">Zeitraum für Einträge, Notenvorschlag und PDF (wie in der Übersicht)</p>${perPick(6)}
   <p class="small muted" style="margin:6px 0">${z.length} zählende ${z.length===1?"Beobachtung":"Beobachtungen"}${lz.length?" zu den Förderplanzielen":os.length>z.length?`, ${os.length-z.length} nur Rückmeldung`:""} · ${zb?"Zeugnis: Bericht statt Note":genug(z)?`Notenvorschlag ${hid(vorschlag(z))}`:`Notenvorschlag ab 3 Beobachtungen in 2 ${lz.length?"Zielen":"Kriterien"}`}</p>${per?`<p style="display:flex;flex-wrap:wrap;gap:6px">${per}</p>`:""}${lzBox}
   ${os.length?`<ul class="obsl">${os.map(o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(zLab(o,s))}</span><br><b>${o.fb?`<span class="muted">Rückmeldung</span> ${hid(oTxt(o))}`:hid(oTxt(o))}</b>${o.t?` <span class="small">${esc(o.t)}</span>`:""}</div>
-  ${ro?"":o.pl?`<span class="small muted">gesondert</span>`:`${o.fb?`<button class="btn ghost small" aria-label="Alter Eintrag als Rückmeldung, zählt nicht. Tippen: zählt" onclick="obsFb(${ja(o.id)})">zählt nicht</button>`:""}<button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="obsDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul>`:`<p class="muted small">Noch keine Einträge.</p>`}
+  ${ro?"":o.pl?`<span class="small muted">gesondert</span>`:`${o.fb?`<button class="btn ghost small" aria-label="Alter Eintrag als Rückmeldung, zählt nicht. Tippen: zählt" onclick="obsFb(${ja(o.id)})">zählt nicht</button>`:""}<button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="obsDel(${ja(o.id)})">✕</button>`}</li>`).join("")}</ul>`:`<p class="muted small">${OVP==="all"?"Noch keine Einträge.":"Keine Einträge in diesem Zeitraum."}</p>`}
   ${ro?"":lz.length?`<p style="margin-bottom:0"><button class="btn" onclick="ER={...erNeu(${ja(g.id)},'k'),i:${Math.max(0,msOf(g).findIndex(x=>x.id===s.id))}};go({tab:view.tab,group:${ja(g.id)},erf:${ja(g.id)}})">Ziele für ${esc(s.code)} bewerten</button></p>`:`<p style="margin-bottom:0"><button class="btn" onclick="ER={...erNeu(${ja(g.id)},'e'),sel:[${ja(s.id)}]};go({tab:view.tab,group:${ja(g.id)},erf:${ja(g.id)}})">Für ${esc(s.code)} erfassen</button></p>`}</div>
   ${kaSusCard(s,g,!zb&&genug(z)?noteMean(z):null)}`}
-function kaSusCard(s,g,somi){if(!kaOf(g.id).length)return "";const k=kaMean(g.id,s.id),t=gesamt(somi,k,g.fach);
+function kaSusCard(s,g,somi){if(!kaOf(g.id).length)return "";const k=kaMean(g.id,s.id,ovFrom()),t=gesamt(somi,k,g.fach);
   return `<div class="card"><div class="between"><b>${kaL(g)[1]} in ${esc(gName(g))}</b>${g.fach==="Mathe"?"":ssBtn()}</div>${kaSusV(s,g)}
-  <p class="small" style="margin:8px 0 0">Schnitt: ${k==null?"–":hid(noteTxt(k))} · <b>Gesamtvorschlag: ${t==null?"–":hid(noteTxt(t))}</b></p>
+  <p class="small" style="margin:8px 0 0">Schnitt (${esc(perTxt())}): ${k==null?"–":hid(noteTxt(k))} · <b>Gesamtvorschlag: ${t==null?"–":hid(noteTxt(t))}</b></p>
   <p class="small muted" style="margin:4px 0 0">Gesamt: ${wTxt(g)}. Ins Zeugnis kommt eine ganze Note. Laut SILP zählt die Gesamtentwicklung, nicht nur der Mittelwert.</p></div>`}
 function setKgw(k,n){if(!Object.hasOwn(KMAP,k)||!GWS(kF(KMAP[k])).includes(n))return;const o={...(db.kgw||{})};if(n===(KGW0[k]||1))delete o[k];else o[k]=n;if(Object.keys(o).length)db.kgw=o;else delete db.kgw;save();render()}
 function setStw(v,t){const x=parseFloat(String(t).replace(",","."));if(!(x>=1&&x<=6))return render(),toast("Bitte einen Wert von 1 bis 6.");db.stw={...(db.stw||{}),[v]:Math.round(x*10)/10};save();render();toast("Umrechnung gespeichert")}
@@ -656,7 +670,7 @@ function kaListV(){const g=groupById(view.ka);if(!g){view={tab:view.tab,group:vi
   const PL=!!view.plm,ro=!!g.arch,list=kaOf(g.id,null,PL).reverse(),n=g.members.length,L=kaL(g,PL);
   const pts=!PL||KD?.k==="sue",SP=PL&&g.fach==="Sport";
   return `<button class="btn ghost" onclick="KD=null;back()">‹ Zurück</button>
-  <div class="between"><h1 style="margin-bottom:4px">${L[1]}</h1>${ssBtn()}</div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>
+  <div class="between" style="flex-wrap:wrap"><h1 style="margin-bottom:4px;min-width:0;overflow-wrap:anywhere">${L[1]}</h1>${ssBtn()}</div><p class="muted" style="margin-top:0">${esc(gName(g))}${g.demo?" · fiktives Beispiel":""}</p>
   ${ro?"":KD?`<div class="card"><b>${PL?"Neu anlegen":`Neue ${L[0]}`}</b>
     ${SP?`<label>Art</label><div class="pick">${PUEART.map(t=>`<button class="${KD.art===t?"on":""}" aria-pressed="${KD.art===t}" onclick="KD.art=${ja(t)};render()">${esc(t)}</button>`).join("")}</div>
     <label>Zählt im Bereich</label><div class="pick" style="grid-template-columns:repeat(2,1fr)">${PUEB.map(b=>`<button class="${KD.b===b?"on":""}" aria-pressed="${KD.b===b}" onclick="KD.b='${b}';render()">${esc(KMAP[b].t)}</button>`).join("")}</div>`
@@ -741,12 +755,13 @@ function kaCard(a,ms){if(KE.i>=ms.length){const nx=a.k==="pue"&&KE.rg?rgUsed(a).
   return `<div class="card kan kpk fill"><div class="row" style="gap:6px"><button class="btn ghost ic" ${KE.i?"":"disabled"} onclick="KE.i--;render();kaFocus()" aria-label="Zurück zum vorigen Kürzel">‹</button><b class="grow">${KE.i+1} von ${ms.length}</b><span class="muted small">${kaSt(a).p} eingetragen</span></div>
   <div class="bar" aria-hidden="true"><i style="width:${Math.round(KE.i/ms.length*100)}%"></i></div>
   ${bigSus(s)}
-  <div class="kpw"><input id="kp" class="kp" inputmode="none" autocomplete="off" value="${x.p!=null?fmtP(x.p):""}" onkeydown="if(event.key==='Enter'){event.preventDefault();kaSave()}" aria-label="Punkte von ${fmtP(max)}" aria-describedby="kpn"><span><span class="muted">von ${fmtP(max)}</span><span id="kpn" class="small muted">${x.st?`${KAST[x.st]}`:x.p!=null?`Note ${hid(nTxt(kaNote(a,s.id)))}`:"halbe mit Komma"}</span></span></div>
+  <div class="kpw"><input id="kp" class="kp${!SHOW&&x.p!=null?" msk":""}" inputmode="none" autocomplete="off" value="${x.p!=null?fmtP(x.p):""}" oninput="this.classList.remove('msk')" onkeydown="if(event.key==='Enter'){event.preventDefault();kaSave()}" aria-label="Punkte von ${fmtP(max)}" aria-describedby="kpn"><span><span class="muted">von ${fmtP(max)}</span><span id="kpn" class="small muted">${x.st?`${KAST[x.st]}`:x.p!=null?`Note ${hid(nTxt(kaNote(a,s.id)))}`:"halbe mit Komma"}</span></span></div>
   <div class="pad padn kpad" role="group" aria-label="Ziffern">${["7","8","9","4","5","6","1","2","3",",","0","⌫"].map(k=>`<button onclick="kpKey('${k}')"${k==="⌫"?' aria-label="Ziffer löschen"':""}>${k}</button>`).join("")}</div>
   ${zd||na?`<div class="two" style="margin-top:6px">${zd?`<button class="btn" onclick="kaMxDlg()">Höchstpunkte ${fmtP(max)} …</button>`:""}${na?`<button class="btn${x.na?" stb cur":""}" onclick="kaNaDlg()">${x.na?"✓ NA gewährt":"Nachteilsausgleich …"}</button>`:""}</div>`:""}
   <div class="three" style="margin-top:6px"><button class="btn abw" onclick="kaSetSt('fehlt')" aria-label="nicht mitgeschrieben">fehlt</button><button class="btn abw" onclick="kaSetSt('nach')" aria-label="schreibt nach">holt nach</button><button class="btn pri" onclick="kaSave()" aria-label="Speichern und weiter">Weiter ›</button></div></div>`}
 // 0.5.11: Ziffernfeld statt Systemtastatur (auf dem iPhone fehlt dort die Eingabetaste, und sie verdeckt die Knöpfe)
-function kpKey(k){const el=$("#kp");if(!el)return;let v=el.value;if(k==="⌫")v=v.slice(0,-1);else if(k===","){if(!v.includes(","))v=(v||"0")+","}else if(v.length<7)v+=k;el.value=v;el.focus()}
+function kpKey(k){const el=$("#kp");if(!el)return;let v=el.value;if(el.classList.contains("msk")){el.classList.remove("msk");v=""} // verdeckte alte Punkte: Tippen ersetzt sie (0.5.13)
+  if(k==="⌫")v=v.slice(0,-1);else if(k===","){if(!v.includes(","))v=(v||"0")+","}else if(v.length<7)v+=k;el.value=v;el.focus()}
 async function kaNaDlg(){const {a,s}=kaCur();if(!s)return;const x=a.r[s.id]||{};
   const r=await dlg(`<p style="font-weight:700;margin:0 0 6px">Nachteilsausgleich für ${esc(s.code)}</p><p class="small muted" style="margin:0 0 6px">${s.na?esc(s.na):"Im Profil steht noch kein Nachteilsausgleich."}</p>
   <label class="swr"><span class="grow">Nachteilsausgleich gewährt</span><input id="dna" type="checkbox" class="sw" ${x.na?"checked":""}></label>
@@ -761,7 +776,7 @@ function kaSave(){const {a,s}=kaCur();if(!s)return;const v=parseP($("#kp")?.valu
   if(Number.isNaN(v)||v!=null&&(v<0||v>max))return toast(`Bitte eine Zahl von 0 bis ${fmtP(max)}.`);
   if(v==null){if(x.p!=null||x.st){delete x.p;delete x.st}}else{x.p=v;delete x.st}
   if(Object.keys(x).length)a.r[s.id]=x;else delete a.r[s.id];touch(a);save();
-  const n=kaNote(a,s.id);KE.i++;render();kaFocus();if(v!=null)toast(`${s.code}: ${fmtP(v)} Punkte${SHOW&&n?" · Note "+nTxt(n):""}`)}
+  const n=kaNote(a,s.id);KE.i++;render();kaFocus();if(v!=null)toast(SHOW?`${s.code}: ${fmtP(v)} Punkte${n?" · Note "+nTxt(n):""}`:`${s.code} gespeichert`)}
 function kaSetSt(st){const {a,s}=kaCur();if(!s||!Object.hasOwn(KAST,st))return;const x={...(a.r[s.id]||{}),st};delete x.p;delete x.n;a.r[s.id]=x;touch(a);save();KE.i++;render();kaFocus();toast(`${s.code}: ${kaStL(a,st)}`)}
 function kaSetN(n){const {a,s}=kaCur();if(!s||!plNote(a)||!NOTEN.includes(n))return;const x={...(a.r[s.id]||{}),n};delete x.st;a.r[s.id]=x;touch(a);save();KE.i++;render();toast(`${s.code} gespeichert${SHOW?": "+nTxt(n):""}`)}
 function kaMx(t){const {a,s}=kaCur();if(!s)return;const v=parseP(t),x={...(a.r[s.id]||{})};
@@ -805,14 +820,19 @@ const AV={"+":{t:"+",l:"gut"},"o":{t:"○",l:"teils"},"-":{t:"−",l:"schwierig"
 function okAsv(a){try{return !!a&&okId(a.id)&&okId(a.gid)&&okId(a.sid)&&Object.hasOwn(AMAP,a.m)&&Object.hasOwn(AV,a.v)&&(a.m!=="stoer"||a.v==="-")&&okDate(a.d)&&okStr(a.t,300)&&okNum(a.upd)}catch(e){return false}}
 const asvOf=(gid,sid,from)=>db.asv.filter(a=>a.gid===gid&&(!sid||a.sid===sid)&&(!from||a.d>=from));
 const stOf=(gid,sid,from)=>asvOf(gid,sid,from).filter(a=>a.m==="stoer");
-const ovFrom=()=>OVP==="hj"?hjStart():OVP==="sj"?sjStart():"0000-00-00";
+const ovFrom=()=>OVP==="hj"?hjStart():OVP==="sj"?sjStart():OVP==="ab"&&OVD?OVD:"0000-00-00";
+// 0.5.13: ein Zeitraum für Übersicht, Kürzel-Seite und PDF; „Ab …“ = frei gewählter Stichtag (Quartal, Elternsprechtag)
+const PERT={hj:"Halbjahr",sj:"Schuljahr",all:"Alles",ab:"Ab …"};
+const perTxt=()=>OVP==="ab"?`ab ${dDEy(OVD)}`:({hj:"dieses Halbjahr",sj:"dieses Schuljahr",all:"alle Einträge"})[OVP]||"";
+const perPick=(mb=10)=>`<div class="pick p4" style="margin-bottom:${mb}px" role="group" aria-label="Zeitraum">${Object.entries(PERT).map(([k,t])=>`<button class="${OVP===k?"on":""}" aria-pressed="${OVP===k}" onclick="perSet('${k}')">${t}</button>`).join("")}</div>${OVP==="ab"?`<div class="row" style="margin:-2px 0 10px"><label class="small grow" for="ovd" style="margin:0">Einträge ab</label><input id="ovd" type="date" style="width:auto" max="${today()}" value="${OVD}" onchange="if(okDate(this.value)){OVD=this.value;render()}"></div>`:""}`;
+function perSet(k){if(!Object.hasOwn(PERT,k))return;if(k==="ab"&&!OVD)OVD=hjStart();OVP=k;render()}
 const stBtnTxt=on=>`⚠ ${on?"Störung vermerkt (tippen nimmt zurück)":"Massive Unterrichtsstörung"}`;
 function asvDel(id){const a=db.asv.find(x=>x.id===id);if(!a)return;db.asv=db.asv.filter(x=>x.id!==id);db.del.push(id);save();render();
   undoToast("Eintrag gelöscht",()=>{db.del=db.del.filter(x=>x!==id);db.asv.push(touch(a));save();render()})}
 // Einzeln bewerten: Störung für die ausgewählten Kürzel
 function addStoer(){const g=groupById(ER.gid);if(!g||g.arch)return;if(!ER.sel.length)return toast("Tippe zuerst ein Kürzel an.");
-  stNote(t=>{const g2=groupById(ER.gid);if(!g2||g2!==g)return;
-  const neu=ER.sel.filter(id=>g.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,m:"stoer",v:"-",d:ER.d||today(),t,...(g.demo?{demo:true}:{})}));
+  stNote(t=>{const g2=groupById(ER.gid);if(!g2||g2.id!==g.id||g2.arch)return; // nach Sperre und Entsperren ist g ein neues Objekt (0.5.13)
+  const neu=ER.sel.filter(id=>g2.members.includes(id)).map(sid=>touch({id:uid(),gid:g.id,sid,m:"stoer",v:"-",d:ER.d||today(),t,...(g.demo?{demo:true}:{})}));
   db.asv.push(...neu);ER.sel=[];save();render();const ids=new Set(neu.map(a=>a.id));
   undoToast("Störung vermerkt",()=>{db.asv=db.asv.filter(a=>!ids.has(a.id));save();render()})})}
 // Kürzel-Seite: Störungen dieser Gruppe, darunter alte Verhaltenseinträge (nur noch lesen und löschen)
@@ -820,7 +840,7 @@ function stSusCard(s,g){const from=ovFrom(),st=stOf(g.id,s.id,from).sort((x,y)=>
   const li=o=>`<li><div class="grow"><span class="small muted">${dDEy(o.d)} · ${esc(AMAP[o.m].t)}</span>${o.m==="stoer"?"":`<br><b>${AV[o.v].t}</b>`}${o.t?`<br><span class="small">${esc(o.t)}</span>`:""}</div>${ro?"":`<button class="btn ghost small danger" aria-label="Eintrag löschen" onclick="asvDel(${ja(o.id)})">✕</button>`}</li>`;
   if(!st.length&&!alt.length)return "";
   return `<div class="card"><div class="between"><b>Massive Unterrichtsstörungen in ${esc(gName(g))}</b>${ssBtn()}</div>
-  <p class="small muted" style="margin:6px 0 0">${OVP==="hj"?"Dieses Halbjahr":OVP==="sj"?"Dieses Schuljahr":"Alle"}: ${hid(String(st.length))} · zählt nicht zur Note</p>
+  <p class="small muted" style="margin:6px 0 0">${esc(perTxt().replace(/^./,c=>c.toUpperCase()))}: ${hid(String(st.length))} · zählt nicht zur Note</p>
   ${SHOW&&st.length?`<ul class="obsl">${st.map(li).join("")}</ul>`:""}
   ${alt.length&&SHOW?`<details style="margin-top:8px"><summary class="small" style="font-weight:700;cursor:pointer">Ältere Einträge Arbeits- und Sozialverhalten (${alt.length})</summary><p class="small muted">Aus Beta 0.4.0 bis 0.4.2. Werden nicht mehr erfasst. Du kannst sie löschen.</p><ul class="obsl">${alt.map(li).join("")}</ul></details>`:""}</div>`}
 function demoStoer(g){return [touch({id:uid(),gid:g.id,sid:g.members[6],m:"stoer",v:"-",d:daysAgo(3),t:"Fiktiv: Arbeitsblätter zerrissen, Unterricht 10 Minuten unterbrochen",demo:true})]}
@@ -924,12 +944,20 @@ function render(){if(WIPED)return; // gesperrt: Ansicht bleibt stehen, bis entsp
   else a.innerHTML={heute:heuteV,gruppen:gruppenV,profil:profilV}[view.tab]();
   if(sp.length)a.querySelectorAll(".tilew").forEach((e,i)=>{if(sp[i])e.scrollTop=sp[i]});
   if(view.mark)requestAnimationFrame(()=>$("#app .mark")?.scrollIntoView({block:"center",behavior:"smooth"}));
+  a.querySelectorAll("tr[onclick]").forEach(r=>{r.tabIndex=0}); // 0.5.13: Tabellenzeilen auch mit der Tastatur erreichbar
 }
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches?.("tr[onclick]")){e.preventDefault();e.target.click()}});
 
 /* ===== Eigene Dialoge (funktionieren auch dort, wo confirm/prompt blockiert sind) ===== */
 function dlg(html,onMount){return new Promise(res=>{const el=document.createElement("div");el.className="cele"+(LOCKED?" lockdlg":"");el.style.zIndex=LOCKED?120:40;
   el.innerHTML=`<div class="box" role="dialog" aria-modal="true">${html}</div>`;document.body.appendChild(el);
-  const done=v=>{el.remove();res(v)};el.onclick=e=>{if(e.target===el)done(null)};onMount(el,done)})}
+  // 0.5.13: Escape bricht ab, Tab bleibt im Dialog. Tipp daneben schließt nur, wenn nichts eingetippt werden kann (sonst wäre der Text weg).
+  const key=e=>{if(!el.isConnected)return document.removeEventListener("keydown",key,true);if(document.querySelector(".cele:last-of-type")!==el)return;
+    if(e.key==="Escape"){e.preventDefault();done(null)}
+    else if(e.key==="Tab"){const f=[...el.querySelectorAll("button,input,select,textarea,summary,[tabindex]")].filter(x=>!x.disabled&&x.offsetParent);if(!f.length)return;const i=f.indexOf(document.activeElement);if(e.shiftKey?i<=0:i===f.length-1){e.preventDefault();f[e.shiftKey?f.length-1:0].focus()}}};
+  const done=v=>{document.removeEventListener("keydown",key,true);el.remove();res(v)};document.addEventListener("keydown",key,true);
+  el.onclick=e=>{if(e.target===el&&!el.querySelector("textarea,input:not([type=checkbox]):not([type=radio])"))done(null)};onMount(el,done);
+  const bx=el.firstElementChild,ti=bx.querySelector("p,h2");if(ti){ti.id=ti.id||"dlgT"+Date.now();bx.setAttribute("aria-labelledby",ti.id)}if(!el.contains(document.activeElement)){bx.tabIndex=-1;bx.focus({preventScroll:true})}})}
 async function ask(msg,o={}){const r=await dlg(`<p style="font-weight:700;font-size:1.05rem;margin:0 0 ${o.sub?6:16}px">${esc(msg)}</p>${o.sub?`<p class="small muted" style="margin:0 0 16px">${esc(o.sub)}</p>`:""}
   <div class="duo"><button class="btn" data-a="0">${esc(o.cancel||"Abbrechen")}</button><button class="btn pri" data-a="1" style="${o.danger?"background:var(--down);border-color:var(--down)":""}">${esc(o.ok||"OK")}</button></div>`,
   (el,done)=>{el.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>done(b.dataset.a==="1"));el.querySelector('[data-a="1"]').focus()});return r===true}
@@ -1027,7 +1055,7 @@ function namesV(){let ms,title;if(view.nkl){ms=klOf(view.nkl).filter(s=>!s.demo)
   <p style="margin-bottom:0"><button class="btn pri block" onclick="saveNamesV()">Namen speichern</button></p></div>`}
 function saveNamesV(){if(!db.lock||!LKEY)return;let n=0;
   document.querySelectorAll("#app input[data-sid]").forEach(i=>{const sid=i.dataset.sid,v=i.value.trim().slice(0,60);if(!susById(sid))return;if(v){NAMES[sid]=v;n++}else delete NAMES[sid]});
-  saveNames();back();toast(n?`${n} ${n===1?"Name":"Namen"} gespeichert`:"Namen entfernt")}
+  db.nmUpd=Date.now();save();saveNames();back();toast(n?`${n} ${n===1?"Name":"Namen"} gespeichert. Denk an „Namensliste sichern“.`:"Namen entfernt")}
 function groupV(){const g=groupById(view.group);if(!g){view={tab:"gruppen"};return gruppenV()}
   const ms=g.members.map(susById).filter(Boolean).sort((a,b)=>byNum(a.code,b.code)),ro=!!g.arch,id=ja(g.id),M=g.fach==="Mathe";
   const others=pickable(g),n=x=>x?` (${x})`:"",b=(t,oc,c="")=>`<button class="btn${c}" onclick="${oc}">${t}</button>`,nrl=rlOf(g.id).filter(a=>!a.arch).length;
@@ -1100,7 +1128,7 @@ function klImport(cls,txt){const lines=[...new Set(String(txt||"").split(/\r?\n/
   const neu=code=>{const s=touch({id:uid(),code,cls,icon:freeIcon(cls),profil:"r",na:"",zdNote:false,kl:true});db.sus.push(s);n++;return s};
   for(const x of lines){if(isCode(x)){const s=db.sus.find(y=>y.code.toLowerCase()===x.toLowerCase());if(s){if(!s.kl){s.kl=true;touch(s)}skip++}else neu(x);continue}
     if(have.has(x.toLowerCase())){skip++;continue}const s=neu(nextCode(cls));NAMES[s.id]=x;have.add(x.toLowerCase())}
-  save();if(nms.length)saveNames();toast(`${n} Kürzel angelegt${skip?`, ${skip} schon vorhanden`:""}`);return n||skip}
+  if(nms.length)db.nmUpd=Date.now();save();if(nms.length)saveNames();toast(`${n} Kürzel angelegt${skip?`, ${skip} schon vorhanden`:""}`);return n||skip}
 function klV(){const cls=view.kl,ms=klOf(cls);if(!ms.length){view={tab:"gruppen"};return gruppenV()}
   if(!KLD||KLD.neu||KLD.cls!==cls)KLD={cls,txt:"",open:false};
   const frei=ms.filter(s=>!inGroups(s.id).length&&!s.demo);
@@ -1225,7 +1253,7 @@ const PC={ink:[30,38,34],muted:[96,108,101],acc:[46,107,87],line:[210,220,214],s
 let PDFNM=false;
 const pTxt=t=>String(t??"").replace(/−/g,"-");
 async function susPdf(sid,gid){const s=susById(sid),g=groupById(gid);if(!s||!g||!g.members.includes(sid))return;
-  const from=ovFrom(),SP=g.fach==="Sport",per={hj:"dieses Halbjahr",sj:"dieses Schuljahr",all:"alle Einträge"}[OVP]||"";
+  const from=ovFrom(),SP=g.fach==="Sport",per={hj:"dieses Halbjahr",sj:"dieses Schuljahr",all:"alle Einträge",ab:"frei gewählt"}[OVP]||"";
   const d=new Pdf(595,842,46),L=d.M,W=d.W-2*d.M,CW=118;
   const kv=(k,v)=>{d.need(15);const y=d.y;d.text(L,y+10,k,{size:9.5,color:"muted"});d.y=y;d.wrap(pTxt(v),L+CW,W-CW,{size:10,lh:14})};
   const sec=t=>{d.y+=14;d.need(50);d.text(L,d.y+12,t,{size:13,bold:1,color:"acc"});d.y+=18;d.line(L,d.y,L+W,d.y);d.y+=6};
@@ -1267,7 +1295,7 @@ async function susPdf(sid,gid){const s=susById(sid),g=groupById(gid);if(!s||!g||
 function grpPdfCard(g){return `<div class="card noprint"><b>PDF der Lerngruppe</b><p class="small muted" style="margin:4px 0 8px">Notenliste im gewählten Zeitraum, z. B. für die Zeugniskonferenz. Enthält Noten, also nicht am Beamer öffnen.</p>
   ${hasNames()?`<label class="swr"><span class="grow">Namen ins PDF<span class="sub">Sonst stehen nur die Kürzel drin.</span></span><input type="checkbox" class="sw" ${PDFNM?"checked":""} onchange="PDFNM=this.checked"></label>`:""}
   <button class="btn block" onclick="grpPdf(${ja(g.id)})">PDF der Lerngruppe erstellen</button></div>`}
-async function grpPdf(gid){const g=groupById(gid);if(!g)return;const from=ovFrom(),SP=g.fach==="Sport",ms=msOf(g),per={hj:"dieses Halbjahr",sj:"dieses Schuljahr",all:"alle Einträge"}[OVP]||"";
+async function grpPdf(gid){const g=groupById(gid);if(!g)return;const from=ovFrom(),SP=g.fach==="Sport",ms=msOf(g),per={hj:"dieses Halbjahr",sj:"dieses Schuljahr",all:"alle Einträge",ab:"frei gewählt"}[OVP]||"";
   const d=new Pdf(842,595,40),L=d.M,W=d.W-2*d.M,hasKa=kaOf(g.id,from).length>0;
   d.text(L,d.y+16,`Notenliste ${gName(g)}`,{size:17,bold:1});d.y+=26;
   d.wrap(`Zeitraum: ${per}${OVP==="all"?"":` (ab ${dDEy(from)})`} · Schuljahr ${g.sy} · erstellt am ${dDEy(today())}`,L,W,{size:9.5,color:"muted"});d.y+=6;
@@ -1281,7 +1309,7 @@ async function grpPdf(gid){const g=groupById(gid);if(!g)return;const from=ovFrom
   if(await giveFile(name,d.bytes(`SoMi · ${gName(g)} · vertraulich`),"application/pdf"))toast("PDF erstellt")}
 function pdfCard(s,g){const hasN=!!NAMES[s.id];
   return `<div class="card"><b>PDF</b><p class="small muted" style="margin:4px 0 8px">Übersicht für ${esc(s.code)} in ${esc(gName(g))}: alle Einträge, Noten und Vorschläge im gewählten Zeitraum. ${isIOS?"Es öffnet sich das Teilen-Fenster: „In Dateien sichern“ oder „Drucken“.":"Die Datei wird heruntergeladen."} Enthält Noten, also nicht am Beamer öffnen.</p>
-  <div class="pick" style="margin-bottom:8px">${[["hj","Halbjahr"],["sj","Schuljahr"],["all","Alles"]].map(([k,t])=>`<button class="${OVP===k?"on":""}" aria-pressed="${OVP===k}" onclick="OVP='${k}';render()">${t}</button>`).join("")}</div>
+  ${perPick(8)}
   ${hasN?`<label class="swr"><span class="grow">Name ins PDF<span class="sub">Sonst steht nur das Kürzel drin.</span></span><input type="checkbox" class="sw" ${PDFNM?"checked":""} onchange="PDFNM=this.checked"></label>`:""}
   <button class="btn pri block" onclick="susPdf(${ja(s.id)},${ja(g.id)})">PDF erstellen</button></div>`}
 
@@ -1295,14 +1323,14 @@ function profilV(){const sub=view.sub||(view.mark?"sich":null);
   return `<h1>Einstellungen</h1>
   <div class="card"><b>Erscheinungsbild</b><div class="pick" style="margin-top:10px">${[["system","Wie Gerät"],["light","Hell"],["dark","Dunkel"]].map(([k,t])=>`<button class="${(db.theme||"system")===k?"on":""}" onclick="db.theme='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div>
   <div class="sub" style="margin:14px 0 6px;font-weight:700">Schriftgröße</div><div class="pick">${[["m","Normal"],["l","Groß"],["xl","Sehr groß"]].map(([k,t])=>`<button class="${(db.fs||"m")===k?"on":""}" onclick="db.fs='${k}';save();applyTheme();render()">${t}</button>`).join("")}</div></div>
-  ${tap("sich","Sperre und Daten",`${db.lock?"Sperre an":"Sperre aus"} · ${db.lastBackup?"letzte Sicherung "+dDEy(iso(new Date(db.lastBackup))):"noch keine Sicherung"}`)}
+  ${tap("sich","Sperre und Daten",`${db.lock?"Sperre an":"Sperre aus"} · ${db.lastBackup?"letzte Sicherung "+dDEy(iso(new Date(db.lastBackup))):"noch keine Sicherung"}${db.lock&&LKEY&&namesDue()?" · Namensliste nicht gesichert":""}`)}
   ${tap("noten","Noten berechnen","Kriterien, Gewichte, Umrechnung, schriftliche Leistungen")}
   <p class="muted small" style="text-align:center">SoMi ${SOMI_VERSION} · Stand ${SOMI_STAND} · nur für den eigenen Unterricht</p>`}
 function notenSet(){return `  <div class="card"><h2 style="margin-top:0">Kriterien und Gewichte</h2><p class="small muted" style="margin:0">Mathe nach SILP Mathe 4.2, Sport nach SILP Sport Kap. 3. Ankertexte siehst du beim Erfassen über das Fragezeichen.</p>
   <label class="swr"><span class="grow">Hausaufgaben (LZ-Aufgaben) bewerten<span class="sub">Aus, solange es an der Schule keine Hausaufgaben gibt.</span></span><input type="checkbox" class="sw" ${db.hausa?"checked":""} onchange="db.hausa=this.checked;save();render()"></label>
   <label class="swr"><span class="grow">Werkzeuge bewerten<span class="sub">Dann steht „Werkzeuge“ mit in der Runde.</span></span><input type="checkbox" class="sw" ${db.werkz?"checked":""} onchange="db.werkz=this.checked;save();render()"></label>
   <div class="sub" style="margin:14px 0 4px;font-weight:700">Gewicht im Notenvorschlag</div><p class="small muted" style="margin:0 0 6px">Jedes Kriterium zählt einmal, egal wie oft du es erfasst. Qualität zählt standardmäßig doppelt, damit Qualität vor Beteiligung geht. Hier kannst du das ändern.</p>
-  ${["Mathe","Sport"].map(f=>`<div class="sub" style="margin:10px 0 0;font-weight:700">${f}</div>${f==="Sport"?`<p class="small muted" style="margin:0 0 4px">Der SILP Sport nennt keine Gewichtung. Vorschlag: Motorik 50 %, Wissen 10 %, Sozial- und Arbeitsverhalten je 20 % (5 : 1 : 2 : 2).</p>`:""}`+kritGew(f).map(K=>`<div class="row" style="margin:6px 0;flex-wrap:wrap"><span class="grow">${esc(K.t)}${K.pl?` <span class="muted small">(gesondert)</span>`:""}</span><div class="pick" style="grid-template-columns:repeat(${GWS(f).length},1fr)" role="group" aria-label="Gewicht ${esc(K.t)}">${GWS(f).map(n=>`<button class="${kgw(K.k)===n?"on":""}" aria-pressed="${kgw(K.k)===n}" onclick="setKgw(${ja(K.k)},${n})">${n}×</button>`).join("")}</div></div>`).join("")).join("")}
+  ${["Mathe","Sport"].map(f=>`<div class="sub" style="margin:10px 0 0;font-weight:700">${f}</div>${f==="Sport"?`<p class="small muted" style="margin:0 0 4px">Der SILP Sport nennt keine Gewichtung. Vorschlag: Motorik 50 %, Wissen 10 %, Sozial- und Arbeitsverhalten je 20 % (5 : 1 : 2 : 2).</p>`:""}`+kritGew(f).map(K=>`<div class="row" style="margin:6px 0;flex-wrap:wrap"><span class="grow" style="min-width:9em">${esc(K.t)}${K.pl?` <span class="muted small">(gesondert)</span>`:""}</span><div class="pick" style="grid-template-columns:repeat(${GWS(f).length},minmax(40px,1fr))" role="group" aria-label="Gewicht ${esc(K.t)}">${GWS(f).map(n=>`<button class="${kgw(K.k)===n?"on":""}" aria-pressed="${kgw(K.k)===n}" onclick="setKgw(${ja(K.k)},${n})">${n}×</button>`).join("")}</div></div>`).join("")).join("")}
   ${db.kgw?`<p style="margin:6px 0 0"><button class="btn ghost small" onclick="delete db.kgw;save();render()">Gewichte zurücksetzen</button></p>`:""}</div>
   <div class="card"><h2 style="margin-top:0">Umrechnung Stufen → Note</h2><p class="small muted" style="margin:0 0 8px">Jede Stufe zählt mit diesem Notenwert. SoMi mittelt erst je Kriterium, dann über die Kriterien (mit Gewicht). Das Ergebnis wird auf Drittel gerundet: 2,33 → 2−, 2,67 → 3+. Das Ergebnis ist ein Vorschlag.</p>
   ${Object.entries(STUF).sort((a,b)=>b[0]-a[0]).map(([v,x])=>`<div class="row" style="margin:6px 0"><label for="stw${v}" class="grow" style="margin:0"><b>${x.t}</b> ${x.l}</label><input id="stw${v}" inputmode="decimal" style="width:6em;text-align:right" value="${String(stw()[v]).replace(".",",")}" onchange="setStw('${v}',this.value)"></div>`).join("")}
@@ -1318,7 +1346,7 @@ function sichSet(){return `  ${lockV()}
   ${db.quar?.length?`<p class="small" style="color:var(--sigt);font-weight:700">${db.quar.length} beschädigte ${db.quar.length===1?"Eintrag ist":"Einträge sind"} zurückgelegt. ${db.quar.length===1?"Er bleibt":"Sie bleiben"} gespeichert und ${db.quar.length===1?"steht":"stehen"} in der Sicherung.</p>`:""}
   ${mtip("backup")}<p class="row" style="flex-wrap:wrap"><button class="btn pri${mk("backup")}" onclick="exportJSON()">Sicherung speichern</button><button class="btn" onclick="$('#imp').click()">Sicherung laden</button></p>
   <input type="file" id="imp" accept=".json,application/json" hidden onchange="importJSON(this)">
-  ${db.lock&&LKEY?`<p class="row" style="flex-wrap:wrap"><button class="btn" ${hasNames()?"":"disabled"} onclick="exportNames()">Namensliste sichern</button><button class="btn" onclick="$('#imp').click()">Namensliste laden</button></p><p class="muted small">${Object.keys(NAMES).length} Namen auf diesem Gerät. Die Namensliste ist eine eigene Datei mit demselben Passwort. Bewahre sie getrennt von der Sicherung auf.</p>`:""}
+  ${db.lock&&LKEY?`<p class="row" style="flex-wrap:wrap"><button class="btn" ${hasNames()?"":"disabled"} onclick="exportNames()">Namensliste sichern</button><button class="btn" onclick="$('#imp').click()">Namensliste laden</button></p>${namesDue()?`<p class="small" style="color:var(--sigt);font-weight:700;margin:0 0 4px">Die Namensliste wurde seit der letzten Änderung nicht gesichert.</p>`:""}<p class="muted small">${Object.keys(NAMES).length} Namen auf diesem Gerät. Die Namensliste ist eine eigene Datei mit demselben Passwort. Bewahre sie getrennt von der Sicherung auf.</p>`:""}
   <p class="muted small">${db.lastBackup?`Letzte Sicherung: ${dDEy(iso(new Date(db.lastBackup)))}. `:""}Sichere spätestens alle 3 Tage und vor jedem Gerätewechsel. Laden ergänzt nur: Neues kommt dazu, bei gleichen Einträgen gilt die neuere Fassung.</p>
   ${db.bsalt?`<p class="small">Sicherungs-Passwort ist auf diesem Gerät gemerkt. <button class="btn ghost small" onclick="forgetBackupPw()">Vergessen</button></p>`:""}
   ${mtip("demo")}<p class="row" style="flex-wrap:wrap">${db.groups.some(g=>g.demo)?`<button class="btn" onclick="delDemo()">Beispielklasse entfernen</button>`:`<button class="btn${mk("demo")}" onclick="demo()">Fiktive Beispielklasse laden</button>`}</p>
@@ -1365,7 +1393,7 @@ const backupName=()=>`somi-sicherung-${today()}.json`;
 async function exportNames(){if(!crypto.subtle||!hasNames())return;const ki=await backupKey();if(!ki)return;
   const own=Object.fromEntries(Object.entries(NAMES).filter(([k])=>{const x=susById(k);return x&&!x.demo}));
   const body=await gcm(ki.key,enc({namen:own}));
-  if(await giveFile(`somi-namen-${today()}.json`,JSON.stringify({somi:1,art:"namen",erstellt:new Date().toISOString(),salt:ki.salt,...body})))toast("Namensliste gesichert. Lege sie getrennt von der Sicherung ab.")}
+  if(await giveFile(`somi-namen-${today()}.json`,JSON.stringify({somi:1,art:"namen",erstellt:new Date().toISOString(),salt:ki.salt,...body}))){db.nmBak=Date.now();save();render();toast("Namensliste gesichert. Lege sie getrennt von der Sicherung ab.")}}
 async function exportJSON(){if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
   const ki=await backupKey();if(!ki)return;
   if(!db.backupTip&&!await backupTip())return;
@@ -1389,7 +1417,7 @@ async function importJSON(inp){const f=inp.files[0];inp.value="";if(!f)return;le
   if(!crypto.subtle)return toast("Verschlüsselung in dieser Ansicht nicht möglich. Bitte im Browser öffnen.");
   try{d=await openFile(o)}catch(e){return toast("Keine SoMi-Sicherung")}if(!d)return;
   if(o.art==="namen"||d.namen){if(!db.lock||!LKEY)return toast("Namen gehen nur mit App-Sperre. Schalte sie zuerst ein.");if(!okNames(d.namen))return toast("Namensliste beschädigt");
-    let n=0;for(const [k,v] of Object.entries(d.namen))if(susById(k)){NAMES[k]=v.trim();n++}saveNames();render();return toast(n?`${n} Namen übernommen`:"Keine passenden Kürzel. Lade zuerst die Sicherung.")}
+    let n=0;for(const [k,v] of Object.entries(d.namen))if(susById(k)){NAMES[k]=v.trim();n++}NBAD=false;if(n){db.nmUpd=db.nmBak=Date.now();save()}saveNames();render();return toast(n?`${n} Namen übernommen`:"Keine passenden Kürzel. Lade zuerst die Sicherung.")}
   if(!Array.isArray(d.groups)||!Array.isArray(d.sus))return toast("Keine SoMi-Sicherung");
   if(!Array.isArray(d.obs))d.obs=[];if(!Array.isArray(d.att))d.att=[];if(!Array.isArray(d.ka))d.ka=[];if(!Array.isArray(d.asv))d.asv=[];if(!Array.isArray(d.rl))d.rl=[];
   const ng=d.groups.length,ns=d.sus.length,no=d.obs.length,na=d.att.length,nk=d.ka.length,nv=d.asv.length,nr=d.rl.length;d.groups=d.groups.filter(okGroup);d.sus=d.sus.filter(okSus);d.obs=d.obs.filter(okObs);d.att=d.att.filter(okAtt);d.ka=d.ka.filter(okKa);d.asv=d.asv.filter(okAsv);d.rl=d.rl.filter(okRl);
@@ -1455,6 +1483,8 @@ async function offLock(){if(!await ask("App-Sperre wirklich ausschalten?",{ok:"A
 // 0.5.10: Beim Sperren verschwinden Schlüssel, Noten und Namen aus dem Arbeitsspeicher. Die Sperre ist dann mehr als ein Vorhang.
 function lockNow(){if(!db.lock)return;
   if(LKEY&&!ENCWAIT&&!WIPED){save();WIPED=true;LKEY=null;NAMES={};db={...leer(),lock:{...db.lock},theme:db.theme,fs:db.fs,lastBackup:db.lastBackup}}
+  // 0.5.13: Die zuletzt gezeigte Seite bleibt nicht hinter dem Sperrbildschirm liegen, der Sichtschutz ist danach wieder an
+  SHOW=false;const a=$("#app");if(a)a.innerHTML="";const nv=$("#nav");if(nv)nv.innerHTML="";
   LOCKED=true;LOCKIN="";document.body.classList.add("locked");document.activeElement?.blur?.();renderLock()}
 function renderLock(msg,busy){let el=$("#lock");if(!LOCKED){el?.remove();return}
   if(!el){el=document.createElement("div");el.id="lock";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","SoMi ist gesperrt");document.body.appendChild(el)}

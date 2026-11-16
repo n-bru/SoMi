@@ -44,6 +44,13 @@ const ANSICHTEN=[
   {name:"einstellungen",titel:"Einstellungen",js:`go({tab:"profil"})`,voll:true},
   {name:"noten-berechnen",titel:"Noten berechnen",js:`go({tab:"profil",sub:"noten"})`,voll:true},
   {name:"sperre-daten",titel:"Sperre und Daten",js:`go({tab:"profil",sub:"sich"})`,voll:true},
+  // 0.5.13 ergänzt: Diese Ansichten fehlten, so blieb ein Überlauf in der Klassenarbeiten-Liste unbemerkt.
+  {name:"ka-liste",titel:"Klassenarbeiten",js:`go({tab:"gruppen",group:${GM}.id,ka:${GM}.id})`,voll:true},
+  {name:"gesondert",titel:"Präsentation, Heft, Übung",js:`go({tab:"gruppen",group:${GM}.id,ka:${GM}.id,plm:true})`,voll:true},
+  {name:"ruecklauf",titel:"Rückläufe",js:`go({tab:"gruppen",group:${GM}.id,rl:${GM}.id})`,voll:true},
+  {name:"klassenliste",titel:"Klassenliste",js:`go({tab:"gruppen",kl:db.sus.find(s=>s.demo).code.split("-")[0]})`,voll:true},
+  // Sperrbildschirm zuletzt: Die Sperre bleibt im Speicher dieses Geräts, danach käme jede Ansicht gesperrt.
+  {name:"gesperrt",titel:"Sperrbildschirm",js:`(async()=>{const salt=b64(rnd(16));LKEY=await codeKey("2468",salt);db.lock={salt,len:4,after:1};save();await SAVEQ;lockNow()})()`},
 ];
 
 // Läuft im Browser: sucht Probleme in der aktuellen Ansicht.
@@ -77,7 +84,7 @@ function pruefen(){
 (async()=>{fs.rmSync(out,{recursive:true,force:true});fs.mkdirSync(out,{recursive:true});
   const b=await chromium.launch(),bericht=[];let fehlerZahl=0,hinweisZahl=0;
   for(const g of GERAETE){
-    const ctx=await b.newContext({viewport:{width:g.w,height:g.h},isMobile:g.mobil,hasTouch:g.mobil,deviceScaleFactor:1,colorScheme:g.dunkel?"dark":"light"});
+    const ctx=await b.newContext({viewport:{width:g.w,height:g.h},isMobile:g.mobil,hasTouch:g.mobil,deviceScaleFactor:1,colorScheme:g.dunkel?"dark":"light",locale:"de-DE"});
     // Jede Ansicht auf einer frischen Seite: Ein Ganzseiten-Foto schaltet in Chromium die Touch-Nachbildung ab,
     // danach würden die Touch-Regeln der App (Tippziele 40 px) nicht mehr greifen.
     const konsole=[];

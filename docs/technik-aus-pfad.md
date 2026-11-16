@@ -2,14 +2,14 @@
 
 SoMi teilt sich die Technik mit Pfad (hbg-pfad/pfad). Es gibt keine gemeinsame Bibliothek: Die Bausteine sind aus `quelle/pfad.html` kopiert und angepasst. Wird ein Baustein in Pfad korrigiert, hier prüfen und nachziehen.
 
-Stand der Kopie: Pfad 1.1.3 (26.10.2026), Technik-Korrekturen nachgezogen bis Pfad 1.2.6 (05.11.2026): Offline zuerst mit Knopf „Aktualisieren“ (1.2.0/1.2.1), Abstand oben in der Home-Bildschirm-App ohne festen Streifen (1.1.8/1.2.6), kein Nachfedern (1.2.5). Nicht übernommen: Team-Passwort (1.1.5), Sicherungs-Zeile auf „Heute“ (1.1.6), Upload-Paket (1.2.0).
+Stand der Kopie: Pfad 1.1.3 (26.10.2026), Technik-Korrekturen abgeglichen bis Pfad 1.3.8 (16.11.2026): Offline zuerst mit Knopf „Aktualisieren“ (1.2.0/1.2.1), Abstand oben in der Home-Bildschirm-App ohne festen Streifen (1.1.8/1.2.6), kein Nachfedern (1.2.5). Nicht übernommen: Team-Passwort (1.1.5), Sicherungs-Zeile auf „Heute“ (1.1.6), Upload-Paket (1.2.0).
 
 | Baustein in Pfad | In SoMi | Anpassung |
 |---|---|---|
 | Content-Security-Policy | gleich | – |
-| `load`, `save` mit verschlüsseltem Umschlag | gleich | Schlüssel `somi-v1`, Feld `somiEnc` |
+| `load`, `save` mit verschlüsseltem Umschlag | abweichend seit SoMi 0.5.10 | SoMi speichert in IndexedDB (`rawRead`, `rawWrite`, Umzug mit Gegenlesen), Pfad noch in localStorage. Schlüssel `somi-v1`, Feld `somiEnc` |
 | `esc`, `ja`, `okId`, `okDate`, `okStr`, `okNum` | gleich | neu: `okSus`, `okGroup`, `okSetting` für SoMi-Daten |
-| `toast`, `undoToast`, `dlg`, `ask`, `askText` | gleich | `ask` mit Untertitel |
+| `toast`, `undoToast`, `dlg`, `ask`, `askText` | gleich | `ask` mit Untertitel. `dlg` seit SoMi 0.5.13 / Pfad 1.3.8: Escape, Tab bleibt im Dialog, Tipp daneben schließt nicht bei Textfeld |
 | `go`, `back`, `navTo`, `renderNav` | gleich | eigene Bereiche |
 | `applyTheme`, Hell/Dunkel, Schriftgröße | gleich | – |
 | Design B (Formen, Abstände, Bausteine) | angepasst | eigene Farben „Tafelgrün“ und eigenes Logo, nicht Sopäd-Team-Design |
@@ -18,7 +18,7 @@ Stand der Kopie: Pfad 1.1.3 (26.10.2026), Technik-Korrekturen nachgezogen bis Pf
 | `pwKey`, `gcm`, `ungcm`, `idb*`, `askNewPw`, `backupKey`, `forgetBackupPw` | gleich | IndexedDB `somi` |
 | `sealFile`, `openFile`, `exportJSON`, `backupTip`, `giveFile`, `download` | angepasst | Format `{somi:1}`, keine alten unverschlüsselten Formate |
 | Zusammenführen beim Laden (neuere Fassung gewinnt, Löschungen gelten) | angepasst | `mergeList` pro Lerngruppe und Schüler:in |
-| App-Sperre (`codeKey`, `tryCode`, `askCode`, `setLock`, `offLock`, `lockNow`, `renderLock`, `lockPress`, `lockForgot`, Fehlversuche) | gleich | in SoMi Standard an, Ausschalten mit Warnung |
+| App-Sperre (`codeKey`, `tryCode`, `askCode`, `setLock`, `offLock`, `lockNow`, `renderLock`, `lockPress`, `lockForgot`, Fehlversuche) | gleich | in SoMi Standard an, Ausschalten mit Warnung. Sperren räumt Daten und Schlüssel aus dem Speicher (SoMi 0.5.10 / Pfad 1.3.7) und leert die Ansicht (SoMi 0.5.13 / Pfad 1.3.8) |
 | Symbole (`ICONS`, `freeIcon`, `pickIcon`) | gleich | frei pro Klasse statt global |
 | Bauwege `beta-bauen.py`, `hauptversion-freigeben.py` | angepasst | Namen und Schlüssel |
 | PDF-Erzeugung (`HW`, `HBW`, `WINA`, `pdfTxt`, `Pdf`) | gleich (ab SoMi 0.5.2, Stand Pfad 1.2.6) | eigene Farben `PC`, `pdfTxt` wandelt − in -; Inhalt `susPdf` neu |

@@ -5,6 +5,9 @@ Aufruf (im Repo-Ordner): python3 werkzeuge/hauptversion-freigeben.py <cache-name
 import sys, re, shutil, pathlib
 repo = pathlib.Path(__file__).resolve().parent.parent; cache = sys.argv[1]
 assert cache.startswith("somi-") and not cache.startswith("somi-beta"), "Cache-Name wie somi-0.2.0"
+# Der Cache-Name muss zur Version in der Quelldatei passen, sonst laden Geräte die neue Fassung nicht
+_v = re.search(r'const SOMI_VERSION="([^"]+)"', (repo / "quelle" / "somi.html").read_text()).group(1)
+assert cache == "somi-" + _v, f"Cache-Name {cache} passt nicht zur Version {_v} in quelle/somi.html (erwartet: somi-{_v})"
 src = repo / "quelle" / "somi.html"
 assert 'const KEY="somi-v1";' in src.read_text(), "Speicher-Schlüssel der Hauptversion fehlt"
 shutil.copy(src, repo / "index.html")
