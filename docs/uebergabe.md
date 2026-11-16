@@ -16,13 +16,14 @@
 
 ## Stand
 
-- Hauptversion 0.5.13 (Freigabe durch Nick am 16.11.2026) = Beta 0.5.13. Enthält alle SoMi-Punkte aus dem zweiten Prüfbericht (https://claude.ai/artifact/NKkgN5dbQKkFBthLEazS7t): Runde wird nach Neustart fortgesetzt, ein Zeitraum für Übersicht, Kürzel-Seite und PDF mit freiem Stichtag „Ab …“, Sperre leert die Ansicht, Namensliste wird bei Lesefehler nicht überschrieben.
+- Hauptversion 0.6.0 (Freigabe durch Nick am 16.11.2026) = Beta 0.6.0: neues Aussehen nach den Designvorschlägen (https://claude.ai/artifact/84j1AKTpniuFAtDBxEB8VH, Nicks Auswahl A, B, C nur für Umschalter oben und in den Einstellungen, D). Sonst wie 0.5.13.
+- Vorher: Hauptversion 0.5.13 (Freigabe durch Nick am 16.11.2026) = Beta 0.5.13. Enthält alle SoMi-Punkte aus dem zweiten Prüfbericht (https://claude.ai/artifact/NKkgN5dbQKkFBthLEazS7t): Runde wird nach Neustart fortgesetzt, ein Zeitraum für Übersicht, Kürzel-Seite und PDF mit freiem Stichtag „Ab …“, Sperre leert die Ansicht, Namensliste wird bei Lesefehler nicht überschrieben.
 - Entscheidungen (03.11.2026): nur für Nick; eigene Adresse n-bru.github.io/SoMi; App-Sperre standardmäßig an; Klassenarbeiten gehören dazu; Hausaufgaben als abschaltbares Kriterium; Notenskala 1 bis 6 mit + und −; Aufbewahrung 5 Jahre, Löschen nur nach Rückfrage; LE kann Noten bekommen.
 - Kriterien: Mathe nach SILP Mathe 4.2/4.3 (Stand 09/2026), Sport nach SILP Sport Kap. 3 (Stand 03/2021, veraltet).
 
 ## Offene Punkte
 
-1. **iPad-Test der Hauptversion 0.5.13** (Nick): Runde beenden und neu öffnen (wird fortgesetzt), Zeitraum „Ab …“, Sperre, Punkte eintragen bei Sichtschutz.
+1. **iPad-Test der Hauptversion 0.6.0** (Nick): neues Aussehen hell und dunkel, Rückfragen auf dem iPhone von unten. Außerdem aus 0.5.13: Runde beenden und neu öffnen (wird fortgesetzt), Zeitraum „Ab …“, Sperre, Punkte eintragen bei Sichtschutz.
 6. **Speichern bei sehr großem Bestand** (Prüfbericht 2, S14): nur beobachten. Wird das Tippen nach einem Schuljahr träge, archivierte Lerngruppen getrennt speichern.
 7. **Design:** Vorschläge nach dem Vorbild der Claude-iPhone-App liegen als Seite mit Bildern vor (Link im Thread „SoMi und Pfad komplett prüfen“), Nick wählt aus.
 2. **Hauptversion** nur auf Nicks Kommando (`python3 werkzeuge/hauptversion-freigeben.py somi-<version>`). Vorher eine Sicherung speichern.

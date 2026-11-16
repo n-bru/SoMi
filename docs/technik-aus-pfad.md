@@ -7,7 +7,7 @@ Stand der Kopie: Pfad 1.1.3 (26.10.2026), Technik-Korrekturen abgeglichen bis Pf
 | Baustein in Pfad | In SoMi | Anpassung |
 |---|---|---|
 | Content-Security-Policy | gleich | – |
-| `load`, `save` mit verschlüsseltem Umschlag | abweichend seit SoMi 0.5.10 | SoMi speichert in IndexedDB (`rawRead`, `rawWrite`, Umzug mit Gegenlesen), Pfad noch in localStorage. Schlüssel `somi-v1`, Feld `somiEnc` |
+| `load`, `save` mit verschlüsseltem Umschlag | gleich seit Pfad 1.4.0 | Beide speichern in IndexedDB (`rawRead`, `rawWrite`, Umzug mit Gegenlesen). Schlüssel `somi-v1`, Feld `somiEnc` |
 | `esc`, `ja`, `okId`, `okDate`, `okStr`, `okNum` | gleich | neu: `okSus`, `okGroup`, `okSetting` für SoMi-Daten |
 | `toast`, `undoToast`, `dlg`, `ask`, `askText` | gleich | `ask` mit Untertitel. `dlg` seit SoMi 0.5.13 / Pfad 1.3.8: Escape, Tab bleibt im Dialog, Tipp daneben schließt nicht bei Textfeld |
 | `go`, `back`, `navTo`, `renderNav` | gleich | eigene Bereiche |
